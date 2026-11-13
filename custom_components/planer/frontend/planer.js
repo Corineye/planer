@@ -453,11 +453,104 @@ li.aufgabe.farbig .zeile{border-left:4px solid var(--b)}
 .farben{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
 .farben label{display:flex;gap:8px;align-items:center;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:4px 10px}
 .farben input[type=color]{width:36px;height:28px;border:0;background:none;padding:0}
+
+/* ===== Liquid Glass: Glas nur für Navigation und Bedienelemente, Inhalt bleibt auf festen Karten ===== */
+:host{
+  --glas:rgba(255,255,255,.62); --glas-rand:rgba(255,255,255,.75); --glas-schatten:0 8px 32px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.06);
+  --glas-blur:blur(22px) saturate(180%); --karte-schatten:0 1px 3px rgba(0,0,0,.06),0 1px 1px rgba(0,0,0,.04);
+  --wahl:rgba(0,122,255,.14);
+  background:
+    radial-gradient(60vmax 40vmax at 10% -10%,rgba(0,122,255,.10),transparent 60%),
+    radial-gradient(50vmax 40vmax at 100% 10%,rgba(175,82,222,.08),transparent 60%),
+    radial-gradient(60vmax 50vmax at 50% 110%,rgba(52,199,89,.07),transparent 60%),
+    var(--bg);
+  background-attachment:fixed;
+}
+@media (prefers-color-scheme:dark){:host{
+  --glas:rgba(44,44,48,.55); --glas-rand:rgba(255,255,255,.14); --glas-schatten:0 8px 32px rgba(0,0,0,.5),0 1px 2px rgba(0,0,0,.4);
+  --karte-schatten:none; --wahl:rgba(10,132,255,.28);
+  background:
+    radial-gradient(60vmax 40vmax at 10% -10%,rgba(10,132,255,.20),transparent 60%),
+    radial-gradient(50vmax 40vmax at 100% 10%,rgba(191,90,242,.14),transparent 60%),
+    radial-gradient(60vmax 50vmax at 50% 110%,rgba(48,209,88,.10),transparent 60%),
+    var(--bg);
+  background-attachment:fixed;
+}}
+.glas,.seg,nav.tabs,.knopf:not(.primaer),.menu,.rund{background:var(--glas);-webkit-backdrop-filter:var(--glas-blur);backdrop-filter:var(--glas-blur);border:1px solid var(--glas-rand);box-shadow:var(--glas-schatten)}
+@media (prefers-reduced-transparency:reduce){.glas,.seg,nav.tabs,.knopf:not(.primaer),.menu,.rund{background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none}}
+.seg{border-radius:999px;padding:3px;gap:2px}
+.seg button{border-radius:999px;min-height:38px;padding:6px 14px;color:var(--fg);transition:background .2s ease}
+.seg button[aria-pressed="true"]{background:var(--wahl);color:var(--mint)}
+.knopf{border-radius:999px;font-weight:500;transition:transform .12s ease,background .2s ease}
+.knopf:active,.seg button:active,nav.tabs button:active{transform:scale(.96)}
+.knopf.primaer{border-radius:999px;box-shadow:0 4px 14px color-mix(in srgb,var(--mint) 40%,transparent)}
+.knopf:hover{border-color:var(--glas-rand);filter:brightness(1.04)}
+.knopf svg,nav.tabs svg,.rund svg{width:20px;height:20px;flex:none}
+.knopf{display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.rund{width:44px;height:44px;border-radius:50%;display:inline-grid;place-items:center;cursor:pointer;color:var(--mint);padding:0}
+.menu{border-radius:50%}
+header{gap:4px 12px}
+header .titel-block{display:grid;gap:0;min-width:0}
+header .eyebrow{font-size:.8125rem;font-weight:600;color:var(--mint);letter-spacing:.02em}
+header h1{font-size:2.125rem;line-height:1.15}
+header .datum{font-size:.9375rem}
+.eingabe input{border-radius:999px;background:var(--card);border:1px solid var(--line);box-shadow:var(--karte-schatten);padding:0 20px}
+.zeile,.termin,.wtag,.mtag,.leer,.person-einst{box-shadow:var(--karte-schatten)}
+.zeile{border-radius:16px;background:var(--card);border-color:transparent}
+.termin{background:var(--card);border-color:transparent;border-radius:14px}
+.wtag,.mtag{background:var(--card);border-color:transparent}
+.gruppe h2{letter-spacing:.04em;text-transform:none;font-size:1.0625rem;color:var(--fg);font-weight:700}
+.gruppe h2 .zahl{font-size:.8125rem;color:var(--muted);font-weight:500}
+nav.tabs{border-radius:999px;padding:4px;gap:2px;width:max-content;max-width:100%}
+nav.tabs button{border-radius:999px;color:var(--fg);border:0;min-height:40px;padding:6px 16px}
+nav.tabs button[aria-current="page"]{background:var(--wahl);color:var(--mint);border:0}
+nav.tabs .zahl{background:var(--fill);color:var(--muted)}
+dialog{border-radius:24px;border:1px solid var(--glas-rand);box-shadow:0 24px 64px rgba(0,0,0,.3)}
+.schmal .wrap{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))}
+.schmal nav.tabs{left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));width:auto;border-radius:999px;padding:5px;border-top:1px solid var(--glas-rand);background:var(--glas)}
+.schmal nav.tabs button{gap:2px;font-size:.6875rem;font-weight:600;padding:6px 2px;min-height:52px;position:relative}
+.schmal nav.tabs button svg{width:24px;height:24px}
+.schmal nav.tabs .zahl{position:absolute;top:2px;left:calc(50% + 6px);font-size:.625rem;padding:0 5px;line-height:1.5;background:var(--mint);color:var(--on-mint)}
+.schmal nav.tabs .zahl.null{display:none}
+.schmal header{flex-wrap:nowrap;align-items:flex-start}
+.schmal header .rechts{order:0;width:auto;margin-left:auto;flex:none}
+.schmal header .titel-block{flex:1}
+.filterzeile .seg{width:100%}
+.filterzeile .seg button{flex:1}
+.meta{flex-wrap:wrap;min-width:0}
+.chip{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.schmal header h1{font-size:2.125rem}
+.termin.block{border:1px dashed var(--line2);background:transparent;box-shadow:none}
+.kalumschalter{width:max-content}
+.schmal .eingabe .knopf{width:48px;min-width:48px;height:48px;min-height:48px;padding:0}
+.schmal .eingabe input{min-height:48px}
+.schmal .bereiche button{min-height:34px;padding:4px 12px;font-size:.875rem}
+.schmal .monat{min-width:0;gap:3px}
+.schmal .mtag{min-height:58px;padding:5px 4px;border-radius:10px;gap:3px}
+.schmal .mkopf{padding:2px 2px;text-align:center;letter-spacing:.02em}
+.schmal .mnr{text-align:center}
+.schmal .mpunkt{font-size:0;height:4px;padding:0;border-left:0;background:var(--k,var(--mint));border-radius:2px}
+.schmal .mpunkt.aufg{background:var(--muted)}
+.schmal .mmehr{font-size:.625rem;text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media (forced-colors:active){.haken[aria-checked="true"]{forced-color-adjust:none;background:Highlight}}
 `;
 
 const HAKEN = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+
+const ICON = {
+  heute: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16.5 9.5"/></svg>`,
+  woche: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>`,
+  demnaechst: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>`,
+  eingang: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 13.5l2.6-7.2A2 2 0 0 1 8 5h8a2 2 0 0 1 1.9 1.3l2.6 7.2V18a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/><path d="M3.5 13.5H8l1.5 2.5h5l1.5-2.5h4.5"/></svg>`,
+  einkauf: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2.2l2.3 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6.3"/><circle cx="10" cy="20.5" r="1.2"/><circle cx="17" cy="20.5" r="1.2"/></svg>`,
+  plus: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`,
+  regler: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>`,
+  termin: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></svg>`,
+  einstellungen: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>`,
+  menu: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>`,
+};
 
 class PlanerPanel extends HTMLElement {
   constructor() {
@@ -472,6 +565,7 @@ class PlanerPanel extends HTMLElement {
     try {
       this._ansicht = localStorage.getItem("planer.ansicht") || "heute";
       this._kalAnsicht = localStorage.getItem("planer.kalansicht") || "monat";
+      this._eListe = localStorage.getItem("planer.eliste") || "";
       this._filter = localStorage.getItem("planer.filter") || "ich";
       this._bereich = localStorage.getItem("planer.bereich") || "";
     } catch (e) { /* ohne Speicher weiter */ }
@@ -480,6 +574,11 @@ class PlanerPanel extends HTMLElement {
   set hass(h) {
     const erst = !this._hass;
     this._hass = h;
+    const el = this._daten && this._eListeId();
+    if (el && this._eArtikel?.liste === el && h.states[el]?.last_updated !== this._eStand) {
+      this._eStand = h.states[el]?.last_updated;
+      this._einkaufLaden(true);
+    }
     if (erst && this.isConnected) this._start();
   }
   set narrow(n) { this._narrow = n; if (this._daten) this._zeichnen(); }
@@ -613,8 +712,11 @@ class PlanerPanel extends HTMLElement {
       demnaechst: offen.filter((a) => a.datum && a.datum > h).length,
       eingang: offen.filter((a) => !a.datum).length,
       woche: offen.filter((a) => a.datum && a.datum >= iso(montag(new Date())) && a.datum <= iso(plusTage(montag(new Date()), 6))).length,
+      einkauf: (this._eArtikel?.liste === this._eListeId() ? this._eArtikel.items.filter((x) => !x.erledigt).length : 0),
     };
     const tabs = [["heute", "Heute"], ["woche", "Kalender"], ["demnaechst", "Demnächst"], ["eingang", "Eingang"]];
+    if ((d.einkauf_listen || []).length) tabs.push(["einkauf", "Einkauf"]);
+    if (this._ansicht === "einkauf" && !(d.einkauf_listen || []).length) this._ansicht = "heute";
     const heuteD = new Date();
     const filterKnoepfe = d.andere_sehen
       ? `<div class="seg" role="group" aria-label="Wessen Aufgaben">
@@ -627,34 +729,38 @@ class PlanerPanel extends HTMLElement {
     <div class="wrap">
       <header>
         ${this._menuKnopf()}
-        <h1>Planer</h1>
-        <span class="datum">${WOCHENTAGE[wt(heuteD)]}, ${heuteD.getDate()}. ${MONATE[heuteD.getMonth()]}</span>
+        <div class="titel-block">
+          <span class="eyebrow">Planer · ${WOCHENTAGE[wt(heuteD)]}, ${heuteD.getDate()}. ${MONATE[heuteD.getMonth()]}</span>
+          <h1>${esc((tabs.find(([k]) => k === this._ansicht) || tabs[0])[1])}</h1>
+        </div>
         <div class="rechts">
-          ${filterKnoepfe}
-          ${d.admin ? `<button type="button" class="knopf" data-aktion="einstellungen" data-fokus="einst">Einstellungen</button>` : ""}
+          ${this._ansicht === "einkauf" || schmal ? "" : filterKnoepfe}
+          ${d.admin ? `<button type="button" class="rund" data-aktion="einstellungen" data-fokus="einst" aria-label="Einstellungen" title="Einstellungen">${ICON.einstellungen}</button>` : ""}
         </div>
       </header>
+      ${schmal && this._ansicht !== "einkauf" && filterKnoepfe ? `<div class="filterzeile">${filterKnoepfe}</div>` : ""}
 
-      <form class="schnell" id="schnellform" autocomplete="off">
+      <form class="schnell" id="schnellform" autocomplete="off" ${this._ansicht === "einkauf" ? "hidden" : ""}>
         <label class="sr" for="schnell">Neue Aufgabe</label>
         <div class="eingabe">
           <input id="schnell" data-fokus="schnell" placeholder="Neue Aufgabe, z. B. morgen 15 Uhr !1 Filament bestellen #werkstatt" aria-describedby="vorschau tipp" enterkeyhint="done">
-          <button class="knopf primaer" type="submit" aria-label="Aufgabe hinzufügen">${schmal ? "＋" : "Aufgabe"}</button>
-          <button class="knopf" type="button" data-aktion="erweitert" aria-label="Aufgabe mit allen Einstellungen anlegen">${schmal ? "⚙" : "Erweitert"}</button>
-          ${(d.kalender || []).some((k) => k.schreiben) ? `<button class="knopf" type="button" data-aktion="termin" aria-label="Als Termin in den Kalender eintragen">${schmal ? "📅" : "Termin"}</button>` : ""}
+          <button class="knopf primaer" type="submit" aria-label="Aufgabe hinzufügen">${ICON.plus}${schmal ? "" : "Aufgabe"}</button>
+          <button class="knopf" type="button" data-aktion="erweitert" aria-label="Aufgabe mit allen Einstellungen anlegen" title="Erweitert">${ICON.regler}${schmal ? "" : "Erweitert"}</button>
+          ${(d.kalender || []).some((k) => k.schreiben) ? `<button class="knopf" type="button" data-aktion="termin" aria-label="Termin in den Kalender eintragen" title="Termin">${ICON.termin}${schmal ? "" : "Termin"}</button>` : ""}
         </div>
         <div class="hinweis" id="vorschau" aria-live="polite"></div>
         <span class="sr" id="tipp">Erkennt heute, morgen, Wochentage, Datum wie 24.12., Uhrzeit wie 15 Uhr, !1 bis !3 für Top 3, # für Bereich, @ für Person und Wiederholungen wie jeden Montag oder täglich. Taste N springt hierher.</span>
       </form>
 
       <nav class="tabs" aria-label="Ansichten">
-        ${tabs.map(([k, t]) => `<button type="button" data-ansicht="${k}" data-fokus="t-${k}" ${this._ansicht === k ? 'aria-current="page"' : ""}>${t} <span class="zahl" aria-label="${zaehler[k]} offen">${zaehler[k]}</span></button>`).join("")}
+        ${tabs.map(([k, t]) => `<button type="button" data-ansicht="${k}" data-fokus="t-${k}" ${this._ansicht === k ? 'aria-current="page"' : ""}>${ICON[k] || ""}<span>${t}</span> <span class="zahl ${!zaehler[k] ? "null" : ""}" aria-label="${zaehler[k]} offen">${zaehler[k]}</span></button>`).join("")}
       </nav>
 
       ${(() => {
         const liste = [...new Set(d.aufgaben.filter((a) => a.status === "offen").flatMap((a) => [a.bereich, ...(a.tags || [])]).filter(Boolean))].sort();
         if (this._bereich && !liste.includes(this._bereich)) liste.push(this._bereich);
         if (!liste.length) return "";
+        if (this._ansicht === "einkauf") return "";
         return `<div class="seg bereiche" role="group" aria-label="Nach Bereich filtern">
           <button type="button" data-bereich="" data-fokus="b-alle" aria-pressed="${!this._bereich}">Alle Bereiche</button>
           ${liste.map((x) => `<button type="button" data-bereich="${esc(x)}" data-fokus="b-${esc(x)}" aria-pressed="${this._bereich === x}" style="--b:${bereichFarbe(x, d.farben)}"><span class="punkt" aria-hidden="true"></span>${esc(x[0].toUpperCase() + x.slice(1))}</button>`).join("")}
@@ -680,7 +786,7 @@ class PlanerPanel extends HTMLElement {
   }
 
   _menuKnopf() {
-    return this._narrow ? `<button type="button" class="menu" id="menu" aria-label="Seitenleiste öffnen">☰</button>` : "";
+    return this._narrow ? `<button type="button" class="menu rund" id="menu" aria-label="Seitenleiste öffnen" style="color:var(--fg)">${ICON.menu}</button>` : "";
   }
   _menuBinden() {
     const m = this.shadowRoot.getElementById("menu");
@@ -689,6 +795,7 @@ class PlanerPanel extends HTMLElement {
 
   _ansichtHtml(alle, offen) {
     const h = this._tag;
+    if (this._ansicht === "einkauf") return this._einkaufHtml();
     if (this._ansicht === "eingang") {
       const liste = this._sortiert(offen.filter((a) => !a.datum));
       return this._gruppe("Eingang", liste, "Der Eingang ist leer. Alles ohne Datum landet hier, auch was du per Sprache oder in der HA-App zur Planer-Liste hinzufügst.");
@@ -740,6 +847,93 @@ class PlanerPanel extends HTMLElement {
     return `<div class="spalten"><div>${html}</div>${kal}</div>`;
   }
 
+  // ---------- Einkauf (Bring! und andere To-do-Listen) ----------
+  _eListeId() {
+    const listen = this._daten?.einkauf_listen || [];
+    return (listen.find((l) => l.id === this._eListe) || listen[0] || {}).id;
+  }
+
+  async _einkaufLaden(still) {
+    const liste = this._eListeId();
+    if (!liste || this._eLaedt === liste) return;
+    this._eLaedt = liste;
+    try {
+      const items = await this._hass.callWS({ type: "planer/einkauf", liste });
+      this._eArtikel = { liste, items, fehler: null };
+    } catch (e) {
+      this._eArtikel = { liste, items: [], fehler: e.message || "Liste konnte nicht geladen werden." };
+    }
+    this._eLaedt = null;
+    this._eStand = this._hass.states[liste]?.last_updated;
+    if (!still || this._ansicht === "einkauf") this._zeichnen();
+  }
+
+  _einkaufHtml() {
+    const listen = this._daten.einkauf_listen || [];
+    const liste = this._eListeId();
+    const geladen = this._eArtikel?.liste === liste ? this._eArtikel : null;
+    if (!geladen) this._einkaufLaden();
+    const name = (listen.find((l) => l.id === liste) || {}).name || "Einkauf";
+    const offen = geladen ? geladen.items.filter((x) => !x.erledigt) : [];
+    const fertig = geladen ? geladen.items.filter((x) => x.erledigt) : [];
+    const zeile = (x) => `<li class="aufgabe ${x.erledigt ? "erledigt" : ""}"><div class="zeile">
+        <button type="button" class="haken" role="checkbox" aria-checked="${x.erledigt}" data-ehaken="${esc(x.uid)}" data-fokus="eh-${esc(x.uid)}" aria-label="${esc(x.text)} ${x.erledigt ? "wieder auf die Liste" : "gekauft"}">${x.erledigt ? HAKEN : ""}</button>
+        <div class="inhalt" style="cursor:default"><span class="titel">${esc(x.text)}</span>${x.beschreibung ? `<span class="meta"><span class="muted">${esc(x.beschreibung)}</span></span>` : ""}</div>
+        <button type="button" class="knopf klein" data-eweg="${esc(x.uid)}" aria-label="${esc(x.text)} löschen">✕</button>
+      </div></li>`;
+    return `${listen.length > 1 ? `<div class="seg" role="group" aria-label="Einkaufsliste wählen">${listen.map((l) => `<button type="button" data-eliste="${esc(l.id)}" aria-pressed="${l.id === liste}">${esc(l.name)}</button>`).join("")}</div>` : ""}
+      <section class="gruppe" aria-labelledby="e-titel">
+        <h2 id="e-titel">${esc(name)} <span class="zahl">${offen.length}</span></h2>
+        <form class="eingabe" id="eform" autocomplete="off">
+          <label class="sr" for="e-neu">Artikel hinzufügen</label>
+          <input id="e-neu" data-fokus="e-neu" placeholder="Artikel, z. B. Milch, 2 Liter" enterkeyhint="done">
+          <button class="knopf primaer" type="submit">${this._narrow ? "＋" : "Hinzufügen"}</button>
+        </form>
+        <p class="hinweis" style="display:block">Nach dem Komma steht die Menge oder ein Hinweis. Alles ist sofort auch in der Bring!-App.</p>
+        ${geladen?.fehler ? `<p class="leer" role="alert">${esc(geladen.fehler)}</p>` : ""}
+        ${!geladen ? `<p class="hinweis" role="status">Liste wird geladen …</p>` : offen.length ? `<ul class="liste">${offen.map(zeile).join("")}</ul>` : `<p class="leer">Alles eingekauft.</p>`}
+      </section>
+      ${fertig.length ? `<details class="zu"><summary>Zuletzt gekauft (${fertig.length})</summary><p class="hinweis" style="display:block">Antippen setzt den Artikel wieder auf die Liste.</p><ul class="liste">${fertig.slice(0, 40).map(zeile).join("")}</ul></details>` : ""}`;
+  }
+
+  _einkaufBinden(root) {
+    const liste = this._eListeId();
+    root.querySelectorAll("[data-eliste]").forEach((b) => b.addEventListener("click", () => {
+      this._eListe = b.dataset.eliste;
+      try { localStorage.setItem("planer.eliste", this._eListe); } catch (e) { /* egal */ }
+      this._zeichnen();
+    }));
+    root.getElementById("eform")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const feld = root.getElementById("e-neu");
+      const roh = feld.value.trim();
+      if (!roh) return;
+      const i = roh.indexOf(",");
+      const text = i > 0 ? roh.slice(0, i).trim() : roh;
+      const beschreibung = i > 0 ? roh.slice(i + 1).trim() : "";
+      feld.value = "";
+      try {
+        await this._ws({ type: "planer/einkauf_aktion", liste, art: "hinzufuegen", text, ...(beschreibung ? { beschreibung } : {}) });
+        this._sagen(`${text} hinzugefügt`);
+      } catch (err) { this._sagen(err.message || "Hinzufügen hat nicht geklappt"); }
+      await this._einkaufLaden();
+      this.shadowRoot.getElementById("e-neu")?.focus();
+    });
+    const tun = async (art, uid, text) => {
+      try { await this._ws({ type: "planer/einkauf_aktion", liste, art, uid }); this._sagen(text); }
+      catch (err) { this._sagen(err.message || "Das hat nicht geklappt"); }
+      await this._einkaufLaden();
+    };
+    root.querySelectorAll("[data-ehaken]").forEach((b) => b.addEventListener("click", () => {
+      const x = this._eArtikel.items.find((y) => y.uid === b.dataset.ehaken);
+      if (x) tun(x.erledigt ? "offen" : "erledigt", x.uid, x.erledigt ? `${x.text} wieder auf der Liste` : `${x.text} gekauft`);
+    }));
+    root.querySelectorAll("[data-eweg]").forEach((b) => b.addEventListener("click", () => {
+      const x = this._eArtikel.items.find((y) => y.uid === b.dataset.eweg);
+      if (x) tun("loeschen", x.uid, `${x.text} gelöscht`);
+    }));
+  }
+
   _kalenderUmschalter() {
     const m = this._kalAnsicht === "monat";
     return `<div class="seg kalumschalter" role="group" aria-label="Kalenderansicht">
@@ -780,7 +974,7 @@ class PlanerPanel extends HTMLElement {
             ...as.map((a) => `<span class="mpunkt aufg">${esc(a.titel)}</span>`),
           ];
           const sicht = items.slice(0, 3).join("");
-          const rest = items.length > 3 ? `<span class="mmehr">+${items.length - 3} weitere</span>` : "";
+          const rest = items.length > 3 ? `<span class="mmehr">+${items.length - 3}${this._narrow ? "" : " weitere"}</span>` : "";
           return `<button type="button" role="gridcell" class="mtag ${d.getMonth() !== dieserMonat ? "fremd" : ""} ${t === heuteIso ? "heute" : ""}" data-mtag="${t}"
             aria-label="${esc(`${d.getDate()}. ${MONATE[d.getMonth()]}: ${ts.length} Termine, ${as.length} Aufgaben. Woche öffnen`)}">
             <span class="mnr">${d.getDate()}</span>${sicht}${rest}</button>`;
@@ -1016,6 +1210,7 @@ class PlanerPanel extends HTMLElement {
     }));
     root.querySelectorAll("[data-aktion]").forEach((b) => b.addEventListener("click", () => this._aktion(b.dataset.aktion, b.dataset.id)));
     root.querySelectorAll("li.aufgabe").forEach((li) => this._wischen(li));
+    this._einkaufBinden(root);
     root.querySelectorAll("[data-kal-ansicht]").forEach((b) => b.addEventListener("click", () => {
       this._kalAnsicht = b.dataset.kalAnsicht;
       try { localStorage.setItem("planer.kalansicht", this._kalAnsicht); } catch (e) { /* egal */ }
@@ -1315,6 +1510,10 @@ class PlanerPanel extends HTMLElement {
       ${kal.some((k) => k.anlegen) ? `<div class="feld"><label for="gk">Kalender für gemeinsame Termine</label>
         <select id="gk"><option value="">Keiner</option>${kal.filter((k) => k.anlegen).map((k) => `<option value="${esc(k.id)}" ${d.gemeinsam_kalender === k.id ? "selected" : ""}>${esc(k.name)}</option>`).join("")}</select>
         <span class="hinweis">Termine mit „Gemeinsam“ oder @gemeinsam landen hier.</span></div>` : ""}
+      ${(d.alle_todo || []).length ? `<fieldset><legend>Einkaufslisten</legend>
+        <p class="hinweis" style="display:block">Diese Listen erscheinen im Reiter „Einkauf“. Ohne Auswahl werden alle Bring!-Listen gezeigt.</p>
+        ${d.alle_todo.map((l) => `<label class="check"><input type="checkbox" data-eliste-wahl="${esc(l.id)}" ${(d.einkauf_eingestellt == null ? l.bring : d.einkauf_eingestellt.includes(l.id)) ? "checked" : ""}> ${esc(l.name)}${l.bring ? " (Bring!)" : ""}</label>`).join("")}
+      </fieldset>` : ""}
       ${(d.alle_benutzer || []).length > 2 ? `<fieldset><legend>Wer nutzt den Planer?</legend>
         <p class="hinweis" style="display:block">Nur angehakte Benutzer erscheinen im Planer. Entferne den Haken bei Konten wie Tablet, Gast oder Claude.</p>
         ${d.alle_benutzer.map((b) => `<label class="check"><input type="checkbox" data-nutzer="${esc(b.id)}" ${b.ausgeblendet ? "" : "checked"} ${b.id === d.ich ? "disabled" : ""}> ${esc(b.name)}</label>`).join("")}
@@ -1361,6 +1560,11 @@ class PlanerPanel extends HTMLElement {
       dlg.querySelectorAll("[data-farbe]").forEach((x) => { farben[x.dataset.farbe] = x.value; });
       await this._ws({ type: "planer/allgemein", werte: { farben } });
       this._sagen(`Farbe für ${f.dataset.farbe} gespeichert`);
+    }));
+    dlg.querySelectorAll("[data-eliste-wahl]").forEach((c) => c.addEventListener("change", async () => {
+      const an = [...dlg.querySelectorAll("[data-eliste-wahl]")].filter((x) => x.checked).map((x) => x.dataset.elisteWahl);
+      await this._ws({ type: "planer/allgemein", werte: { einkauf_listen: an } });
+      this._sagen("Einkaufslisten gespeichert");
     }));
     dlg.querySelectorAll("[data-nutzer]").forEach((c) => c.addEventListener("change", async () => {
       const aus = [...dlg.querySelectorAll("[data-nutzer]")].filter((x) => !x.checked).map((x) => x.dataset.nutzer);

@@ -11,7 +11,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.util import dt as dt_util
 
-from . import kalender
+from . import einkauf, kalender
 
 from .const import DOMAIN
 from .daten import Planer
@@ -43,6 +43,7 @@ def async_registrieren(hass: HomeAssistant) -> None:
     for befehl in (
         ws_lesen, ws_abonnieren, ws_speichern, ws_erledigen, ws_loeschen, ws_einstellung,
         ws_termine, ws_termin_anlegen, ws_termin_loeschen, ws_woche, ws_allgemein,
+        ws_einkauf, ws_einkauf_aktion,
     ):
         websocket_api.async_register_command(hass, befehl)
     daten["ws"] = True
@@ -76,6 +77,9 @@ async def ws_lesen(hass: HomeAssistant, connection: websocket_api.ActiveConnecti
             "wochen": p.wochen.get(user.id, {}),
             "gemeinsam_kalender": p.allgemein.get("gemeinsam_kalender"),
             "farben": p.allgemein.get("farben", {}),
+            "einkauf_listen": einkauf.gewaehlte_listen(hass, p.allgemein.get("einkauf_listen")),
+            "einkauf_eingestellt": p.allgemein.get("einkauf_listen"),
+            "alle_todo": einkauf.alle_listen(hass) if user.is_admin else [],
         },
     )
 
@@ -228,3 +232,37 @@ async def ws_woche(hass: HomeAssistant, connection: websocket_api.ActiveConnecti
 async def ws_allgemein(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
     await _planer(hass).allgemein_setzen(msg["werte"])
     connection.send_result(msg["id"], {"ok": True})
+
+
+def _einkauf_erlaubt(hass: HomeAssistant, liste: str) -> None:
+    p = _planer(hass)
+    if liste not in {x["id"] for x in einkauf.gewaehlte_listen(hass, p.allgemein.get("einkauf_listen"))}:
+        raise PermissionError("Diese Liste ist im Planer nicht freigegeben.")
+
+
+@websocket_api.websocket_command({vol.Required("type"): f"{DOMAIN}/einkauf", vol.Required("liste"): str})
+@websocket_api.async_response
+async def ws_einkauf(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    try:
+        _einkauf_erlaubt(hass, msg["liste"])
+        connection.send_result(msg["id"], await einkauf.artikel(hass, msg["liste"], connection.context(msg)))
+    except (PermissionError, KeyError, ValueError, HomeAssistantError) as err:
+        _fehler(connection, msg["id"], err)
+
+
+@websocket_api.websocket_command({
+    vol.Required("type"): f"{DOMAIN}/einkauf_aktion",
+    vol.Required("liste"): str,
+    vol.Required("art"): vol.In(["hinzufuegen", "erledigt", "offen", "loeschen"]),
+    vol.Optional("text"): str,
+    vol.Optional("beschreibung"): str,
+    vol.Optional("uid"): str,
+})
+@websocket_api.async_response
+async def ws_einkauf_aktion(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    try:
+        _einkauf_erlaubt(hass, msg["liste"])
+        await einkauf.aktion(hass, msg["liste"], msg["art"], msg, connection.context(msg))
+        connection.send_result(msg["id"], {"ok": True})
+    except (PermissionError, KeyError, ValueError, HomeAssistantError) as err:
+        _fehler(connection, msg["id"], err)
