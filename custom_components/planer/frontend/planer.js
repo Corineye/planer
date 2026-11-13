@@ -40,6 +40,114 @@ function regelText(r) {
   return "";
 }
 
+// Erinnerungen in Minuten vor Beginn
+const ERINNER_VORGABEN = [0, 15, 30, 60, 180, 1440, 2880, 10080];
+function minText(m) {
+  if (m === 0) return "Zum Zeitpunkt";
+  if (m % 10080 === 0) return `${m / 10080} ${m === 10080 ? "Woche" : "Wochen"} vorher`;
+  if (m % 1440 === 0) return `${m / 1440} ${m === 1440 ? "Tag" : "Tage"} vorher`;
+  if (m % 60 === 0) return `${m / 60} Std. vorher`;
+  return `${m} Min. vorher`;
+}
+const minKurz = (l) => (l || []).map((m) => minText(m).replace(" vorher", "")).join(", ") || "keine";
+
+// Wiederholung als Kalender-Regel (RRULE) für Google & Co.
+function rrule(r, ganztag) {
+  if (!r) return "";
+  const freq = { tag: "DAILY", woche: "WEEKLY", monat: "MONTHLY", jahr: "YEARLY" }[r.art];
+  let s = `FREQ=${freq}`;
+  if ((r.alle || 1) > 1) s += `;INTERVAL=${r.alle}`;
+  if (r.art === "woche" && r.tage && r.tage.length) s += `;BYDAY=${r.tage.map((t) => ["MO", "TU", "WE", "TH", "FR", "SA", "SU"][t]).join(",")}`;
+  if (r.bis) s += `;UNTIL=${r.bis.replace(/-/g, "")}${ganztag ? "" : "T235959"}`;
+  return s;
+}
+
+function wdhHtml(p, w = {}) {
+  return `<fieldset>
+    <legend>Wiederholung</legend>
+    <div class="reihe">
+      <div class="feld"><label for="${p}-art">Wiederholt sich</label><select id="${p}-art">
+        ${[["", "Nicht"], ["tag", "Täglich"], ["woche", "Wöchentlich"], ["monat", "Monatlich"], ["jahr", "Jährlich"]].map(([k, t]) => `<option value="${k}" ${(w.art || "") === k ? "selected" : ""}>${t}</option>`).join("")}
+      </select></div>
+      <div class="feld" id="${p}-alle-f"><label for="${p}-alle">Alle … (Abstand)</label><input id="${p}-alle" type="number" min="1" max="365" inputmode="numeric" value="${esc(w.alle || 1)}"></div>
+      <div class="feld" id="${p}-bis-f"><label for="${p}-bis">Endet am (optional)</label><input id="${p}-bis" type="date" value="${esc(w.bis || "")}"></div>
+    </div>
+    <div class="feld" id="${p}-tage-f"><span class="lbl" id="${p}-tage-l">An diesen Tagen</span>
+      <div class="tage" id="${p}-tage" role="group" aria-labelledby="${p}-tage-l">
+        ${WT_KURZ.map((t, i) => `<label><input type="checkbox" value="${i}" ${(w.tage || []).includes(i) ? "checked" : ""} aria-label="${WOCHENTAGE[i]}"><span aria-hidden="true">${t}</span></label>`).join("")}
+      </div>
+    </div>
+  </fieldset>`;
+}
+function wdhBinden(dlg, p) {
+  const $ = (id) => dlg.querySelector(`#${p}-${id}`);
+  const anpassen = () => {
+    const art = $("art").value;
+    $("alle-f").hidden = !art;
+    $("bis-f").hidden = !art;
+    $("tage-f").hidden = art !== "woche";
+  };
+  anpassen();
+  $("art").addEventListener("change", anpassen);
+}
+function wdhLesen(dlg, p) {
+  const $ = (id) => dlg.querySelector(`#${p}-${id}`);
+  const art = $("art").value;
+  if (!art) return null;
+  return {
+    art, alle: +$("alle").value || 1, bis: $("bis").value || undefined,
+    tage: art === "woche" ? [...$("tage").querySelectorAll("input:checked")].map((x) => +x.value) : undefined,
+  };
+}
+
+// Erinnerungen wählen: Vorgaben zum Ankreuzen plus eigener Wert
+function erinnHtml(p, liste, standard) {
+  const modus = standard === undefined ? "eigene" : liste == null ? "standard" : liste.length ? "eigene" : "keine";
+  const werte = [...new Set([...ERINNER_VORGABEN, ...(liste || standard || [])])].sort((a, b) => a - b);
+  const an = new Set(liste || standard || []);
+  return `<fieldset>
+    <legend>Erinnerung aufs Handy</legend>
+    ${standard !== undefined ? `<div class="schnellwahl" role="radiogroup" aria-label="Art der Erinnerung">
+      ${[["standard", `Standard (${minKurz(standard)})`], ["eigene", "Eigene"], ["keine", "Keine"]].map(([k, t]) =>
+        `<label class="check"><input type="radio" name="${p}-modus" value="${k}" ${modus === k ? "checked" : ""}> ${esc(t)}</label>`).join("")}
+    </div>` : ""}
+    <div id="${p}-eigene" ${modus === "eigene" ? "" : "hidden"} class="feld">
+      <div class="tage wahl" id="${p}-werte" role="group" aria-label="Wann erinnern">
+        ${werte.map((m) => `<label><input type="checkbox" value="${m}" ${an.has(m) ? "checked" : ""}><span>${esc(minText(m).replace(" vorher", ""))}</span></label>`).join("")}
+      </div>
+      <div class="eigen">
+        <label class="sr" for="${p}-zahl">Eigener Wert</label>
+        <input id="${p}-zahl" type="number" min="1" max="999" inputmode="numeric" placeholder="z. B. 45">
+        <label class="sr" for="${p}-einheit">Einheit</label>
+        <select id="${p}-einheit"><option value="1">Minuten</option><option value="60">Stunden</option><option value="1440">Tage</option></select>
+        <button type="button" class="knopf klein" id="${p}-plus">Hinzufügen</button>
+      </div>
+    </div>
+  </fieldset>`;
+}
+function erinnBinden(dlg, p, sagen) {
+  const $ = (id) => dlg.querySelector(`#${p}-${id}`);
+  dlg.querySelectorAll(`input[name="${p}-modus"]`).forEach((r) => r.addEventListener("change", () => { $("eigene").hidden = r.value !== "eigene" || !r.checked; }));
+  $("plus").addEventListener("click", () => {
+    const m = Math.round((+$("zahl").value || 0) * +$("einheit").value);
+    if (!m || m > 43200) { sagen("Bitte eine Zahl eingeben, höchstens 30 Tage."); return; }
+    const vorhanden = $("werte").querySelector(`input[value="${m}"]`);
+    if (vorhanden) vorhanden.checked = true;
+    else $("werte").insertAdjacentHTML("beforeend", `<label><input type="checkbox" value="${m}" checked><span>${esc(minText(m).replace(" vorher", ""))}</span></label>`);
+    $("zahl").value = "";
+    sagen(`${minText(m)} hinzugefügt`);
+  });
+}
+function erinnLesen(dlg, p) {
+  const modus = dlg.querySelector(`input[name="${p}-modus"]:checked`)?.value || "eigene";
+  if (modus === "standard") return null;
+  if (modus === "keine") return [];
+  return [...dlg.querySelectorAll(`#${p}-werte input:checked`)].map((x) => +x.value).sort((a, b) => a - b);
+}
+
+const KAL_FARBEN = ["#5ff2b8", "#7fb4ff", "#ffb37a", "#f59ad6", "#c3a6ff", "#9be36b"];
+const uhr = (s) => s.slice(11, 16);
+
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 // ---------- Schnelleingabe ----------
@@ -176,8 +284,8 @@ nav.tabs .zahl{font-family:var(--mono);font-size:.75rem;background:rgba(255,255,
 
 main{display:grid;gap:22px}
 section.gruppe{display:grid;gap:8px}
-section.gruppe h2{margin:0;font-size:.8125rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;gap:8px;align-items:center}
-section.gruppe h2 .zahl{font-family:var(--mono);letter-spacing:0}
+.gruppe h2{margin:0;font-size:.8125rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;gap:8px;align-items:center}
+.gruppe h2 .zahl{font-family:var(--mono);letter-spacing:0}
 ul.liste{list-style:none;margin:0;padding:0;display:grid;gap:8px}
 li.aufgabe{position:relative;border-radius:14px;touch-action:pan-y}
 .zeile{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:14px;background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:transform .15s ease}
@@ -222,6 +330,32 @@ fieldset{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margi
 .fehler{color:var(--red)}
 .check{display:flex;gap:10px;align-items:center;min-height:44px}
 .check input{width:22px;height:22px;accent-color:var(--mint)}
+.spalten{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px;align-items:start}
+.spalten>div{display:grid;gap:22px;min-width:0}
+.schmal .spalten{grid-template-columns:1fr}
+aside.kal{display:grid;gap:8px;position:sticky;top:12px}
+.termine{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.termin{width:100%;display:grid;grid-template-columns:6.8em 1fr;gap:2px 10px;text-align:left;padding:8px 12px;border-radius:12px;border:1px solid var(--line);border-left:4px solid var(--k,var(--mint));background:var(--glass);cursor:pointer}
+.termin .zeit{font-family:var(--mono);font-size:.8125rem;color:var(--muted);white-space:nowrap;padding-top:2px}
+.termin .was{overflow-wrap:anywhere}
+.termin .wo{grid-column:2;font-size:.8125rem;color:var(--muted)}
+.termin.block{border-style:dashed;border-left-style:solid;background:none}
+.frei{font-family:var(--mono);font-size:.8125rem;color:var(--mint)}
+.tag-termine{display:grid;gap:6px}
+.wahl label{min-width:auto;padding:0 12px}
+.eigen{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.feld .eigen input{width:110px;min-height:40px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);padding:6px 10px}
+.feld .eigen select{width:auto;min-height:40px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);padding:6px 10px}
+.person-einst{border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;gap:12px}
+.person-einst h3{margin:0;font-size:1.05rem}
+.kal-tab{width:100%;border-collapse:collapse;font-size:.9rem}
+.kal-tab th,.kal-tab td{padding:6px 4px;border-bottom:1px solid var(--line);text-align:center}
+.kal-tab th:first-child,.kal-tab td:first-child{text-align:left}
+.kal-tab input{width:22px;height:22px;accent-color:var(--mint)}
+.tab-wrap{overflow-x:auto}
+.infos{display:grid;gap:6px;margin:0}
+.infos dt{font-size:.8125rem;color:var(--muted)}
+.infos dd{margin:0 0 6px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media (forced-colors:active){.haken[aria-checked="true"]{forced-color-adjust:none;background:Highlight}}
 `;
@@ -266,6 +400,7 @@ class PlanerPanel extends HTMLElement {
     if (this._gestartet) return;
     this._gestartet = true;
     await this._lesen();
+    this._termineLaden();
     try {
       this._abo = this._hass.connection.subscribeMessage(() => {
         clearTimeout(this._neuTimer);
@@ -273,7 +408,8 @@ class PlanerPanel extends HTMLElement {
       }, { type: "planer/abonnieren" });
     } catch (e) { /* Änderungen dann erst beim nächsten Öffnen */ }
     // Tageswechsel: um Mitternacht neu zeichnen
-    setInterval(() => { if (this._tag !== heute()) this._zeichnen(); }, 60000);
+    setInterval(() => { if (this._tag !== heute()) { this._zeichnen(); this._termineLaden(); } }, 60000);
+    setInterval(() => this._termineLaden(), 5 * 60000);
   }
 
   async _ws(msg) {
@@ -293,6 +429,30 @@ class PlanerPanel extends HTMLElement {
       this._fehler = `Der Planer konnte nicht geladen werden (${e.message || e.code}). Ist die Integration unter Geräte & Dienste eingerichtet?`;
     }
     this._zeichnen();
+  }
+
+  async _termineLaden() {
+    try {
+      this._termine = await this._hass.callWS({ type: "planer/termine", start: heute(), ende: iso(plusTage(new Date(), 15)) });
+      this._kalFehler = "";
+    } catch (e) {
+      this._termine = [];
+      this._kalFehler = "Termine konnten nicht geladen werden.";
+    }
+    if (this._daten) this._zeichnen();
+  }
+
+  _kal(id) { return (this._daten.kalender || []).find((k) => k.id === id) || { id, name: id }; }
+  _farbe(id) {
+    const i = (this._daten.kalender || []).findIndex((k) => k.id === id);
+    return KAL_FARBEN[(i < 0 ? 0 : i) % KAL_FARBEN.length];
+  }
+  // Termine, die an diesem Tag stattfinden (ganztägige: Ende exklusiv)
+  _termineAm(tag) {
+    return (this._termine || []).filter((t) => {
+      const s = t.start.slice(0, 10), e = t.ende.slice(0, 10);
+      return t.ganztag ? s <= tag && tag < e : s <= tag && tag <= e;
+    });
   }
 
   // ---------- Hilfen ----------
@@ -373,7 +533,8 @@ class PlanerPanel extends HTMLElement {
         <label class="sr" for="schnell">Neue Aufgabe</label>
         <div class="eingabe">
           <input id="schnell" data-fokus="schnell" placeholder="Neue Aufgabe, z. B. morgen 15 Uhr !1 Filament bestellen #werkstatt" aria-describedby="vorschau tipp" enterkeyhint="done">
-          <button class="knopf primaer" type="submit" aria-label="Hinzufügen">${schmal ? "＋" : "Hinzufügen"}</button>
+          <button class="knopf primaer" type="submit" aria-label="Aufgabe hinzufügen">${schmal ? "＋" : "Aufgabe"}</button>
+          ${(d.kalender || []).some((k) => k.schreiben) ? `<button class="knopf" type="button" data-aktion="termin" aria-label="Als Termin in den Kalender eintragen">${schmal ? "📅" : "Termin"}</button>` : ""}
         </div>
         <div class="hinweis" id="vorschau" aria-live="polite"></div>
         <span class="sr" id="tipp">Erkennt heute, morgen, Wochentage, Datum wie 24.12., Uhrzeit wie 15 Uhr, !1 bis !3 für Top 3, # für Bereich, @ für Person und Wiederholungen wie jeden Montag oder täglich. Taste N springt hierher.</span>
@@ -388,7 +549,8 @@ class PlanerPanel extends HTMLElement {
     </div>
     <div id="ansage" class="sr" role="status" aria-live="polite"></div>
     <dialog id="blatt" aria-labelledby="blatt-titel"></dialog>
-    <dialog id="einst" aria-labelledby="einst-titel"></dialog>`;
+    <dialog id="einst" aria-labelledby="einst-titel"></dialog>
+    <dialog id="tdlg" aria-labelledby="t-titel-h"></dialog>`;
 
     const s = root.getElementById("schnell");
     s.value = eingabe;
@@ -416,9 +578,22 @@ class PlanerPanel extends HTMLElement {
     }
     if (this._ansicht === "demnaechst") {
       const kommend = offen.filter((a) => a.datum && a.datum > h).sort((a, b) => a.datum.localeCompare(b.datum));
-      if (!kommend.length) return `<p class="leer">Für die nächsten Tage ist nichts geplant.</p>`;
-      const tage = [...new Set(kommend.map((a) => a.datum))];
-      return tage.map((t) => this._gruppe(datumText(t), this._sortiert(kommend.filter((a) => a.datum === t)))).join("");
+      const tage = new Set(kommend.map((a) => a.datum));
+      for (let i = 1; i <= 14; i++) {
+        const t = iso(plusTage(new Date(), i));
+        if (this._termineAm(t).length) tage.add(t);
+      }
+      if (!tage.size) return `<p class="leer">Für die nächsten Tage ist nichts geplant.</p>`;
+      return [...tage].sort().map((t) => {
+        const termine = this._termineAm(t);
+        const aufg = this._sortiert(kommend.filter((a) => a.datum === t));
+        const id = `g-${t}`;
+        return `<section class="gruppe" aria-labelledby="${id}">
+          <h2 id="${id}">${esc(datumText(t))}</h2>
+          ${termine.length ? `<ul class="termine" aria-label="Termine">${termine.map((x) => this._terminZeile(x, t)).join("")}</ul>` : ""}
+          ${aufg.length ? `<ul class="liste" aria-label="Aufgaben">${aufg.map((a) => this._zeile(a)).join("")}</ul>` : ""}
+        </section>`;
+      }).join("");
     }
     // Heute
     const ueber = this._sortiert(offen.filter((a) => a.datum && a.datum < h));
@@ -428,6 +603,8 @@ class PlanerPanel extends HTMLElement {
     const fertig = alle.filter((a) => a.status === "erledigt" && (a.erledigt_am || "").slice(0, 10) === h);
     const wiederHeute = alle.filter((a) => a.wiederholung && (a.verlauf || []).includes(h) && a.status === "offen");
     let html = "";
+    const kal = this._kalenderHeute(heuteOffen);
+    if (this._narrow) html += kal;
     if (ueber.length) html += this._gruppe("Überfällig", ueber, "", "warn");
     const freie = 3 - top.length;
     html += this._gruppe("Top 3", top, "Noch keine Top-Aufgabe für heute. Öffne eine Aufgabe und wähle einen Rang, oder tippe !1 in die Schnelleingabe.",
@@ -438,7 +615,62 @@ class PlanerPanel extends HTMLElement {
       html += `<details class="zu"><summary>Heute erledigt (${erledigtHeute.length})</summary>
         <ul class="liste">${erledigtHeute.map((a) => this._zeile(a, a.status === "offen")).join("")}</ul></details>`;
     }
-    return html;
+    if (this._narrow) return html;
+    return `<div class="spalten"><div>${html}</div>${kal}</div>`;
+  }
+
+  _terminZeile(t, tag) {
+    const k = this._kal(t.kalender);
+    let zeit = "ganztägig";
+    if (!t.ganztag) {
+      const s = t.start.slice(0, 10) === tag ? uhr(t.start) : "…";
+      const e = t.ende.slice(0, 10) === tag ? uhr(t.ende) : "…";
+      zeit = `${s}–${e}`;
+    }
+    const key = `${t.kalender}|${t.uid}|${t.start}`;
+    return `<li><button type="button" class="termin" style="--k:${this._farbe(t.kalender)}" data-termin="${esc(key)}" data-fokus="k-${esc(key)}"
+      aria-label="${esc(`${t.titel}, ${zeit}, Kalender ${k.name}`)}">
+      <span class="zeit">${esc(zeit)}</span><span class="was">${esc(t.titel)}${t.wiederholt ? ' <span aria-hidden="true">↻</span>' : ""}</span>
+      <span class="wo">${esc(k.name)}${t.ort ? ` · ${esc(t.ort)}` : ""}</span>
+    </button></li>`;
+  }
+
+  // Kalender-Spalte: Termine von heute, Zeitblöcke der Aufgaben, freie Zeit bis 22 Uhr
+  _kalenderHeute(heuteOffen) {
+    const h = this._tag;
+    const termine = this._termineAm(h);
+    const bloecke = heuteOffen.filter((a) => a.uhrzeit).sort((a, b) => a.uhrzeit.localeCompare(b.uhrzeit));
+    const eintraege = [
+      ...termine.map((t) => ({ sort: t.ganztag ? "00" : uhr(t.start), html: this._terminZeile(t, h) })),
+      ...bloecke.map((a) => {
+        const ende = a.dauer ? (() => { const [hh, mm] = a.uhrzeit.split(":").map(Number); const m = hh * 60 + mm + a.dauer; return `${String(Math.floor(m / 60) % 24).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`; })() : "";
+        return { sort: a.uhrzeit, html: `<li><button type="button" class="termin block" data-aktion="oeffnen" data-id="${a.id}" aria-label="${esc(`Aufgabe ${a.titel} um ${a.uhrzeit}`)}">
+          <span class="zeit">${a.uhrzeit}${ende ? `–${ende}` : ""}</span><span class="was">${esc(a.titel)}</span><span class="wo">Aufgabe${a.top ? ` · Top ${a.top}` : ""}</span></button></li>` };
+      }),
+    ].sort((x, y) => x.sort.localeCompare(y.sort));
+    // freie Zeit von jetzt (frühestens 8 Uhr) bis 22 Uhr
+    const jetzt = new Date();
+    const von = Math.max(8 * 60, jetzt.getHours() * 60 + jetzt.getMinutes());
+    const bis = 22 * 60;
+    const belegt = [
+      ...termine.filter((t) => !t.ganztag).map((t) => {
+        const s = t.start.slice(0, 10) < h ? 0 : +uhr(t.start).slice(0, 2) * 60 + +uhr(t.start).slice(3);
+        const e = t.ende.slice(0, 10) > h ? 1440 : +uhr(t.ende).slice(0, 2) * 60 + +uhr(t.ende).slice(3);
+        return [s, e];
+      }),
+      ...bloecke.map((a) => { const s = +a.uhrzeit.slice(0, 2) * 60 + +a.uhrzeit.slice(3); return [s, s + (a.dauer || 30)]; }),
+    ].map(([s, e]) => [Math.max(s, von), Math.min(e, bis)]).filter(([s, e]) => e > s).sort((x, y) => x[0] - y[0]);
+    let frei = Math.max(0, bis - von), ende = von;
+    for (const [s, e] of belegt) { const s2 = Math.max(s, ende); if (e > s2) { frei -= e - s2; ende = e; } }
+    const freiText = frei <= 0 ? "Heute ist bis 22 Uhr nichts mehr frei." : `Frei bis 22 Uhr: ${Math.floor(frei / 60) ? `${Math.floor(frei / 60)} Std. ` : ""}${frei % 60 ? `${frei % 60} Min.` : ""}`.trim();
+    const keineKal = !(this._daten.kalender || []).length;
+    return `<aside class="kal gruppe" aria-labelledby="g-kal">
+      <h2 id="g-kal">Kalender heute</h2>
+      ${eintraege.length ? `<ul class="termine">${eintraege.map((x) => x.html).join("")}</ul>`
+        : `<p class="leer">${keineKal ? "Noch kein Kalender sichtbar. In HA eingebundene Kalender erscheinen hier automatisch." : "Heute keine Termine."}</p>`}
+      ${this._kalFehler ? `<p class="fehler">${esc(this._kalFehler)}</p>` : ""}
+      <p class="frei">${esc(freiText)}</p>
+    </aside>`;
   }
 
   _gruppe(titel, liste, leer = "", art = "", zusatz = "") {
@@ -509,6 +741,10 @@ class PlanerPanel extends HTMLElement {
     }));
     root.querySelectorAll("[data-aktion]").forEach((b) => b.addEventListener("click", () => this._aktion(b.dataset.aktion, b.dataset.id)));
     root.querySelectorAll("li.aufgabe").forEach((li) => this._wischen(li));
+    root.querySelectorAll("[data-termin]").forEach((b) => b.addEventListener("click", () => {
+      const t = (this._termine || []).find((x) => `${x.kalender}|${x.uid}|${x.start}` === b.dataset.termin);
+      if (t) this._terminZeigen(t);
+    }));
   }
 
   _taste(e) {
@@ -541,6 +777,7 @@ class PlanerPanel extends HTMLElement {
   async _aktion(art, id) {
     const a = id ? this._finde(id) : null;
     if (art === "einstellungen") return this._einstellungen();
+    if (art === "termin") return this._terminNeu();
     if (!a) return;
     if (art === "oeffnen") return this._oeffnen(a);
     if (art === "haken") {
@@ -623,21 +860,9 @@ class PlanerPanel extends HTMLElement {
           <option value="">Keine Top-Aufgabe</option>${[1, 2, 3].map((i) => `<option value="${i}" ${a.top === i ? "selected" : ""}>Rang ${i}</option>`).join("")}</select></div>
         <div class="feld"><label for="b-bereich">Bereich</label><input id="b-bereich" value="${esc(a.bereich || "")}" placeholder="z. B. werkstatt" list="b-bereiche"><datalist id="b-bereiche">${[...new Set(d.aufgaben.map((x) => x.bereich).filter(Boolean))].map((b) => `<option value="${esc(b)}">`).join("")}</datalist></div>
       </div>
-      <fieldset>
-        <legend>Wiederholung</legend>
-        <div class="reihe">
-          <div class="feld"><label for="b-art">Wiederholt sich</label><select id="b-art">
-            ${[["", "Nicht"], ["tag", "Täglich"], ["woche", "Wöchentlich"], ["monat", "Monatlich"], ["jahr", "Jährlich"]].map(([k, t]) => `<option value="${k}" ${(w.art || "") === k ? "selected" : ""}>${t}</option>`).join("")}
-          </select></div>
-          <div class="feld" id="b-alle-f"><label for="b-alle">Alle … (Abstand)</label><input id="b-alle" type="number" min="1" max="365" inputmode="numeric" value="${esc(w.alle || 1)}"></div>
-          <div class="feld" id="b-bis-f"><label for="b-bis">Endet am (optional)</label><input id="b-bis" type="date" value="${esc(w.bis || "")}"></div>
-        </div>
-        <div class="feld" id="b-tage-f"><span class="lbl" id="b-tage-l">An diesen Tagen</span>
-          <div class="tage" role="group" aria-labelledby="b-tage-l">
-            ${WT_KURZ.map((t, i) => `<label><input type="checkbox" value="${i}" ${(w.tage || []).includes(i) ? "checked" : ""} aria-label="${WOCHENTAGE[i]}"><span aria-hidden="true">${t}</span></label>`).join("")}
-          </div>
-        </div>
-      </fieldset>
+      ${wdhHtml("b", w)}
+      ${erinnHtml("be", a.erinnerungen, d.einst.erinnerungen)}
+      <p class="hinweis" style="display:block">Ohne Uhrzeit wird um 9:00 Uhr am Fälligkeitstag gerechnet. Erinnert wird nur, wenn für die Person ein Handy eingestellt ist.</p>
       <div class="feld"><label for="b-notiz">Notiz</label><textarea id="b-notiz">${esc(a.notiz || "")}</textarea></div>
       <p class="fehler" id="b-fehler" role="alert"></p>
       <div class="fuss">
@@ -648,14 +873,8 @@ class PlanerPanel extends HTMLElement {
     </form>`;
 
     const $ = (id) => dlg.querySelector(`#${id}`);
-    const artAnpassen = () => {
-      const art = $("b-art").value;
-      $("b-alle-f").hidden = !art;
-      $("b-bis-f").hidden = !art;
-      $("b-tage-f").hidden = art !== "woche";
-    };
-    artAnpassen();
-    $("b-art").addEventListener("change", artAnpassen);
+    wdhBinden(dlg, "b");
+    erinnBinden(dlg, "be", (t) => this._sagen(t));
     dlg.querySelectorAll("[data-tag]").forEach((b) => b.addEventListener("click", () => {
       $("b-datum").value = b.dataset.tag === "eingang" ? "" : iso(plusTage(new Date(), +b.dataset.tag));
       this._sagen(b.dataset.tag === "eingang" ? "Datum entfernt, Aufgabe kommt in den Eingang" : `Datum ${datumText($("b-datum").value)}`);
@@ -673,11 +892,7 @@ class PlanerPanel extends HTMLElement {
       e.preventDefault();
       const titel = $("b-titel").value.trim();
       if (!titel) { $("b-fehler").textContent = "Bitte einen Titel eingeben."; $("b-titel").focus(); return; }
-      const art = $("b-art").value;
-      const wiederholung = art ? {
-        art, alle: +$("b-alle").value || 1, bis: $("b-bis").value || undefined,
-        tage: art === "woche" ? [...dlg.querySelectorAll(".tage input:checked")].map((x) => +x.value) : undefined,
-      } : null;
+      const wiederholung = wdhLesen(dlg, "b");
       let datum = $("b-datum").value || null;
       if (wiederholung && !datum) datum = heute();
       const top = $("b-top").value ? +$("b-top").value : null;
@@ -685,7 +900,7 @@ class PlanerPanel extends HTMLElement {
       try {
         await this._ws({ type: "planer/speichern", aufgabe: {
           id: a.id, titel, datum, uhrzeit: $("b-uhr").value || null, dauer: $("b-dauer").value || null,
-          person: $("b-person").value, top, bereich: $("b-bereich").value, notiz: $("b-notiz").value, wiederholung,
+          person: $("b-person").value, top, bereich: $("b-bereich").value, notiz: $("b-notiz").value, wiederholung, erinnerungen: erinnLesen(dlg, "be"),
         } });
       } catch (err) { $("b-fehler").textContent = err.message || "Speichern hat nicht geklappt."; return; }
       dlg.close();
@@ -711,17 +926,169 @@ class PlanerPanel extends HTMLElement {
   _einstellungen() {
     const dlg = this.shadowRoot.getElementById("einst");
     const d = this._daten;
+    const kal = d.alle_kalender || [];
     dlg.innerHTML = `<form method="dialog" id="eform">
-      <h2 id="einst-titel">Wer sieht was</h2>
-      <p class="hinweis" style="display:block">Eigene und gemeinsame Aufgaben sieht jede Person immer. Hier legst du fest, ob jemand zusätzlich die Aufgaben der anderen sieht.</p>
-      ${d.personen.map((p) => `<label class="check"><input type="checkbox" data-person="${esc(p.id)}" ${(d.einstellungen[p.id]?.andere_sehen ?? true) ? "checked" : ""}> ${esc(p.name)} sieht die Aufgaben der anderen</label>`).join("")}
-      <div class="fuss"><button type="submit" class="knopf primaer">Fertig</button></div>
+      <h2 id="einst-titel">Einstellungen</h2>
+      <p class="hinweis" style="display:block">Eigene und gemeinsame Aufgaben sieht jede Person immer. Pro Person legst du hier fest, was sie zusätzlich sieht, wo sie Termine eintragen darf und wie sie erinnert wird.</p>
+      ${d.personen.map((p, i) => {
+        const e = d.einstellungen[p.id] || {};
+        const sehen = e.kalender_sehen, schreiben = e.kalender_schreiben;
+        return `<section class="person-einst" data-person="${esc(p.id)}" aria-labelledby="pe-${i}">
+          <h3 id="pe-${i}">${esc(p.name)}</h3>
+          <label class="check"><input type="checkbox" data-feld="andere_sehen" ${e.andere_sehen !== false ? "checked" : ""}> Sieht die Aufgaben der anderen</label>
+          ${kal.length ? `<div class="tab-wrap"><table class="kal-tab">
+            <caption class="sr">Kalender von ${esc(p.name)}</caption>
+            <thead><tr><th scope="col">Kalender</th><th scope="col">Sehen</th><th scope="col">Eintragen</th><th scope="col">Erinnern</th></tr></thead>
+            <tbody>${kal.map((k) => `<tr><th scope="row" style="font-weight:400">${esc(k.name)}</th>
+              <td><input type="checkbox" data-kal="sehen" value="${esc(k.id)}" aria-label="${esc(k.name)} sehen" ${sehen == null || sehen.includes(k.id) ? "checked" : ""}></td>
+              <td>${k.anlegen ? `<input type="checkbox" data-kal="schreiben" value="${esc(k.id)}" aria-label="In ${esc(k.name)} eintragen" ${schreiben == null || schreiben.includes(k.id) ? "checked" : ""}>` : '<span class="sr">nicht möglich</span><span aria-hidden="true">–</span>'}</td>
+              <td><input type="checkbox" data-kal="erinnern" value="${esc(k.id)}" aria-label="An Termine aus ${esc(k.name)} erinnern" ${(e.kalender_erinnern || []).includes(k.id) ? "checked" : ""}></td></tr>`).join("")}</tbody>
+          </table></div>
+          <div class="feld"><label for="sk-${i}">Standard-Kalender für neue Termine</label>
+            <select id="sk-${i}" data-feld="standard_kalender"><option value="">Zuletzt benutzter</option>
+            ${kal.filter((k) => k.anlegen).map((k) => `<option value="${esc(k.id)}" ${e.standard_kalender === k.id ? "selected" : ""}>${esc(k.name)}</option>`).join("")}</select></div>`
+          : `<p class="leer">Noch keine Kalender in Home Assistant.</p>`}
+          <div class="feld"><label for="hy-${i}">Handy für Erinnerungen</label>
+            <select id="hy-${i}" data-feld="handy"><option value="">Keine Erinnerungen</option>
+            ${(d.handys || []).map((h) => `<option value="${esc(h.id)}" ${e.handy === h.id ? "selected" : ""}>${esc(h.name)}</option>`).join("")}</select>
+            ${(d.handys || []).length ? "" : '<span class="hinweis">Kein Handy mit der Home-Assistant-App gefunden.</span>'}</div>
+          ${erinnHtml(`se${i}`, e.erinnerungen || [30, 180, 1440])}
+          <div class="fuss"><button type="button" class="knopf" data-speichern="${i}">Für ${esc(p.name.split(" ")[0])} speichern</button></div>
+        </section>`;
+      }).join("")}
+      <div class="fuss"><button type="submit" class="knopf primaer">Schließen</button></div>
     </form>`;
-    dlg.querySelectorAll("[data-person]").forEach((c) => c.addEventListener("change", async () => {
-      await this._ws({ type: "planer/einstellung", person: c.dataset.person, andere_sehen: c.checked });
-      this._sagen("Gespeichert");
+    d.personen.forEach((p, i) => erinnBinden(dlg, `se${i}`, (t) => this._sagen(t)));
+    dlg.querySelectorAll("[data-speichern]").forEach((b) => b.addEventListener("click", async () => {
+      const i = +b.dataset.speichern;
+      const sec = dlg.querySelectorAll("section.person-einst")[i];
+      const liste = (art) => [...sec.querySelectorAll(`[data-kal="${art}"]:checked`)].map((x) => x.value);
+      const alle = (art) => sec.querySelectorAll(`[data-kal="${art}"]`).length;
+      const werte = {
+        andere_sehen: sec.querySelector('[data-feld="andere_sehen"]').checked,
+        handy: sec.querySelector('[data-feld="handy"]').value || null,
+        erinnerungen: erinnLesen(dlg, `se${i}`),
+      };
+      if (kal.length) {
+        werte.kalender_sehen = liste("sehen").length === alle("sehen") ? null : liste("sehen");
+        werte.kalender_schreiben = liste("schreiben").length === alle("schreiben") ? null : liste("schreiben");
+        werte.kalender_erinnern = liste("erinnern");
+        werte.standard_kalender = sec.querySelector('[data-feld="standard_kalender"]').value || null;
+      }
+      await this._ws({ type: "planer/einstellung", person: d.personen[i].id, werte });
+      b.textContent = "Gespeichert ✓";
+      this._sagen(`Einstellungen für ${d.personen[i].name} gespeichert`);
     }));
-    dlg.addEventListener("close", () => this._lesen(), { once: true });
+    dlg.addEventListener("close", async () => { await this._lesen(); this._termineLaden(); }, { once: true });
+    dlg.showModal();
+  }
+
+  // Neuer Termin; übernimmt, was schon in der Schnelleingabe steht
+  _terminNeu() {
+    const dlg = this.shadowRoot.getElementById("tdlg");
+    const d = this._daten;
+    const text = this.shadowRoot.getElementById("schnell")?.value || "";
+    const v = text.trim() ? parse(text, d.personen) : {};
+    const schreibbar = (d.kalender || []).filter((k) => k.schreiben);
+    let zuletzt = null;
+    try { zuletzt = localStorage.getItem("planer.kalender"); } catch (e) { /* egal */ }
+    const vorwahl = [d.einst.standard_kalender, zuletzt].find((x) => schreibbar.some((k) => k.id === x)) || schreibbar[0]?.id;
+    const datum = v.datum || heute();
+    const von = v.uhrzeit || "";
+    const bis = von ? (() => { const [h, m] = von.split(":").map(Number); return `${String(Math.min(23, h + 1)).padStart(2, "0")}:${String(m).padStart(2, "0")}`; })() : "";
+    dlg.innerHTML = `<form method="dialog" id="tform" novalidate>
+      ${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
+      <h2 id="t-titel-h">Neuer Termin</h2>
+      <div class="feld"><label for="t-titel">Titel</label><input id="t-titel" required value="${esc(v.titel || "")}"></div>
+      <div class="feld"><label for="t-kal">Kalender</label><select id="t-kal">
+        ${schreibbar.map((k) => `<option value="${esc(k.id)}" ${k.id === vorwahl ? "selected" : ""}>${esc(k.name)}</option>`).join("")}</select></div>
+      <label class="check"><input type="checkbox" id="t-ganz" ${von ? "" : "checked"}> Ganztägig</label>
+      <div class="reihe">
+        <div class="feld"><label for="t-datum">Datum</label><input id="t-datum" type="date" value="${esc(datum)}"></div>
+        <div class="feld" id="t-von-f"><label for="t-von">Von</label><input id="t-von" type="time" value="${esc(von || "09:00")}"></div>
+        <div class="feld" id="t-bis-f"><label for="t-bis">Bis</label><input id="t-bis" type="time" value="${esc(bis || "10:00")}"></div>
+        <div class="feld" id="t-ende-f"><label for="t-ende">Letzter Tag (optional)</label><input id="t-ende" type="date"></div>
+      </div>
+      ${wdhHtml("tw", v.wiederholung || {})}
+      <div class="feld"><label for="t-ort">Ort (optional)</label><input id="t-ort"></div>
+      <div class="feld"><label for="t-beschr">Beschreibung (optional)</label><textarea id="t-beschr"></textarea></div>
+      <p class="hinweis" style="display:block">Erinnert wird mit deinem Standard (${esc(minKurz(d.einst.erinnerungen))}), wenn der Kalender in den Einstellungen unter „Erinnern“ angehakt ist.</p>
+      <p class="fehler" id="t-fehler" role="alert"></p>
+      <div class="fuss">
+        <button type="button" class="knopf" id="t-abbrechen">Abbrechen</button>
+        <button type="submit" class="knopf primaer">Eintragen</button>
+      </div>
+    </form>`;
+    const $ = (id) => dlg.querySelector(`#${id}`);
+    const ganz = () => { const g = $("t-ganz").checked; $("t-von-f").hidden = g; $("t-bis-f").hidden = g; $("t-ende-f").hidden = !g; };
+    ganz();
+    $("t-ganz").addEventListener("change", ganz);
+    wdhBinden(dlg, "tw");
+    $("t-abbrechen").addEventListener("click", () => dlg.close());
+    $("tform").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const titel = $("t-titel").value.trim();
+      if (!titel) { $("t-fehler").textContent = "Bitte einen Titel eingeben."; $("t-titel").focus(); return; }
+      const g = $("t-ganz").checked;
+      const tag = $("t-datum").value || heute();
+      if (!g && $("t-bis").value <= $("t-von").value) { $("t-fehler").textContent = "„Bis“ muss nach „Von“ liegen."; $("t-bis").focus(); return; }
+      const termin = {
+        titel, ganztag: g, ort: $("t-ort").value, beschreibung: $("t-beschr").value,
+        start: g ? tag : `${tag}T${$("t-von").value}`,
+        ende: g ? ($("t-ende").value || tag) : `${tag}T${$("t-bis").value}`,
+        rrule: rrule(wdhLesen(dlg, "tw"), g) || undefined,
+      };
+      try {
+        await this._hass.callWS({ type: "planer/termin_anlegen", kalender: $("t-kal").value, termin });
+      } catch (err) { $("t-fehler").textContent = err.message || "Eintragen hat nicht geklappt."; return; }
+      try { localStorage.setItem("planer.kalender", $("t-kal").value); } catch (e2) { /* egal */ }
+      dlg.close();
+      const s = this.shadowRoot.getElementById("schnell");
+      if (s) { s.value = ""; this._vorschau(); }
+      this._sagen(`Termin eingetragen: ${titel}, ${datumText(tag)}`);
+      this._termineLaden();
+    });
+    this._wischZu(dlg);
+    dlg.showModal();
+    $("t-titel").focus();
+  }
+
+  _terminZeigen(t) {
+    const dlg = this.shadowRoot.getElementById("tdlg");
+    const k = this._kal(t.kalender);
+    const wann = t.ganztag
+      ? (t.ende.slice(0, 10) > iso(plusTage(ausIso(t.start.slice(0, 10)), 1)) ? `${datumText(t.start.slice(0, 10))} bis ${datumText(iso(plusTage(ausIso(t.ende.slice(0, 10)), -1)))}, ganztägig` : `${datumText(t.start.slice(0, 10))}, ganztägig`)
+      : `${datumText(t.start.slice(0, 10))}, ${uhr(t.start)}–${uhr(t.ende)} Uhr`;
+    dlg.innerHTML = `<form method="dialog">
+      ${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
+      <h2 id="t-titel-h">${esc(t.titel)}</h2>
+      <dl class="infos">
+        <dt>Wann</dt><dd>${esc(wann)}${t.wiederholt ? " · wiederholt sich" : ""}</dd>
+        <dt>Kalender</dt><dd>${esc(k.name)}</dd>
+        ${t.ort ? `<dt>Ort</dt><dd>${esc(t.ort)}</dd>` : ""}
+        ${t.beschreibung ? `<dt>Beschreibung</dt><dd style="white-space:pre-wrap">${esc(t.beschreibung)}</dd>` : ""}
+      </dl>
+      <p class="hinweis" style="display:block">Termine änderst du in Google Kalender. Hier kannst du sie ansehen und löschen.</p>
+      <p class="fehler" id="t-fehler" role="alert"></p>
+      <div class="fuss">
+        ${k.loeschen && t.uid ? (t.recurrence_id
+          ? `<button type="button" class="knopf gefahr links" data-loeschen="einer">Nur diesen löschen</button><button type="button" class="knopf gefahr" data-loeschen="folgende">Diesen und alle folgenden löschen</button>`
+          : `<button type="button" class="knopf gefahr links" data-loeschen="einer">Löschen</button>`) : ""}
+        <button type="submit" class="knopf primaer">Schließen</button>
+      </div>
+    </form>`;
+    const sicher = {};
+    dlg.querySelectorAll("[data-loeschen]").forEach((b) => b.addEventListener("click", async () => {
+      const art = b.dataset.loeschen;
+      if (!sicher[art]) { sicher[art] = true; b.textContent = "Wirklich löschen?"; b.focus(); return; }
+      try {
+        await this._hass.callWS({ type: "planer/termin_loeschen", kalender: t.kalender, uid: t.uid, recurrence_id: t.recurrence_id, alle_folgenden: art === "folgende" });
+      } catch (err) { dlg.querySelector("#t-fehler").textContent = err.message || "Löschen hat nicht geklappt."; return; }
+      dlg.close();
+      this._sagen(`Termin gelöscht: ${t.titel}`);
+      this._termineLaden();
+    }));
+    this._wischZu(dlg);
     dlg.showModal();
   }
 }

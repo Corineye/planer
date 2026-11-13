@@ -20,6 +20,7 @@ from homeassistant.util import dt as dt_util
 from .const import GEMEINSAM, MAX_AUFGABEN, SPEICHER_SCHLUESSEL, SPEICHER_VERSION
 from .wiederholung import fortschreiben, gueltig
 
+STANDARD_ERINNERUNGEN = [30, 180, 1440]
 UHRZEIT = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
 MAX_VERLAUF = 60
 
@@ -59,7 +60,7 @@ class Planer:
         benutzer = await self.hass.auth.async_get_users()
         self.personen = sorted(
             (
-                {"id": b.id, "name": b.name or "Ohne Namen"}
+                {"id": b.id, "name": b.name or "Ohne Namen", "admin": b.is_admin}
                 for b in benutzer
                 if b.is_active and not b.system_generated
             ),
@@ -90,7 +91,20 @@ class Planer:
     # --- Sichtbarkeit -------------------------------------------------------------------------
 
     def sieht_andere(self, benutzer_id: str | None) -> bool:
-        return bool(self.einstellungen.get(benutzer_id or "", {}).get("andere_sehen", True))
+        return bool(self.einst(benutzer_id)["andere_sehen"])
+
+    def einst(self, benutzer_id: str | None) -> dict[str, Any]:
+        """Einstellungen einer Person mit Standardwerten."""
+        e = self.einstellungen.get(benutzer_id or "", {})
+        return {
+            "andere_sehen": e.get("andere_sehen", True),
+            "kalender_sehen": e.get("kalender_sehen"),  # None = alle
+            "kalender_schreiben": e.get("kalender_schreiben"),  # None = alle, in die man schreiben kann
+            "kalender_erinnern": e.get("kalender_erinnern", []),
+            "handy": e.get("handy"),
+            "standard_kalender": e.get("standard_kalender"),
+            "erinnerungen": e.get("erinnerungen", STANDARD_ERINNERUNGEN),
+        }
 
     def sichtbar(self, aufgabe: dict[str, Any], benutzer_id: str | None) -> bool:
         if benutzer_id is None:
@@ -147,7 +161,9 @@ class Planer:
         if "wiederholung" in roh:
             a["wiederholung"] = gueltig(roh["wiederholung"])
         if "erinnerungen" in roh:
-            a["erinnerungen"] = sorted({int(m) for m in roh["erinnerungen"] or [] if str(m).isdigit() and int(m) <= 43200})
+            # None = Standard der Person, [] = keine Erinnerung
+            e = roh["erinnerungen"]
+            a["erinnerungen"] = None if e is None else sorted({int(m) for m in e if str(m).isdigit() and int(m) <= 43200})
         if "reihenfolge" in roh:
             try:
                 a["reihenfolge"] = float(roh["reihenfolge"])
@@ -167,7 +183,7 @@ class Planer:
                 a.setdefault(feld, "")
             for feld in ("datum", "uhrzeit", "dauer", "top", "wiederholung"):
                 a.setdefault(feld, None)
-            a.setdefault("erinnerungen", [])
+            a.setdefault("erinnerungen", None)
             a.setdefault("reihenfolge", dt_util.utcnow().timestamp())
         a["geaendert"] = jetzt
         return a
@@ -232,6 +248,18 @@ class Planer:
         del self.aufgaben[aufgabe_id]
         await self._sichern()
 
-    async def einstellung(self, person: str, andere_sehen: bool) -> None:
-        self.einstellungen.setdefault(person, {})["andere_sehen"] = bool(andere_sehen)
+    async def einstellung(self, person: str, werte: dict[str, Any]) -> None:
+        e = self.einstellungen.setdefault(person, {})
+        if "andere_sehen" in werte:
+            e["andere_sehen"] = bool(werte["andere_sehen"])
+        for feld in ("kalender_sehen", "kalender_schreiben", "kalender_erinnern"):
+            if feld in werte:
+                v = werte[feld]
+                e[feld] = None if v is None else [str(x) for x in v if str(x).startswith("calendar.")]
+        if "standard_kalender" in werte:
+            e["standard_kalender"] = str(werte["standard_kalender"]) if werte["standard_kalender"] else None
+        if "handy" in werte:
+            e["handy"] = str(werte["handy"]) if werte["handy"] else None
+        if "erinnerungen" in werte:
+            e["erinnerungen"] = sorted({int(m) for m in werte["erinnerungen"] or [] if str(m).isdigit() and int(m) <= 43200})
         await self._sichern()

@@ -10,7 +10,7 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
 3. Einstellungen › Geräte & Dienste › Integration hinzufügen › **Planer**.
 4. In der Seitenleiste erscheint „Planer“.
 
-## Was es gibt (v0.1)
+## Was es gibt (v0.2)
 
 - **Heute** mit Top 3 (je Rang 1–3, nie mehr als drei), weiteren Aufgaben, Überfälligem und „Heute erledigt“.
 - **Demnächst** (nach Tagen gruppiert) und **Eingang** (alles ohne Datum).
@@ -26,10 +26,17 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
 - **Bedienung**: Am Handy wischen (rechts = erledigt, links = morgen), jede Geste auch als Knopf.
   Taste `N` springt in die Schnelleingabe. Bildschirmleser bekommen Ansagen, alles ist per Tastatur erreichbar.
 
+- **Kalender** (v0.2): Termine aller in HA eingebundenen Kalender (z. B. Google) in der Spalte „Kalender heute“
+  und in „Demnächst“, dazu „Frei bis 22 Uhr“. Neue Termine über „Termin“ eintragen (auch ganztägig und wiederkehrend),
+  Termine ansehen und löschen. Pro Person: welche Kalender sie sieht, wo sie eintragen darf, Standard-Kalender.
+- **Erinnerungen** (v0.2): Push über die HA-App für Aufgaben mit Datum und für Termine ausgewählter Kalender.
+  Standard 30 Min., 3 Std., 1 Tag vorher, pro Aufgabe änderbar, eigene Werte möglich. Knöpfe „Erledigt“ und „In 1 Stunde“.
+  Handy pro Person unter „Einstellungen“ wählen. Aufgaben ohne Uhrzeit zählen ab 9:00 Uhr.
+
 ## Daten
 
 Gespeichert in `.storage/planer.daten` (im HA-Backup enthalten).
 
 ## Geplant
 
-Google-Kalender (lesen + Termine anlegen), Erinnerungen aufs Handy, Bring!-Einkaufsliste, Wochenansicht mit Wochenzielen.
+Bring!-Einkaufsliste, Wochenansicht mit Wochenzielen.
