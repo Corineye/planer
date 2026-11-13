@@ -14,6 +14,13 @@ const ausIso = (s) => { const [y, m, d] = s.split("-").map(Number); return new D
 const plusTage = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
 const wt = (d) => (d.getDay() + 6) % 7; // 0 = Montag
 const heute = () => iso(new Date());
+const montag = (d) => plusTage(d, -wt(d));
+function kw(d) {
+  const x = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 3 - wt(d));
+  const j = new Date(x.getFullYear(), 0, 4);
+  const n = 1 + Math.round(((x - j) / 86400000 - 3 + wt(j)) / 7);
+  return `${x.getFullYear()}-W${String(n).padStart(2, "0")}`;
+}
 
 function datumText(s, mitWochentag = true) {
   if (!s) return "Eingang";
@@ -356,6 +363,32 @@ aside.kal{display:grid;gap:8px;position:sticky;top:12px}
 .infos{display:grid;gap:6px;margin:0}
 .infos dt{font-size:.8125rem;color:var(--muted)}
 .infos dd{margin:0 0 6px}
+.wkopf{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.wkopf h2{margin:0 8px 0 0;font-size:1.15rem}
+.wkopf .knopf{min-width:44px}
+.ziele{display:grid;gap:8px}
+.ziel{display:flex;gap:10px;align-items:center}
+.ziel input[type=text]{flex:1;min-width:0;min-height:44px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);padding:6px 12px}
+.ziel input[type=checkbox]{width:24px;height:24px;accent-color:var(--mint);flex:none}
+.ziel .nr{font-family:var(--mono);font-weight:700;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:var(--mint-dim);color:var(--mint);flex:none}
+.woche{display:grid;grid-template-columns:repeat(7,minmax(118px,1fr));gap:8px;min-width:860px}
+.woche-wrap{overflow-x:auto;padding-bottom:4px}
+.schmal .woche{grid-template-columns:1fr;min-width:0}
+.wtag{background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:8px;display:grid;gap:6px;align-content:start;min-height:180px;min-width:0}
+.schmal .wtag{min-height:0}
+.wtag.heute{border-color:rgba(95,242,184,.5)}
+.wtag.ziel-drop{outline:2px dashed var(--mint);outline-offset:2px}
+.wtag h3{margin:0;font-size:.9rem;display:flex;justify-content:space-between;gap:6px}
+.wtag h3 .d{color:var(--muted);font-weight:400}
+.wpunkt{display:block;width:100%;text-align:left;font-size:.8125rem;line-height:1.35;padding:5px 7px;border-radius:8px;border:1px solid transparent;background:rgba(255,255,255,.04);cursor:pointer;overflow-wrap:anywhere}
+.wpunkt.t{border-left:3px solid var(--k,var(--mint));background:rgba(255,255,255,.02)}
+.wpunkt.a.top{background:var(--mint-dim);color:var(--mint)}
+.wpunkt.a.fertig{opacity:.55;text-decoration:line-through}
+.wpunkt .z{font-family:var(--mono);color:var(--muted);margin-right:6px}
+.wpunkt[draggable=true]{cursor:grab}
+.wleer{font-size:.8125rem;color:var(--muted)}
+.ablage{display:flex;gap:6px;flex-wrap:wrap}
+.ablage .wpunkt{width:auto}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media (forced-colors:active){.haken[aria-checked="true"]{forced-color-adjust:none;background:Highlight}}
 `;
@@ -507,8 +540,9 @@ class PlanerPanel extends HTMLElement {
       heute: offen.filter((a) => a.datum && a.datum <= h).length,
       demnaechst: offen.filter((a) => a.datum && a.datum > h).length,
       eingang: offen.filter((a) => !a.datum).length,
+      woche: offen.filter((a) => a.datum && a.datum >= iso(montag(new Date())) && a.datum <= iso(plusTage(montag(new Date()), 6))).length,
     };
-    const tabs = [["heute", "Heute"], ["demnaechst", "Demnächst"], ["eingang", "Eingang"]];
+    const tabs = [["heute", "Heute"], ["woche", "Woche"], ["demnaechst", "Demnächst"], ["eingang", "Eingang"]];
     const heuteD = new Date();
     const filterKnoepfe = d.andere_sehen
       ? `<div class="seg" role="group" aria-label="Wessen Aufgaben">
@@ -576,6 +610,7 @@ class PlanerPanel extends HTMLElement {
       const liste = this._sortiert(offen.filter((a) => !a.datum));
       return this._gruppe("Eingang", liste, "Der Eingang ist leer. Alles ohne Datum landet hier, auch was du per Sprache oder in der HA-App zur Planer-Liste hinzufügst.");
     }
+    if (this._ansicht === "woche") return this._wocheHtml(alle);
     if (this._ansicht === "demnaechst") {
       const kommend = offen.filter((a) => a.datum && a.datum > h).sort((a, b) => a.datum.localeCompare(b.datum));
       const tage = new Set(kommend.map((a) => a.datum));
@@ -617,6 +652,80 @@ class PlanerPanel extends HTMLElement {
     }
     if (this._narrow) return html;
     return `<div class="spalten"><div>${html}</div>${kal}</div>`;
+  }
+
+  _wocheHtml(alle) {
+    const start = this._wStart || montag(new Date());
+    const k = kw(start);
+    const nr = +k.slice(6);
+    const tage = [...Array(7)].map((_, i) => iso(plusTage(start, i)));
+    const ende = tage[6];
+    const termine = this._wTermine?.start === iso(start) ? this._wTermine.liste : null;
+    if (!termine) this._wocheTermineLaden(start);
+    const ziele = [...((this._daten.wochen || {})[k]?.ziele || [])];
+    while (ziele.length < 3) ziele.push({ text: "", erledigt: false });
+    const am = (tag) => (termine || []).filter((t) => {
+      const s0 = t.start.slice(0, 10), e0 = t.ende.slice(0, 10);
+      return t.ganztag ? s0 <= tag && tag < e0 : s0 <= tag && tag <= e0;
+    });
+    const aufg = (tag) => this._sortiert(alle.filter((a) => a.datum === tag && (a.status === "offen" || (a.erledigt_am || "").slice(0, 10) === tag)));
+    const d0 = ausIso(tage[0]), d6 = ausIso(ende);
+    const spanne = `${d0.getDate()}. ${d0.getMonth() !== d6.getMonth() ? MONATE[d0.getMonth()] + " " : ""}– ${d6.getDate()}. ${MONATE[d6.getMonth()]}`;
+    const eingang = this._sortiert(alle.filter((a) => a.status === "offen" && !a.datum));
+    return `<section class="gruppe" aria-labelledby="w-titel">
+      <div class="wkopf">
+        <h2 id="w-titel">KW ${nr} <span class="muted" style="font-weight:400;color:var(--muted)">· ${esc(spanne)}</span></h2>
+        <button type="button" class="knopf klein" data-woche="-1" aria-label="Vorige Woche">←</button>
+        <button type="button" class="knopf klein" data-woche="0" ${iso(start) === iso(montag(new Date())) ? "disabled" : ""}>Diese Woche</button>
+        <button type="button" class="knopf klein" data-woche="1" aria-label="Nächste Woche">→</button>
+      </div>
+    </section>
+    <section class="gruppe" aria-labelledby="z-titel">
+      <h2 id="z-titel">Wochenziele</h2>
+      <form class="ziele" id="zform" data-kw="${k}">
+        ${ziele.slice(0, 3).map((z, i) => `<div class="ziel">
+          <span class="nr" aria-hidden="true">${i + 1}</span>
+          <label class="sr" for="z-${i}">Wochenziel ${i + 1}</label>
+          <input type="text" id="z-${i}" data-fokus="z-${i}" value="${esc(z.text)}" placeholder="${["Was soll diese Woche klappen?", "Zweites Ziel (optional)", "Drittes Ziel (optional)"][i]}">
+          <input type="checkbox" id="zc-${i}" ${z.erledigt ? "checked" : ""} aria-label="Wochenziel ${i + 1} erreicht">
+        </div>`).join("")}
+      </form>
+    </section>
+    <div class="woche-wrap"><div class="woche" role="list" aria-label="Tage der Woche">
+      ${tage.map((t) => {
+        const d = ausIso(t);
+        const ts = am(t), as = aufg(t);
+        return `<div class="wtag ${t === this._tag ? "heute" : ""}" role="listitem" data-tag="${t}" aria-labelledby="wt-${t}">
+          <h3 id="wt-${t}"><span>${WOCHENTAGE[wt(d)]}${t === this._tag ? " · heute" : ""}</span><span class="d">${d.getDate()}.${d.getMonth() + 1}.</span></h3>
+          ${ts.map((x) => `<button type="button" class="wpunkt t" style="--k:${this._farbe(x.kalender)}" data-termin="${esc(`${x.kalender}|${x.uid}|${x.start}`)}" aria-label="${esc(`Termin ${x.titel}, ${x.ganztag ? "ganztägig" : uhr(x.start)}, ${this._kal(x.kalender).name}`)}">
+            <span class="z">${x.ganztag ? "ganzt." : uhr(x.start)}</span><span>${esc(x.titel)}</span></button>`).join("")}
+          ${as.map((a) => `<button type="button" class="wpunkt a ${a.top ? "top" : ""} ${a.status === "erledigt" ? "fertig" : ""}" draggable="${a.status === "offen"}" data-ziehen="${a.id}" data-aktion="oeffnen" data-id="${a.id}" data-fokus="w-${a.id}"
+            aria-label="${esc(`Aufgabe ${a.titel}${a.top ? `, Top ${a.top}` : ""}${a.status === "erledigt" ? ", erledigt" : ""}. Öffnen zum Bearbeiten oder Verschieben`)}">
+            ${a.top ? `<span class="z">${a.top}</span>` : a.uhrzeit ? `<span class="z">${a.uhrzeit}</span>` : ""}<span>${esc(a.titel)}</span></button>`).join("")}
+          ${!ts.length && !as.length ? `<span class="wleer">frei</span>` : ""}
+        </div>`;
+      }).join("")}
+    </div></div>
+    ${termine === null ? `<p class="hinweis" role="status">Termine werden geladen …</p>` : ""}
+    ${eingang.length ? `<section class="gruppe" aria-labelledby="ab-titel">
+      <h2 id="ab-titel">Aus dem Eingang einplanen</h2>
+      <p class="hinweis" style="display:block">${this._narrow ? "Aufgabe antippen und ein Datum wählen." : "Auf einen Tag ziehen oder öffnen und ein Datum wählen."}</p>
+      <div class="ablage">${eingang.map((a) => `<button type="button" class="wpunkt a" draggable="true" data-ziehen="${a.id}" data-aktion="oeffnen" data-id="${a.id}">${esc(a.titel)}</button>`).join("")}</div>
+    </section>` : ""}`;
+  }
+
+  async _wocheTermineLaden(start) {
+    const key = iso(start);
+    if (this._wLaedt === key) return;
+    this._wLaedt = key;
+    try {
+      const liste = await this._hass.callWS({ type: "planer/termine", start: key, ende: iso(plusTage(start, 7)) });
+      this._wTermine = { start: key, liste };
+    } catch (e) {
+      this._wTermine = { start: key, liste: [] };
+    }
+    this._wLaedt = null;
+    if (this._ansicht === "woche") this._zeichnen();
   }
 
   _terminZeile(t, tag) {
@@ -741,8 +850,44 @@ class PlanerPanel extends HTMLElement {
     }));
     root.querySelectorAll("[data-aktion]").forEach((b) => b.addEventListener("click", () => this._aktion(b.dataset.aktion, b.dataset.id)));
     root.querySelectorAll("li.aufgabe").forEach((li) => this._wischen(li));
+    root.querySelectorAll("[data-woche]").forEach((b) => b.addEventListener("click", () => {
+      const n = +b.dataset.woche;
+      this._wStart = n === 0 ? montag(new Date()) : plusTage(this._wStart || montag(new Date()), 7 * n);
+      this._zeichnen();
+      this._sagen(`Kalenderwoche ${+kw(this._wStart).slice(6)}`);
+    }));
+    const zf = root.getElementById("zform");
+    if (zf) {
+      const speichern = async () => {
+        const ziele = [0, 1, 2].map((i) => ({ text: zf.querySelector(`#z-${i}`).value.trim(), erledigt: zf.querySelector(`#zc-${i}`).checked }));
+        const e = await this._ws({ type: "planer/woche", kw: zf.dataset.kw, ziele, notiz: "" });
+        this._daten.wochen = { ...(this._daten.wochen || {}), [zf.dataset.kw]: e };
+      };
+      zf.querySelectorAll('input[type="text"]').forEach((i) => i.addEventListener("change", () => { speichern(); this._sagen("Wochenziel gespeichert"); }));
+      zf.querySelectorAll('input[type="checkbox"]').forEach((c) => c.addEventListener("change", () => { speichern(); this._sagen(c.checked ? "Wochenziel erreicht" : "Wochenziel wieder offen"); }));
+      zf.addEventListener("submit", (e) => e.preventDefault());
+    }
+    // Ziehen auf einen Tag (Maus/Trackpad); am Handy und mit Tastatur über „Öffnen“ und Datum
+    root.querySelectorAll("[data-ziehen]").forEach((el) => el.addEventListener("dragstart", (e) => {
+      e.dataTransfer.setData("text/plain", el.dataset.ziehen);
+      e.dataTransfer.effectAllowed = "move";
+    }));
+    root.querySelectorAll(".wtag").forEach((tag) => {
+      tag.addEventListener("dragover", (e) => { e.preventDefault(); tag.classList.add("ziel-drop"); });
+      tag.addEventListener("dragleave", () => tag.classList.remove("ziel-drop"));
+      tag.addEventListener("drop", async (e) => {
+        e.preventDefault();
+        tag.classList.remove("ziel-drop");
+        const id = e.dataTransfer.getData("text/plain");
+        const a = this._finde(id);
+        if (!a || a.datum === tag.dataset.tag) return;
+        await this._ws({ type: "planer/speichern", aufgabe: { id, datum: tag.dataset.tag, top: a.datum === tag.dataset.tag ? a.top : null } });
+        this._sagen(`${a.titel} auf ${datumText(tag.dataset.tag)} gelegt`);
+        await this._lesen();
+      });
+    });
     root.querySelectorAll("[data-termin]").forEach((b) => b.addEventListener("click", () => {
-      const t = (this._termine || []).find((x) => `${x.kalender}|${x.uid}|${x.start}` === b.dataset.termin);
+      const t = [...(this._termine || []), ...(this._wTermine?.liste || [])].find((x) => `${x.kalender}|${x.uid}|${x.start}` === b.dataset.termin);
       if (t) this._terminZeigen(t);
     }));
   }
@@ -929,6 +1074,9 @@ class PlanerPanel extends HTMLElement {
     const kal = d.alle_kalender || [];
     dlg.innerHTML = `<form method="dialog" id="eform">
       <h2 id="einst-titel">Einstellungen</h2>
+      ${kal.some((k) => k.anlegen) ? `<div class="feld"><label for="gk">Kalender für gemeinsame Termine</label>
+        <select id="gk"><option value="">Keiner</option>${kal.filter((k) => k.anlegen).map((k) => `<option value="${esc(k.id)}" ${d.gemeinsam_kalender === k.id ? "selected" : ""}>${esc(k.name)}</option>`).join("")}</select>
+        <span class="hinweis">Termine mit „Gemeinsam“ oder @gemeinsam landen hier.</span></div>` : ""}
       <p class="hinweis" style="display:block">Eigene und gemeinsame Aufgaben sieht jede Person immer. Pro Person legst du hier fest, was sie zusätzlich sieht, wo sie Termine eintragen darf und wie sie erinnert wird.</p>
       ${d.personen.map((p, i) => {
         const e = d.einstellungen[p.id] || {};
@@ -959,6 +1107,10 @@ class PlanerPanel extends HTMLElement {
       <div class="fuss"><button type="submit" class="knopf primaer">Schließen</button></div>
     </form>`;
     d.personen.forEach((p, i) => erinnBinden(dlg, `se${i}`, (t) => this._sagen(t)));
+    dlg.querySelector("#gk")?.addEventListener("change", async (e) => {
+      await this._ws({ type: "planer/allgemein", werte: { gemeinsam_kalender: e.target.value || null } });
+      this._sagen("Kalender für gemeinsame Termine gespeichert");
+    });
     dlg.querySelectorAll("[data-speichern]").forEach((b) => b.addEventListener("click", async () => {
       const i = +b.dataset.speichern;
       const sec = dlg.querySelectorAll("section.person-einst")[i];
@@ -992,7 +1144,8 @@ class PlanerPanel extends HTMLElement {
     const schreibbar = (d.kalender || []).filter((k) => k.schreiben);
     let zuletzt = null;
     try { zuletzt = localStorage.getItem("planer.kalender"); } catch (e) { /* egal */ }
-    const vorwahl = [d.einst.standard_kalender, zuletzt].find((x) => schreibbar.some((k) => k.id === x)) || schreibbar[0]?.id;
+    const eigene = [d.einst.standard_kalender, zuletzt].find((x) => schreibbar.some((k) => k.id === x)) || schreibbar[0]?.id;
+    const vorwahl = v.person === GEMEINSAM && schreibbar.some((k) => k.id === d.gemeinsam_kalender) ? d.gemeinsam_kalender : eigene;
     const datum = v.datum || heute();
     const von = v.uhrzeit || "";
     const bis = von ? (() => { const [h, m] = von.split(":").map(Number); return `${String(Math.min(23, h + 1)).padStart(2, "0")}:${String(m).padStart(2, "0")}`; })() : "";
@@ -1000,6 +1153,10 @@ class PlanerPanel extends HTMLElement {
       ${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
       <h2 id="t-titel-h">Neuer Termin</h2>
       <div class="feld"><label for="t-titel">Titel</label><input id="t-titel" required value="${esc(v.titel || "")}"></div>
+      ${d.gemeinsam_kalender && schreibbar.some((k) => k.id === d.gemeinsam_kalender) ? `<div class="schnellwahl" role="radiogroup" aria-label="Für wen">
+        <label class="check"><input type="radio" name="t-fuer" value="ich" ${v.person === GEMEINSAM ? "" : "checked"}> Für mich</label>
+        <label class="check"><input type="radio" name="t-fuer" value="gemeinsam" ${v.person === GEMEINSAM ? "checked" : ""}> Gemeinsam (${esc(this._kal(d.gemeinsam_kalender).name)})</label>
+      </div>` : ""}
       <div class="feld"><label for="t-kal">Kalender</label><select id="t-kal">
         ${schreibbar.map((k) => `<option value="${esc(k.id)}" ${k.id === vorwahl ? "selected" : ""}>${esc(k.name)}</option>`).join("")}</select></div>
       <label class="check"><input type="checkbox" id="t-ganz" ${von ? "" : "checked"}> Ganztägig</label>
@@ -1024,6 +1181,9 @@ class PlanerPanel extends HTMLElement {
     ganz();
     $("t-ganz").addEventListener("change", ganz);
     wdhBinden(dlg, "tw");
+    dlg.querySelectorAll('input[name="t-fuer"]').forEach((r) => r.addEventListener("change", () => {
+      $("t-kal").value = r.value === "gemeinsam" ? d.gemeinsam_kalender : eigene;
+    }));
     $("t-abbrechen").addEventListener("click", () => dlg.close());
     $("tform").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -1041,11 +1201,12 @@ class PlanerPanel extends HTMLElement {
       try {
         await this._hass.callWS({ type: "planer/termin_anlegen", kalender: $("t-kal").value, termin });
       } catch (err) { $("t-fehler").textContent = err.message || "Eintragen hat nicht geklappt."; return; }
-      try { localStorage.setItem("planer.kalender", $("t-kal").value); } catch (e2) { /* egal */ }
+      if ($("t-kal").value !== d.gemeinsam_kalender) { try { localStorage.setItem("planer.kalender", $("t-kal").value); } catch (e2) { /* egal */ } }
       dlg.close();
       const s = this.shadowRoot.getElementById("schnell");
       if (s) { s.value = ""; this._vorschau(); }
       this._sagen(`Termin eingetragen: ${titel}, ${datumText(tag)}`);
+      this._wTermine = null;
       this._termineLaden();
     });
     this._wischZu(dlg);
@@ -1086,6 +1247,7 @@ class PlanerPanel extends HTMLElement {
       } catch (err) { dlg.querySelector("#t-fehler").textContent = err.message || "Löschen hat nicht geklappt."; return; }
       dlg.close();
       this._sagen(`Termin gelöscht: ${t.titel}`);
+      this._wTermine = null;
       this._termineLaden();
     }));
     this._wischZu(dlg);

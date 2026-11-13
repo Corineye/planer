@@ -46,6 +46,8 @@ class Planer:
         self._store: Store = Store(hass, SPEICHER_VERSION, SPEICHER_SCHLUESSEL)
         self.aufgaben: dict[str, dict[str, Any]] = {}
         self.einstellungen: dict[str, dict[str, Any]] = {}
+        self.wochen: dict[str, dict[str, dict[str, Any]]] = {}  # Person → Kalenderwoche (2026-W47) → Ziele, Notiz
+        self.allgemein: dict[str, Any] = {}
         self._zuhoerer: list[Callable[[], None]] = []
         self.personen: list[dict[str, str]] = []
 
@@ -53,6 +55,8 @@ class Planer:
         daten = await self._store.async_load() or {}
         self.aufgaben = daten.get("aufgaben", {})
         self.einstellungen = daten.get("einstellungen", {})
+        self.wochen = daten.get("wochen", {})
+        self.allgemein = daten.get("allgemein", {})
         await self.async_personen()
 
     async def async_personen(self) -> list[dict[str, str]]:
@@ -123,7 +127,9 @@ class Planer:
         return lambda: self._zuhoerer.remove(fn) if fn in self._zuhoerer else None
 
     async def _sichern(self) -> None:
-        await self._store.async_save({"aufgaben": self.aufgaben, "einstellungen": self.einstellungen})
+        await self._store.async_save(
+            {"aufgaben": self.aufgaben, "einstellungen": self.einstellungen, "wochen": self.wochen, "allgemein": self.allgemein}
+        )
         for fn in list(self._zuhoerer):
             fn()
 
@@ -246,6 +252,25 @@ class Planer:
         if not self.sichtbar(a, benutzer_id):
             raise PermissionError("Diese Aufgabe gehört einer anderen Person.")
         del self.aufgaben[aufgabe_id]
+        await self._sichern()
+
+    async def woche(self, person: str, kw: str, ziele: list[dict[str, Any]], notiz: str) -> dict[str, Any]:
+        if not re.match(r"^\d{4}-W\d{2}$", kw):
+            raise ValueError("Kalenderwoche ungültig")
+        sauber = [
+            {"text": _text(z.get("text"), 200), "erledigt": bool(z.get("erledigt"))}
+            for z in ziele[:3]
+            if isinstance(z, dict) and _text(z.get("text"), 200)
+        ]
+        eintrag = {"ziele": sauber, "notiz": _text(notiz, 4000)}
+        self.wochen.setdefault(person, {})[kw] = eintrag
+        await self._sichern()
+        return eintrag
+
+    async def allgemein_setzen(self, werte: dict[str, Any]) -> None:
+        if "gemeinsam_kalender" in werte:
+            v = werte["gemeinsam_kalender"]
+            self.allgemein["gemeinsam_kalender"] = str(v) if v and str(v).startswith("calendar.") else None
         await self._sichern()
 
     async def einstellung(self, person: str, werte: dict[str, Any]) -> None:

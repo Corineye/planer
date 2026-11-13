@@ -42,7 +42,7 @@ def async_registrieren(hass: HomeAssistant) -> None:
         return
     for befehl in (
         ws_lesen, ws_abonnieren, ws_speichern, ws_erledigen, ws_loeschen, ws_einstellung,
-        ws_termine, ws_termin_anlegen, ws_termin_loeschen,
+        ws_termine, ws_termin_anlegen, ws_termin_loeschen, ws_woche, ws_allgemein,
     ):
         websocket_api.async_register_command(hass, befehl)
     daten["ws"] = True
@@ -72,6 +72,8 @@ async def ws_lesen(hass: HomeAssistant, connection: websocket_api.ActiveConnecti
             "handys": hass.data[DOMAIN]["erinnerungen"].handys() if user.is_admin else [],
             "kalender": _kalender_fuer(hass, user.id),
             "aufgaben": p.fuer(user.id),
+            "wochen": p.wochen.get(user.id, {}),
+            "gemeinsam_kalender": p.allgemein.get("gemeinsam_kalender"),
         },
     )
 
@@ -196,4 +198,31 @@ async def ws_termin_loeschen(hass: HomeAssistant, connection: websocket_api.Acti
     except (HomeAssistantError, ValueError) as err:
         _fehler(connection, msg["id"], err)
         return
+    connection.send_result(msg["id"], {"ok": True})
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): f"{DOMAIN}/woche",
+        vol.Required("kw"): str,
+        vol.Required("ziele"): list,
+        vol.Optional("notiz", default=""): str,
+    }
+)
+@websocket_api.async_response
+async def ws_woche(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    """Wochenziele (höchstens drei) und Notiz der angemeldeten Person für eine Kalenderwoche."""
+    try:
+        e = await _planer(hass).woche(connection.user.id, msg["kw"], msg["ziele"], msg["notiz"])
+    except ValueError as err:
+        _fehler(connection, msg["id"], err)
+        return
+    connection.send_result(msg["id"], e)
+
+
+@websocket_api.websocket_command({vol.Required("type"): f"{DOMAIN}/allgemein", vol.Required("werte"): dict})
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_allgemein(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    await _planer(hass).allgemein_setzen(msg["werte"])
     connection.send_result(msg["id"], {"ok": True})

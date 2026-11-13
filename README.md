@@ -10,7 +10,7 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
 3. Einstellungen › Geräte & Dienste › Integration hinzufügen › **Planer**.
 4. In der Seitenleiste erscheint „Planer“.
 
-## Was es gibt (v0.2)
+## Was es gibt (v0.3)
 
 - **Heute** mit Top 3 (je Rang 1–3, nie mehr als drei), weiteren Aufgaben, Überfälligem und „Heute erledigt“.
 - **Demnächst** (nach Tagen gruppiert) und **Eingang** (alles ohne Datum).
@@ -33,10 +33,15 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
   Standard 30 Min., 3 Std., 1 Tag vorher, pro Aufgabe änderbar, eigene Werte möglich. Knöpfe „Erledigt“ und „In 1 Stunde“.
   Handy pro Person unter „Einstellungen“ wählen. Aufgaben ohne Uhrzeit zählen ab 9:00 Uhr.
 
+- **Woche** (v0.3): sieben Tage mit Terminen und Aufgaben, bis zu drei Wochenziele zum Abhaken, Wochen vor- und
+  zurückblättern. Aufgaben am PC auf einen Tag ziehen, auch aus dem Eingang; am Handy und mit Tastatur über „Öffnen“ und Datum.
+- **Gemeinsame Termine** (v0.3): In den Einstellungen einen Kalender für gemeinsame Termine wählen (z. B. „Linda und Corin“).
+  Beim Termin „Gemeinsam“ wählen oder `@gemeinsam` tippen, dann landet er dort.
+
 ## Daten
 
 Gespeichert in `.storage/planer.daten` (im HA-Backup enthalten).
 
 ## Geplant
 
-Bring!-Einkaufsliste, Wochenansicht mit Wochenzielen.
+Bring!-Einkaufsliste, Assist-Sätze, Verknüpfung mit der Filament-Werkstatt.
