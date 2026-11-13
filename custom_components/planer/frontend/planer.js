@@ -200,7 +200,7 @@ function naechsterWochentag(i, abHeute = true) {
 export function parse(text, personen) {
   let t = ` ${text} `;
   const r = { titel: "", datum: undefined, uhrzeit: null, top: null, bereich: "", person: undefined, wiederholung: null };
-  const weg = (re, fn) => { t = t.replace(re, (...m) => { fn(m); return " "; }); };
+  const weg = (re, fn) => { let ok = false; t = t.replace(re, (...m) => { ok = true; fn(m); return " "; }); return ok; };
   const WT = "(montags?|dienstags?|mittwochs?|donnerstags?|freitags?|samstags?|sonntags?|mo|di|mi|do|fr|sa|so)";
 
   // Wiederholung
@@ -243,7 +243,11 @@ export function parse(text, personen) {
 
   // Top, Bereich, Person
   weg(/\s!([1-3])(?=\s)/, (m) => { r.top = +m[1]; });
-  weg(/\s#([\wäöüß-]+)(?=\s)/i, (m) => { r.bereich = m[1].toLowerCase(); });
+  r.tags = [];
+  while (true) {
+    const treffer = weg(/\s#([\wäöüß-]+)(?=\s)/i, (m) => { if (!r.bereich) r.bereich = m[1].toLowerCase(); else r.tags.push(m[1].toLowerCase()); });
+    if (!treffer) break;
+  }
   weg(/\s@([\wäöüß-]+)(?=\s)/i, (m) => {
     const w = m[1].toLowerCase();
     if (["gemeinsam", "beide", "alle"].includes(w)) r.person = GEMEINSAM;
@@ -266,22 +270,28 @@ export function parse(text, personen) {
 // ---------- Stil ----------
 const CSS = `
 :host{
-  --bg:#0b1110; --bg2:#111a18; --glass:rgba(24,37,34,.72); --line:rgba(140,255,214,.14); --line2:rgba(140,255,214,.28);
-  --fg:#e6f1ed; --muted:#9db3ab; --mint:#5ff2b8; --mint-dim:rgba(95,242,184,.14); --on-mint:#06241a;
-  --warn:#ffc46b; --warn-dim:rgba(255,196,107,.14); --red:#ff8f8f; --focus:#ffe58a;
-  --font:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --bg:#f2f2f7; --bg2:#ffffff; --card:#ffffff; --glass:#ffffff; --line:rgba(60,60,67,.16); --line2:rgba(60,60,67,.32);
+  --fg:#000000; --muted:#5f5f66; --mint:#007aff; --mint-dim:rgba(0,122,255,.12); --on-mint:#ffffff; --accent:#007aff;
+  --warn:#9a5200; --warn-dim:rgba(255,149,0,.16); --red:#d70015; --focus:#0a5fd0; --fill:rgba(120,120,128,.12); --navbg:rgba(249,249,249,.94);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",system-ui,Roboto,sans-serif; --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   display:block; min-height:100vh; min-height:100dvh; background:var(--bg); color:var(--fg); font-family:var(--font); font-size:1rem; line-height:1.5;
-  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
-  background-size:32px 32px; color-scheme:dark;
+  color-scheme:light dark;
 }
+@media (prefers-color-scheme:dark){:host{
+  --bg:#000000; --bg2:#1c1c1e; --card:#1c1c1e; --glass:#1c1c1e; --line:rgba(255,255,255,.16); --line2:rgba(255,255,255,.34);
+  --fg:#ffffff; --muted:#aeaeb4; --mint:#0a84ff; --mint-dim:rgba(10,132,255,.22); --on-mint:#ffffff; --accent:#0a84ff;
+  --warn:#ffb340; --warn-dim:rgba(255,159,10,.2); --red:#ff6b61; --focus:#64d2ff; --fill:rgba(255,255,255,.1); --navbg:rgba(28,28,30,.94);
+}}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:8px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap>*{min-width:0}
+.eingabe .knopf{flex:none}
 .wrap{max-width:960px;margin:0 auto;padding:16px 16px 120px;display:grid;gap:18px}
 header{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-header h1{margin:0;font-size:1.5rem;font-weight:700;letter-spacing:-.01em}
+header h1{margin:0;font-size:2rem;font-weight:700;letter-spacing:-.02em}
 header .datum{color:var(--muted)}
 header .rechts{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .menu{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--glass);cursor:pointer;font-size:1.25rem}
@@ -291,38 +301,38 @@ header .rechts{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:
 .knopf{border:1px solid var(--line2);background:var(--glass);border-radius:12px;padding:8px 14px;min-height:44px;cursor:pointer}
 .knopf:hover{border-color:var(--mint)}
 .knopf.primaer{background:var(--mint);color:var(--on-mint);border-color:var(--mint);font-weight:600}
-.knopf.gefahr{border-color:rgba(255,143,143,.5);color:var(--red)}
+.knopf.gefahr{border-color:color-mix(in srgb,var(--red) 50%,transparent);color:var(--red)}
 .knopf.klein{min-height:36px;padding:4px 10px;font-size:.875rem}
 
 form.schnell{display:grid;gap:6px}
-.eingabe{display:flex;gap:8px}
-.eingabe input{flex:1;min-width:0;min-height:52px;border-radius:14px;border:1px solid var(--line2);background:var(--glass);padding:0 16px;font-size:1.05rem}
+.eingabe{display:flex;gap:8px;min-width:0;width:100%}
+.eingabe input{flex:1;width:0;min-width:0;min-height:52px;border-radius:14px;border:1px solid var(--line2);background:var(--glass);padding:0 16px;font-size:1.05rem}
 .eingabe input::placeholder{color:var(--muted)}
 .hinweis{font-size:.875rem;color:var(--muted);min-height:1.5em;display:flex;gap:6px;flex-wrap:wrap}
 .chip{display:inline-flex;align-items:center;gap:4px;font-size:.8125rem;padding:1px 8px;border-radius:99px;border:1px solid var(--line2);color:var(--muted);white-space:nowrap}
-.chip.mint{color:var(--mint);border-color:rgba(95,242,184,.45);background:var(--mint-dim)}
-.chip.warn{color:var(--warn);border-color:rgba(255,196,107,.45);background:var(--warn-dim)}
+.chip.mint{color:var(--mint);border-color:color-mix(in srgb,var(--mint) 45%,transparent);background:var(--mint-dim)}
+.chip.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 45%,transparent);background:var(--warn-dim)}
 
 nav.tabs{display:flex;gap:6px}
 nav.tabs button{border:1px solid transparent;background:none;border-radius:12px;padding:8px 14px;min-height:44px;cursor:pointer;color:var(--muted);display:flex;gap:6px;align-items:center}
-nav.tabs button[aria-current="page"]{background:var(--mint-dim);color:var(--mint);border-color:rgba(95,242,184,.35);font-weight:600}
-nav.tabs .zahl{font-family:var(--mono);font-size:.75rem;background:rgba(255,255,255,.08);border-radius:99px;padding:0 7px}
+nav.tabs button[aria-current="page"]{background:var(--mint-dim);color:var(--mint);border-color:color-mix(in srgb,var(--mint) 35%,transparent);font-weight:600}
+nav.tabs .zahl{font-family:var(--mono);font-size:.75rem;background:var(--fill);border-radius:99px;padding:0 7px}
 .schmal .eingabe .primaer{min-width:52px;font-size:1.4rem}
 .schmal header .rechts{margin-left:0;width:100%}
-.schmal nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:5;justify-content:space-around;background:rgba(11,17,16,.96);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
+.schmal nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:5;justify-content:space-around;background:var(--navbg);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
 .schmal nav.tabs button{flex:1;flex-direction:column;gap:0;font-size:.8125rem;padding:6px 4px}
 
-main{display:grid;gap:22px}
+main{display:grid;grid-template-columns:minmax(0,1fr);gap:22px}
 section.gruppe{display:grid;gap:8px}
 .gruppe h2{margin:0;font-size:.8125rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;gap:8px;align-items:center}
 .gruppe h2 .zahl{font-family:var(--mono);letter-spacing:0}
 ul.liste{list-style:none;margin:0;padding:0;display:grid;gap:8px}
 li.aufgabe{position:relative;border-radius:14px;touch-action:pan-y}
-.zeile{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:14px;background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:transform .15s ease}
-.top .zeile{border-color:rgba(95,242,184,.35)}
+.zeile{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:14px;background:var(--glass);border:1px solid var(--line);transition:transform .15s ease}
+.top .zeile{border-color:color-mix(in srgb,var(--mint) 35%,transparent)}
 .erledigt .zeile{opacity:.6}
 .erledigt .titel{text-decoration:line-through}
-.haken{flex:none;width:28px;height:28px;border-radius:8px;border:2px solid var(--muted);background:none;cursor:pointer;display:grid;place-items:center;padding:0}
+.haken{flex:none;width:28px;height:28px;border-radius:50%;border:2px solid var(--muted);background:none;cursor:pointer;display:grid;place-items:center;padding:0}
 .haken[aria-checked="true"]{background:var(--mint);border-color:var(--mint);color:var(--on-mint)}
 .haken svg{width:16px;height:16px}
 .rang{flex:none;font-family:var(--mono);font-size:.8125rem;font-weight:700;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:var(--mint);color:var(--on-mint)}
@@ -336,7 +346,7 @@ li.aufgabe{position:relative;border-radius:14px;touch-action:pan-y}
 .wisch.links{background:var(--warn-dim);color:var(--warn);justify-content:flex-end}
 details.zu summary{cursor:pointer;color:var(--muted);min-height:44px;display:flex;align-items:center}
 
-dialog{border:1px solid var(--line2);border-radius:18px;background:#121c1a;color:var(--fg);padding:0;width:min(560px,calc(100vw - 24px));max-height:calc(100dvh - 24px)}
+dialog{border:1px solid var(--line2);border-radius:18px;background:var(--card);color:var(--fg);padding:0;width:min(560px,calc(100vw - 24px));max-height:calc(100dvh - 24px)}
 dialog::backdrop{background:rgba(0,0,0,.6)}
 .schmal dialog{margin:auto auto 0;width:100vw;max-width:100vw;border-radius:18px 18px 0 0;border-bottom:0}
 dialog form{display:grid;gap:14px;padding:20px;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))}
@@ -361,9 +371,11 @@ fieldset{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margi
 .check{display:flex;gap:10px;align-items:center;min-height:44px}
 .check input{width:22px;height:22px;accent-color:var(--mint)}
 .spalten{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px;align-items:start}
-.spalten>div{display:grid;gap:22px;min-width:0}
-.schmal .spalten{grid-template-columns:1fr}
-aside.kal{display:grid;gap:8px;position:sticky;top:12px}
+.spalten>div{display:grid;grid-template-columns:minmax(0,1fr);gap:22px;min-width:0}
+.schmal .spalten{grid-template-columns:minmax(0,1fr)}
+.spalten>*{min-width:0}
+.termin .was,.termin .wo{min-width:0;overflow-wrap:anywhere}
+aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;position:sticky;top:12px}
 .termine{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .termin{width:100%;display:grid;grid-template-columns:6.8em 1fr;gap:2px 10px;text-align:left;padding:8px 12px;border-radius:12px;border:1px solid var(--line);border-left:4px solid var(--k,var(--mint));background:var(--glass);cursor:pointer}
 .termin .zeit{font-family:var(--mono);font-size:.8125rem;color:var(--muted);white-space:nowrap;padding-top:2px}
@@ -399,12 +411,12 @@ aside.kal{display:grid;gap:8px;position:sticky;top:12px}
 .schmal .woche{grid-template-columns:1fr;min-width:0}
 .wtag{background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:8px;display:grid;gap:6px;align-content:start;min-height:180px;min-width:0}
 .schmal .wtag{min-height:0}
-.wtag.heute{border-color:rgba(95,242,184,.5)}
+.wtag.heute{border-color:color-mix(in srgb,var(--mint) 50%,transparent)}
 .wtag.ziel-drop{outline:2px dashed var(--mint);outline-offset:2px}
 .wtag h3{margin:0;font-size:.9rem;display:flex;justify-content:space-between;gap:6px}
 .wtag h3 .d{color:var(--muted);font-weight:400}
-.wpunkt{display:block;width:100%;text-align:left;font-size:.8125rem;line-height:1.35;padding:5px 7px;border-radius:8px;border:1px solid transparent;background:rgba(255,255,255,.04);cursor:pointer;overflow-wrap:anywhere}
-.wpunkt.t{border-left:3px solid var(--k,var(--mint));background:rgba(255,255,255,.02)}
+.wpunkt{display:block;width:100%;text-align:left;font-size:.8125rem;line-height:1.35;padding:5px 7px;border-radius:8px;border:1px solid transparent;background:var(--fill);cursor:pointer;overflow-wrap:anywhere}
+.wpunkt.t{border-left:3px solid var(--k,var(--mint));background:var(--fill)}
 .wpunkt.a.top{background:var(--mint-dim);color:var(--mint)}
 .wpunkt.a.fertig{opacity:.55;text-decoration:line-through}
 .wpunkt .z{font-family:var(--mono);color:var(--muted);margin-right:6px}
@@ -416,6 +428,20 @@ li.aufgabe.farbig .zeile{border-left:4px solid var(--b)}
 .punkt{width:9px;height:9px;border-radius:50%;background:var(--b);display:inline-block}
 .chip.naechstes{color:var(--on-mint);background:var(--mint);border-color:var(--mint);font-weight:600}
 .bereiche{flex-wrap:wrap}
+.kalumschalter{margin-bottom:12px}
+.monat{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;min-width:560px}
+.mkopf{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:2px 6px;font-weight:700}
+.mtag{display:flex;flex-direction:column;align-items:stretch;gap:2px;text-align:left;min-height:96px;padding:6px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg);font:inherit;cursor:pointer;min-width:0;overflow:hidden}
+.mtag:hover{border-color:var(--accent)}
+.mtag.fremd{opacity:.55}
+.mtag.heute{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.mnr{font-weight:700;font-size:.9rem}
+.mtag.heute .mnr{color:var(--accent)}
+.mpunkt{display:block;font-size:.72rem;line-height:1.3;padding:1px 4px;border-left:3px solid var(--k,var(--accent));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mpunkt.aufg{border-left-color:var(--muted);color:var(--muted)}
+.mmehr{font-size:.7rem;color:var(--muted)}
+.schmal .mtag{min-height:64px}
+.schmal .mpunkt{font-size:.62rem}
 .bereiche button{display:inline-flex;gap:6px;align-items:center}
 .teile{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .teil{display:flex;gap:8px;align-items:center}
@@ -439,11 +465,13 @@ class PlanerPanel extends HTMLElement {
     this.attachShadow({ mode: "open" });
     this._daten = null;
     this._ansicht = "heute";
+    this._kalAnsicht = "monat";
     this._filter = "ich";
     this._fehler = "";
     this._tasten = (e) => this._taste(e);
     try {
       this._ansicht = localStorage.getItem("planer.ansicht") || "heute";
+      this._kalAnsicht = localStorage.getItem("planer.kalansicht") || "monat";
       this._filter = localStorage.getItem("planer.filter") || "ich";
       this._bereich = localStorage.getItem("planer.bereich") || "";
     } catch (e) { /* ohne Speicher weiter */ }
@@ -539,7 +567,7 @@ class PlanerPanel extends HTMLElement {
     const f = this._filter;
     const b = this._bereich;
     return d.aufgaben.filter((a) => {
-      if (b && (a.bereich || "") !== b) return false;
+      if (b && (a.bereich || "") !== b && !(a.tags || []).includes(b)) return false;
       if (f === "alle") return true;
       if (f === "ich") return a.person === d.ich || a.person === GEMEINSAM;
       return a.person === f;
@@ -586,7 +614,7 @@ class PlanerPanel extends HTMLElement {
       eingang: offen.filter((a) => !a.datum).length,
       woche: offen.filter((a) => a.datum && a.datum >= iso(montag(new Date())) && a.datum <= iso(plusTage(montag(new Date()), 6))).length,
     };
-    const tabs = [["heute", "Heute"], ["woche", "Woche"], ["demnaechst", "Demnächst"], ["eingang", "Eingang"]];
+    const tabs = [["heute", "Heute"], ["woche", "Kalender"], ["demnaechst", "Demnächst"], ["eingang", "Eingang"]];
     const heuteD = new Date();
     const filterKnoepfe = d.andere_sehen
       ? `<div class="seg" role="group" aria-label="Wessen Aufgaben">
@@ -612,6 +640,7 @@ class PlanerPanel extends HTMLElement {
         <div class="eingabe">
           <input id="schnell" data-fokus="schnell" placeholder="Neue Aufgabe, z. B. morgen 15 Uhr !1 Filament bestellen #werkstatt" aria-describedby="vorschau tipp" enterkeyhint="done">
           <button class="knopf primaer" type="submit" aria-label="Aufgabe hinzufügen">${schmal ? "＋" : "Aufgabe"}</button>
+          <button class="knopf" type="button" data-aktion="erweitert" aria-label="Aufgabe mit allen Einstellungen anlegen">${schmal ? "⚙" : "Erweitert"}</button>
           ${(d.kalender || []).some((k) => k.schreiben) ? `<button class="knopf" type="button" data-aktion="termin" aria-label="Als Termin in den Kalender eintragen">${schmal ? "📅" : "Termin"}</button>` : ""}
         </div>
         <div class="hinweis" id="vorschau" aria-live="polite"></div>
@@ -623,7 +652,7 @@ class PlanerPanel extends HTMLElement {
       </nav>
 
       ${(() => {
-        const liste = [...new Set(d.aufgaben.filter((a) => a.status === "offen").map((a) => a.bereich).filter(Boolean))].sort();
+        const liste = [...new Set(d.aufgaben.filter((a) => a.status === "offen").flatMap((a) => [a.bereich, ...(a.tags || [])]).filter(Boolean))].sort();
         if (this._bereich && !liste.includes(this._bereich)) liste.push(this._bereich);
         if (!liste.length) return "";
         return `<div class="seg bereiche" role="group" aria-label="Nach Bereich filtern">
@@ -664,7 +693,7 @@ class PlanerPanel extends HTMLElement {
       const liste = this._sortiert(offen.filter((a) => !a.datum));
       return this._gruppe("Eingang", liste, "Der Eingang ist leer. Alles ohne Datum landet hier, auch was du per Sprache oder in der HA-App zur Planer-Liste hinzufügst.");
     }
-    if (this._ansicht === "woche") return this._wocheHtml(alle);
+    if (this._ansicht === "woche") return this._kalenderUmschalter() + (this._kalAnsicht === "monat" ? this._monatHtml(alle) : this._wocheHtml(alle));
     if (this._ansicht === "demnaechst") {
       const kommend = offen.filter((a) => a.datum && a.datum > h).sort((a, b) => a.datum.localeCompare(b.datum));
       const tage = new Set(kommend.map((a) => a.datum));
@@ -709,6 +738,70 @@ class PlanerPanel extends HTMLElement {
     }
     if (this._narrow) return html;
     return `<div class="spalten"><div>${html}</div>${kal}</div>`;
+  }
+
+  _kalenderUmschalter() {
+    const m = this._kalAnsicht === "monat";
+    return `<div class="seg kalumschalter" role="group" aria-label="Kalenderansicht">
+      <button type="button" data-kal-ansicht="monat" aria-pressed="${m}">Monat</button>
+      <button type="button" data-kal-ansicht="woche" aria-pressed="${!m}">Woche</button>
+    </div>`;
+  }
+
+  _monatHtml(alle) {
+    const erster = this._mStart || new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    const von = montag(erster);
+    const tage = [...Array(42)].map((_, i) => iso(plusTage(von, i)));
+    const key = tage[0];
+    const termine = this._mTermine?.start === key ? this._mTermine.liste : null;
+    if (!termine) this._monatTermineLaden(von, key);
+    const am = (tag) => (termine || []).filter((t) => {
+      const s0 = t.start.slice(0, 10), e0 = t.ende.slice(0, 10);
+      return t.ganztag ? s0 <= tag && tag < e0 : s0 <= tag && tag <= e0;
+    });
+    const aufg = (tag) => this._sortiert(alle.filter((a) => a.datum === tag && a.status === "offen"));
+    const heuteIso = iso(new Date());
+    const dieserMonat = erster.getMonth(), dieserJahr = erster.getFullYear();
+    const zeilen = tage.slice(35).every((t) => ausIso(t).getMonth() !== dieserMonat) ? 35 : 42;
+    return `<section class="gruppe" aria-labelledby="m-titel">
+      <div class="wkopf">
+        <h2 id="m-titel">${MONATE[dieserMonat]} ${dieserJahr}</h2>
+        <button type="button" class="knopf klein" data-monat="-1" aria-label="Voriger Monat">←</button>
+        <button type="button" class="knopf klein" data-monat="0">Heute</button>
+        <button type="button" class="knopf klein" data-monat="1" aria-label="Nächster Monat">→</button>
+      </div>
+      <div class="woche-wrap"><div class="monat" role="grid" aria-labelledby="m-titel">
+        ${["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((n) => `<div class="mkopf" role="columnheader">${n}</div>`).join("")}
+        ${tage.slice(0, zeilen).map((t) => {
+          const d = ausIso(t);
+          const ts = am(t), as = aufg(t);
+          const items = [
+            ...ts.map((x) => `<span class="mpunkt" style="--k:${this._farbe(x.kalender)}">${x.ganztag ? "" : uhr(x.start) + " "}${esc(x.titel)}</span>`),
+            ...as.map((a) => `<span class="mpunkt aufg">${esc(a.titel)}</span>`),
+          ];
+          const sicht = items.slice(0, 3).join("");
+          const rest = items.length > 3 ? `<span class="mmehr">+${items.length - 3} weitere</span>` : "";
+          return `<button type="button" role="gridcell" class="mtag ${d.getMonth() !== dieserMonat ? "fremd" : ""} ${t === heuteIso ? "heute" : ""}" data-mtag="${t}"
+            aria-label="${esc(`${d.getDate()}. ${MONATE[d.getMonth()]}: ${ts.length} Termine, ${as.length} Aufgaben. Woche öffnen`)}">
+            <span class="mnr">${d.getDate()}</span>${sicht}${rest}</button>`;
+        }).join("")}
+      </div></div>
+      ${termine === null ? `<p class="hinweis" role="status">Termine werden geladen …</p>` : ""}
+      <p class="hinweis" style="display:block">Tippe auf einen Tag, um die Woche mit allen Details zu öffnen.</p>
+    </section>`;
+  }
+
+  async _monatTermineLaden(von, key) {
+    if (this._mLaedt === key) return;
+    this._mLaedt = key;
+    try {
+      const liste = await this._hass.callWS({ type: "planer/termine", start: key, ende: iso(plusTage(von, 42)) });
+      this._mTermine = { start: key, liste };
+    } catch (e) {
+      this._mTermine = { start: key, liste: [] };
+    }
+    this._mLaedt = null;
+    if (this._ansicht === "woche" && this._kalAnsicht === "monat") this._zeichnen();
   }
 
   _wocheHtml(alle) {
@@ -857,6 +950,7 @@ class PlanerPanel extends HTMLElement {
     const farbe = bereichFarbe(a.bereich, this._daten.farben);
     if (!fertig && this._ansicht === "heute" && this._naechste === a.id) meta.unshift(`<span class="chip naechstes">Als Nächstes</span>`);
     if (a.bereich) meta.push(`<span class="chip" style="--b:${farbe}"><span class="punkt" aria-hidden="true"></span> ${esc(a.bereich)}</span>`);
+    for (const t of a.tags || []) meta.push(`<span class="chip">#${esc(t)}</span>`);
     const teile = a.teilaufgaben || [];
     if (teile.length) {
       const fertigT = teile.filter((t) => t.erledigt).length;
@@ -922,6 +1016,24 @@ class PlanerPanel extends HTMLElement {
     }));
     root.querySelectorAll("[data-aktion]").forEach((b) => b.addEventListener("click", () => this._aktion(b.dataset.aktion, b.dataset.id)));
     root.querySelectorAll("li.aufgabe").forEach((li) => this._wischen(li));
+    root.querySelectorAll("[data-kal-ansicht]").forEach((b) => b.addEventListener("click", () => {
+      this._kalAnsicht = b.dataset.kalAnsicht;
+      try { localStorage.setItem("planer.kalansicht", this._kalAnsicht); } catch (e) { /* egal */ }
+      this._zeichnen();
+    }));
+    root.querySelectorAll("[data-monat]").forEach((b) => b.addEventListener("click", () => {
+      const n = +b.dataset.monat;
+      const jetzt = new Date();
+      const e = this._mStart || new Date(jetzt.getFullYear(), jetzt.getMonth(), 1);
+      this._mStart = n === 0 ? new Date(jetzt.getFullYear(), jetzt.getMonth(), 1) : new Date(e.getFullYear(), e.getMonth() + n, 1);
+      this._zeichnen();
+      this._sagen(`${MONATE[this._mStart.getMonth()]} ${this._mStart.getFullYear()}`);
+    }));
+    root.querySelectorAll("[data-mtag]").forEach((b) => b.addEventListener("click", () => {
+      this._wStart = montag(ausIso(b.dataset.mtag));
+      this._kalAnsicht = "woche";
+      this._zeichnen();
+    }));
     root.querySelectorAll("[data-woche]").forEach((b) => b.addEventListener("click", () => {
       const n = +b.dataset.woche;
       this._wStart = n === 0 ? montag(new Date()) : plusTage(this._wStart || montag(new Date()), 7 * n);
@@ -989,12 +1101,23 @@ class PlanerPanel extends HTMLElement {
     this.shadowRoot.getElementById("schnell")?.focus();
   }
 
+  _erweitert() {
+    const s = this.shadowRoot.getElementById("schnell");
+    const p = s.value.trim() ? parse(s.value, this._daten.personen) : {};
+    const aufgabe = { titel: "", teilaufgaben: [], ...p };
+    if (aufgabe.datum === undefined) aufgabe.datum = this._ansicht === "heute" ? heute() : null;
+    if (!aufgabe.person) aufgabe.person = this._filter !== "ich" && this._filter !== "alle" ? this._filter : this._daten.ich;
+    s.value = "";
+    this._oeffnen(aufgabe);
+  }
+
   _finde(id) { return this._daten.aufgaben.find((a) => a.id === id); }
 
   async _aktion(art, id) {
     const a = id ? this._finde(id) : null;
     if (art === "einstellungen") return this._einstellungen();
     if (art === "termin") return this._terminNeu();
+    if (art === "erweitert") return this._erweitert();
     if (!a) return;
     if (art === "oeffnen") return this._oeffnen(a);
     if (art === "haken") {
@@ -1056,7 +1179,7 @@ class PlanerPanel extends HTMLElement {
     const personen = [...d.personen.map((p) => [p.id, p.name]), [GEMEINSAM, "Gemeinsam"]];
     dlg.innerHTML = `<form method="dialog" id="bform" novalidate>
       ${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
-      <h2 id="blatt-titel">Aufgabe bearbeiten</h2>
+      <h2 id="blatt-titel">${a.id ? "Aufgabe bearbeiten" : "Neue Aufgabe"}</h2>
       <div class="feld"><label for="b-titel">Titel</label><input id="b-titel" required value="${esc(a.titel)}"></div>
       <fieldset>
         <legend>Teilaufgaben</legend>
@@ -1084,6 +1207,7 @@ class PlanerPanel extends HTMLElement {
         <div class="feld"><label for="b-person">Für</label><select id="b-person">${personen.map(([id, n]) => `<option value="${esc(id)}" ${a.person === id ? "selected" : ""}>${esc(n)}</option>`).join("")}</select></div>
         <div class="feld"><label for="b-top">Top 3</label><select id="b-top">
           <option value="">Keine Top-Aufgabe</option>${[1, 2, 3].map((i) => `<option value="${i}" ${a.top === i ? "selected" : ""}>Rang ${i}</option>`).join("")}</select></div>
+        <div class="feld"><label for="b-tags">Hashtags</label><input id="b-tags" value="${esc((a.tags || []).map((t) => "#" + t).join(" "))}" placeholder="#filament #bestellen"></div>
         <div class="feld"><label for="b-bereich">Bereich</label><input id="b-bereich" value="${esc(a.bereich || "")}" placeholder="z. B. werkstatt" list="b-bereiche"><datalist id="b-bereiche">${[...new Set([...Object.keys(BEREICH_STANDARD), ...d.aufgaben.map((x) => x.bereich).filter(Boolean)])].map((b) => `<option value="${esc(b)}">`).join("")}</datalist></div>
       </div>
       ${wdhHtml("b", w)}
@@ -1150,7 +1274,7 @@ class PlanerPanel extends HTMLElement {
       try {
         await this._ws({ type: "planer/speichern", aufgabe: {
           id: a.id, titel, datum, uhrzeit: $("b-uhr").value || null, dauer: $("b-dauer").value || null,
-          person: $("b-person").value, top, bereich: $("b-bereich").value, notiz: $("b-notiz").value, wiederholung, erinnerungen: erinnLesen(dlg, "be"), teilaufgaben,
+          person: $("b-person").value, top, bereich: $("b-bereich").value, tags: $("b-tags").value, notiz: $("b-notiz").value, wiederholung, erinnerungen: erinnLesen(dlg, "be"), teilaufgaben,
         } });
       } catch (err) { $("b-fehler").textContent = err.message || "Speichern hat nicht geklappt."; return; }
       dlg.close();
@@ -1191,6 +1315,10 @@ class PlanerPanel extends HTMLElement {
       ${kal.some((k) => k.anlegen) ? `<div class="feld"><label for="gk">Kalender für gemeinsame Termine</label>
         <select id="gk"><option value="">Keiner</option>${kal.filter((k) => k.anlegen).map((k) => `<option value="${esc(k.id)}" ${d.gemeinsam_kalender === k.id ? "selected" : ""}>${esc(k.name)}</option>`).join("")}</select>
         <span class="hinweis">Termine mit „Gemeinsam“ oder @gemeinsam landen hier.</span></div>` : ""}
+      ${(d.alle_benutzer || []).length > 2 ? `<fieldset><legend>Wer nutzt den Planer?</legend>
+        <p class="hinweis" style="display:block">Nur angehakte Benutzer erscheinen im Planer. Entferne den Haken bei Konten wie Tablet, Gast oder Claude.</p>
+        ${d.alle_benutzer.map((b) => `<label class="check"><input type="checkbox" data-nutzer="${esc(b.id)}" ${b.ausgeblendet ? "" : "checked"} ${b.id === d.ich ? "disabled" : ""}> ${esc(b.name)}</label>`).join("")}
+      </fieldset>` : ""}
       ${(() => {
         const namen = [...new Set([...Object.keys(BEREICH_STANDARD), ...d.aufgaben.map((a) => a.bereich).filter(Boolean)])].sort();
         return `<fieldset><legend>Bereiche und Farben</legend>
@@ -1233,6 +1361,11 @@ class PlanerPanel extends HTMLElement {
       dlg.querySelectorAll("[data-farbe]").forEach((x) => { farben[x.dataset.farbe] = x.value; });
       await this._ws({ type: "planer/allgemein", werte: { farben } });
       this._sagen(`Farbe für ${f.dataset.farbe} gespeichert`);
+    }));
+    dlg.querySelectorAll("[data-nutzer]").forEach((c) => c.addEventListener("change", async () => {
+      const aus = [...dlg.querySelectorAll("[data-nutzer]")].filter((x) => !x.checked).map((x) => x.dataset.nutzer);
+      await this._ws({ type: "planer/allgemein", werte: { ausgeblendet: aus } });
+      this._sagen("Gespeichert. Die Liste aktualisiert sich beim Schließen.");
     }));
     dlg.querySelector("#gk")?.addEventListener("change", async (e) => {
       await this._ws({ type: "planer/allgemein", werte: { gemeinsam_kalender: e.target.value || null } });

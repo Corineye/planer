@@ -50,6 +50,7 @@ class Planer:
         self.allgemein: dict[str, Any] = {}
         self._zuhoerer: list[Callable[[], None]] = []
         self.personen: list[dict[str, str]] = []
+        self.alle_benutzer: list[dict[str, Any]] = []
 
     async def async_laden(self) -> None:
         daten = await self._store.async_load() or {}
@@ -62,7 +63,8 @@ class Planer:
     async def async_personen(self) -> list[dict[str, str]]:
         """Alle echten, aktiven HA-Benutzer (keine Systemkonten)."""
         benutzer = await self.hass.auth.async_get_users()
-        self.personen = sorted(
+        ausgeblendet = set(self.allgemein.get("ausgeblendet", []))
+        echte = sorted(
             (
                 {"id": b.id, "name": b.name or "Ohne Namen", "admin": b.is_admin}
                 for b in benutzer
@@ -70,6 +72,8 @@ class Planer:
             ),
             key=lambda p: p["name"].lower(),
         )
+        self.alle_benutzer = [{**b, "ausgeblendet": b["id"] in ausgeblendet} for b in echte]
+        self.personen = [b for b in echte if b["id"] not in ausgeblendet]
         return self.personen
 
     def name(self, person: str | None) -> str:
@@ -142,6 +146,9 @@ class Planer:
             a["notiz"] = _text(roh["notiz"], 4000)
         if "bereich" in roh:
             a["bereich"] = _text(roh["bereich"], 40).lstrip("#").lower()
+        if "tags" in roh:
+            teile = roh["tags"] if isinstance(roh["tags"], list) else re.split(r"[\s,]+", str(roh["tags"] or ""))
+            a["tags"] = list(dict.fromkeys(t for t in (_text(x, 30).lstrip("#").lower() for x in teile) if t))[:10]
         if "person" in roh:
             p = roh["person"]
             a["person"] = p if p == GEMEINSAM or any(x["id"] == p for x in self.personen) else (benutzer_id or GEMEINSAM)
@@ -199,6 +206,7 @@ class Planer:
             )
             for feld in ("notiz", "bereich"):
                 a.setdefault(feld, "")
+            a.setdefault("tags", [])
             for feld in ("datum", "uhrzeit", "dauer", "top", "wiederholung"):
                 a.setdefault(feld, None)
             a.setdefault("erinnerungen", None)
@@ -292,6 +300,9 @@ class Planer:
         if "gemeinsam_kalender" in werte:
             v = werte["gemeinsam_kalender"]
             self.allgemein["gemeinsam_kalender"] = str(v) if v and str(v).startswith("calendar.") else None
+        if "ausgeblendet" in werte and isinstance(werte["ausgeblendet"], list):
+            self.allgemein["ausgeblendet"] = [str(x) for x in werte["ausgeblendet"]][:100]
+            await self.async_personen()
         await self._sichern()
 
     async def einstellung(self, person: str, werte: dict[str, Any]) -> None:
