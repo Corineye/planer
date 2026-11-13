@@ -420,6 +420,20 @@ li.aufgabe.farbig .zeile{border-left:4px solid var(--b)}
 .punkt{width:9px;height:9px;border-radius:50%;background:var(--b);display:inline-block}
 .chip.naechstes{color:var(--on-mint);background:var(--mint);border-color:var(--mint);font-weight:600}
 .bereiche{flex-wrap:wrap}
+.kalumschalter{margin-bottom:12px}
+.monat{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;min-width:560px}
+.mkopf{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:2px 6px;font-weight:700}
+.mtag{display:flex;flex-direction:column;align-items:stretch;gap:2px;text-align:left;min-height:96px;padding:6px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg);font:inherit;cursor:pointer;min-width:0;overflow:hidden}
+.mtag:hover{border-color:var(--accent)}
+.mtag.fremd{opacity:.55}
+.mtag.heute{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.mnr{font-weight:700;font-size:.9rem}
+.mtag.heute .mnr{color:var(--accent)}
+.mpunkt{display:block;font-size:.72rem;line-height:1.3;padding:1px 4px;border-left:3px solid var(--k,var(--accent));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mpunkt.aufg{border-left-color:var(--muted);color:var(--muted)}
+.mmehr{font-size:.7rem;color:var(--muted)}
+.schmal .mtag{min-height:64px}
+.schmal .mpunkt{font-size:.62rem}
 .bereiche button{display:inline-flex;gap:6px;align-items:center}
 .teile{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .teil{display:flex;gap:8px;align-items:center}
@@ -443,11 +457,13 @@ class PlanerPanel extends HTMLElement {
     this.attachShadow({ mode: "open" });
     this._daten = null;
     this._ansicht = "heute";
+    this._kalAnsicht = "monat";
     this._filter = "ich";
     this._fehler = "";
     this._tasten = (e) => this._taste(e);
     try {
       this._ansicht = localStorage.getItem("planer.ansicht") || "heute";
+      this._kalAnsicht = localStorage.getItem("planer.kalansicht") || "monat";
       this._filter = localStorage.getItem("planer.filter") || "ich";
       this._bereich = localStorage.getItem("planer.bereich") || "";
     } catch (e) { /* ohne Speicher weiter */ }
@@ -590,7 +606,7 @@ class PlanerPanel extends HTMLElement {
       eingang: offen.filter((a) => !a.datum).length,
       woche: offen.filter((a) => a.datum && a.datum >= iso(montag(new Date())) && a.datum <= iso(plusTage(montag(new Date()), 6))).length,
     };
-    const tabs = [["heute", "Heute"], ["woche", "Woche"], ["demnaechst", "Demnächst"], ["eingang", "Eingang"]];
+    const tabs = [["heute", "Heute"], ["woche", "Kalender"], ["demnaechst", "Demnächst"], ["eingang", "Eingang"]];
     const heuteD = new Date();
     const filterKnoepfe = d.andere_sehen
       ? `<div class="seg" role="group" aria-label="Wessen Aufgaben">
@@ -669,7 +685,7 @@ class PlanerPanel extends HTMLElement {
       const liste = this._sortiert(offen.filter((a) => !a.datum));
       return this._gruppe("Eingang", liste, "Der Eingang ist leer. Alles ohne Datum landet hier, auch was du per Sprache oder in der HA-App zur Planer-Liste hinzufügst.");
     }
-    if (this._ansicht === "woche") return this._wocheHtml(alle);
+    if (this._ansicht === "woche") return this._kalenderUmschalter() + (this._kalAnsicht === "monat" ? this._monatHtml(alle) : this._wocheHtml(alle));
     if (this._ansicht === "demnaechst") {
       const kommend = offen.filter((a) => a.datum && a.datum > h).sort((a, b) => a.datum.localeCompare(b.datum));
       const tage = new Set(kommend.map((a) => a.datum));
@@ -714,6 +730,70 @@ class PlanerPanel extends HTMLElement {
     }
     if (this._narrow) return html;
     return `<div class="spalten"><div>${html}</div>${kal}</div>`;
+  }
+
+  _kalenderUmschalter() {
+    const m = this._kalAnsicht === "monat";
+    return `<div class="seg kalumschalter" role="group" aria-label="Kalenderansicht">
+      <button type="button" data-kal-ansicht="monat" aria-pressed="${m}">Monat</button>
+      <button type="button" data-kal-ansicht="woche" aria-pressed="${!m}">Woche</button>
+    </div>`;
+  }
+
+  _monatHtml(alle) {
+    const erster = this._mStart || new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    const von = montag(erster);
+    const tage = [...Array(42)].map((_, i) => iso(plusTage(von, i)));
+    const key = tage[0];
+    const termine = this._mTermine?.start === key ? this._mTermine.liste : null;
+    if (!termine) this._monatTermineLaden(von, key);
+    const am = (tag) => (termine || []).filter((t) => {
+      const s0 = t.start.slice(0, 10), e0 = t.ende.slice(0, 10);
+      return t.ganztag ? s0 <= tag && tag < e0 : s0 <= tag && tag <= e0;
+    });
+    const aufg = (tag) => this._sortiert(alle.filter((a) => a.datum === tag && a.status === "offen"));
+    const heuteIso = iso(new Date());
+    const dieserMonat = erster.getMonth(), dieserJahr = erster.getFullYear();
+    const zeilen = tage.slice(35).every((t) => ausIso(t).getMonth() !== dieserMonat) ? 35 : 42;
+    return `<section class="gruppe" aria-labelledby="m-titel">
+      <div class="wkopf">
+        <h2 id="m-titel">${MONATE[dieserMonat]} ${dieserJahr}</h2>
+        <button type="button" class="knopf klein" data-monat="-1" aria-label="Voriger Monat">←</button>
+        <button type="button" class="knopf klein" data-monat="0">Heute</button>
+        <button type="button" class="knopf klein" data-monat="1" aria-label="Nächster Monat">→</button>
+      </div>
+      <div class="woche-wrap"><div class="monat" role="grid" aria-labelledby="m-titel">
+        ${["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((n) => `<div class="mkopf" role="columnheader">${n}</div>`).join("")}
+        ${tage.slice(0, zeilen).map((t) => {
+          const d = ausIso(t);
+          const ts = am(t), as = aufg(t);
+          const items = [
+            ...ts.map((x) => `<span class="mpunkt" style="--k:${this._farbe(x.kalender)}">${x.ganztag ? "" : uhr(x.start) + " "}${esc(x.titel)}</span>`),
+            ...as.map((a) => `<span class="mpunkt aufg">${esc(a.titel)}</span>`),
+          ];
+          const sicht = items.slice(0, 3).join("");
+          const rest = items.length > 3 ? `<span class="mmehr">+${items.length - 3} weitere</span>` : "";
+          return `<button type="button" role="gridcell" class="mtag ${d.getMonth() !== dieserMonat ? "fremd" : ""} ${t === heuteIso ? "heute" : ""}" data-mtag="${t}"
+            aria-label="${esc(`${d.getDate()}. ${MONATE[d.getMonth()]}: ${ts.length} Termine, ${as.length} Aufgaben. Woche öffnen`)}">
+            <span class="mnr">${d.getDate()}</span>${sicht}${rest}</button>`;
+        }).join("")}
+      </div></div>
+      ${termine === null ? `<p class="hinweis" role="status">Termine werden geladen …</p>` : ""}
+      <p class="hinweis" style="display:block">Tippe auf einen Tag, um die Woche mit allen Details zu öffnen.</p>
+    </section>`;
+  }
+
+  async _monatTermineLaden(von, key) {
+    if (this._mLaedt === key) return;
+    this._mLaedt = key;
+    try {
+      const liste = await this._hass.callWS({ type: "planer/termine", start: key, ende: iso(plusTage(von, 42)) });
+      this._mTermine = { start: key, liste };
+    } catch (e) {
+      this._mTermine = { start: key, liste: [] };
+    }
+    this._mLaedt = null;
+    if (this._ansicht === "woche" && this._kalAnsicht === "monat") this._zeichnen();
   }
 
   _wocheHtml(alle) {
@@ -928,6 +1008,24 @@ class PlanerPanel extends HTMLElement {
     }));
     root.querySelectorAll("[data-aktion]").forEach((b) => b.addEventListener("click", () => this._aktion(b.dataset.aktion, b.dataset.id)));
     root.querySelectorAll("li.aufgabe").forEach((li) => this._wischen(li));
+    root.querySelectorAll("[data-kal-ansicht]").forEach((b) => b.addEventListener("click", () => {
+      this._kalAnsicht = b.dataset.kalAnsicht;
+      try { localStorage.setItem("planer.kalansicht", this._kalAnsicht); } catch (e) { /* egal */ }
+      this._zeichnen();
+    }));
+    root.querySelectorAll("[data-monat]").forEach((b) => b.addEventListener("click", () => {
+      const n = +b.dataset.monat;
+      const jetzt = new Date();
+      const e = this._mStart || new Date(jetzt.getFullYear(), jetzt.getMonth(), 1);
+      this._mStart = n === 0 ? new Date(jetzt.getFullYear(), jetzt.getMonth(), 1) : new Date(e.getFullYear(), e.getMonth() + n, 1);
+      this._zeichnen();
+      this._sagen(`${MONATE[this._mStart.getMonth()]} ${this._mStart.getFullYear()}`);
+    }));
+    root.querySelectorAll("[data-mtag]").forEach((b) => b.addEventListener("click", () => {
+      this._wStart = montag(ausIso(b.dataset.mtag));
+      this._kalAnsicht = "woche";
+      this._zeichnen();
+    }));
     root.querySelectorAll("[data-woche]").forEach((b) => b.addEventListener("click", () => {
       const n = +b.dataset.woche;
       this._wStart = n === 0 ? montag(new Date()) : plusTage(this._wStart || montag(new Date()), 7 * n);
