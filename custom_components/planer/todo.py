@@ -69,7 +69,9 @@ class PlanerListe(TodoListEntity):
             summary=a.get("titel"),
             status=TodoItemStatus.COMPLETED if a.get("status") == "erledigt" else TodoItemStatus.NEEDS_ACTION,
             due=due,
-            description=a.get("notiz") or None,
+            description="\n".join(
+                filter(None, [a.get("notiz") or ""] + [f"{'☑' if t['erledigt'] else '☐'} {t['text']}" for t in a.get("teilaufgaben") or []])
+            ) or None,
         )
 
     @staticmethod
@@ -78,7 +80,8 @@ class PlanerListe(TodoListEntity):
         if item.summary is not None:
             roh["titel"] = item.summary
         if item.description is not None:
-            roh["notiz"] = item.description
+            # Teilaufgaben werden nur angezeigt; beim Zurückschreiben bleiben sie im Planer
+            roh["notiz"] = "\n".join(z for z in item.description.split("\n") if not z.startswith(("☑ ", "☐ "))).strip()
         if isinstance(item.due, datetime):
             lokal = dt_util.as_local(item.due)
             roh.update(datum=lokal.date().isoformat(), uhrzeit=lokal.strftime("%H:%M"))

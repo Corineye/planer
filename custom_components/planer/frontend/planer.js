@@ -33,9 +33,23 @@ function datumText(s, mitWochentag = true) {
   return mitWochentag ? `${WOCHENTAGE[wt(d)]}, ${t}` : t;
 }
 
+const BEREICH_STANDARD = { arbeit: "#7fb4ff", lernen: "#c3a6ff", haushalt: "#ffb37a", werkstatt: "#5ff2b8", privat: "#f59ad6", gesundheit: "#9be36b", einkauf: "#ffd36b" };
+const BEREICH_PALETTE = ["#7fb4ff", "#ffb37a", "#c3a6ff", "#9be36b", "#f59ad6", "#6be3e3", "#ffd36b", "#ff9a9a"];
+function bereichFarbe(name, farben) {
+  if (!name) return "";
+  if (farben && farben[name]) return farben[name];
+  if (BEREICH_STANDARD[name]) return BEREICH_STANDARD[name];
+  let h = 0;
+  for (const c of name) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return BEREICH_PALETTE[h % BEREICH_PALETTE.length];
+}
+const istTage = (r, t) => r && r.art === "woche" && (r.alle || 1) === 1 && JSON.stringify(r.tage || []) === JSON.stringify(t);
+
 function regelText(r) {
   if (!r) return "";
   const n = r.alle || 1;
+  if (istTage(r, [0, 1, 2, 3, 4])) return "werktags";
+  if (istTage(r, [5, 6])) return "am Wochenende";
   if (r.art === "tag") return n === 1 ? "täglich" : `alle ${n} Tage`;
   if (r.art === "woche") {
     const tage = (r.tage || []).map((t) => WT_KURZ[t]).join(", ");
@@ -74,7 +88,11 @@ function wdhHtml(p, w = {}) {
     <legend>Wiederholung</legend>
     <div class="reihe">
       <div class="feld"><label for="${p}-art">Wiederholt sich</label><select id="${p}-art">
-        ${[["", "Nicht"], ["tag", "Täglich"], ["woche", "Wöchentlich"], ["monat", "Monatlich"], ["jahr", "Jährlich"]].map(([k, t]) => `<option value="${k}" ${(w.art || "") === k ? "selected" : ""}>${t}</option>`).join("")}
+        ${(() => {
+          const aktuell = istTage(w, [0, 1, 2, 3, 4]) ? "werktags" : istTage(w, [5, 6]) ? "wochenende" : w.art || "";
+          return [["", "Nicht"], ["tag", "Täglich"], ["werktags", "Werktags (Mo–Fr)"], ["wochenende", "Am Wochenende (Sa, So)"], ["woche", "Wöchentlich"], ["monat", "Monatlich"], ["jahr", "Jährlich"]]
+            .map(([k, t]) => `<option value="${k}" ${aktuell === k ? "selected" : ""}>${t}</option>`).join("");
+        })()}
       </select></div>
       <div class="feld" id="${p}-alle-f"><label for="${p}-alle">Alle … (Abstand)</label><input id="${p}-alle" type="number" min="1" max="365" inputmode="numeric" value="${esc(w.alle || 1)}"></div>
       <div class="feld" id="${p}-bis-f"><label for="${p}-bis">Endet am (optional)</label><input id="${p}-bis" type="date" value="${esc(w.bis || "")}"></div>
@@ -90,9 +108,11 @@ function wdhBinden(dlg, p) {
   const $ = (id) => dlg.querySelector(`#${p}-${id}`);
   const anpassen = () => {
     const art = $("art").value;
-    $("alle-f").hidden = !art;
+    $("alle-f").hidden = !art || art === "werktags" || art === "wochenende";
     $("bis-f").hidden = !art;
     $("tage-f").hidden = art !== "woche";
+    const einheit = { tag: "Tage", woche: "Wochen", monat: "Monate", jahr: "Jahre" }[art];
+    if (einheit) dlg.querySelector(`label[for="${p}-alle"]`).textContent = `Alle … ${einheit}`;
   };
   anpassen();
   $("art").addEventListener("change", anpassen);
@@ -101,6 +121,7 @@ function wdhLesen(dlg, p) {
   const $ = (id) => dlg.querySelector(`#${p}-${id}`);
   const art = $("art").value;
   if (!art) return null;
+  if (art === "werktags" || art === "wochenende") return { art: "woche", alle: 1, bis: $("bis").value || undefined, tage: art === "werktags" ? [0, 1, 2, 3, 4] : [5, 6] };
   return {
     art, alle: +$("alle").value || 1, bis: $("bis").value || undefined,
     tage: art === "woche" ? [...$("tage").querySelectorAll("input:checked")].map((x) => +x.value) : undefined,
@@ -184,6 +205,8 @@ export function parse(text, personen) {
 
   // Wiederholung
   weg(/\s(täglich|jeden tag)(?=\s)/i, () => { r.wiederholung = { art: "tag", alle: 1 }; });
+  weg(/\s(werktags|jeden werktag)(?=\s)/i, () => { r.wiederholung = { art: "woche", alle: 1, tage: [0, 1, 2, 3, 4] }; });
+  weg(/\s(jedes wochenende|am wochenende|wochenends)(?=\s)/i, () => { r.wiederholung = { art: "woche", alle: 1, tage: [5, 6] }; });
   weg(/\salle (\d+) tage(?=\s)/i, (m) => { r.wiederholung = { art: "tag", alle: +m[1] }; });
   weg(new RegExp(`\\s(?:jeden|jede|alle)\\s+${WT}((?:\\s*(?:,|und|\\+)\\s*${WT})*)(?=\\s)`, "i"), (m) => {
     const woerter = (m[0].match(new RegExp(WT, "gi")) || []);
@@ -389,6 +412,21 @@ aside.kal{display:grid;gap:8px;position:sticky;top:12px}
 .wleer{font-size:.8125rem;color:var(--muted)}
 .ablage{display:flex;gap:6px;flex-wrap:wrap}
 .ablage .wpunkt{width:auto}
+li.aufgabe.farbig .zeile{border-left:4px solid var(--b)}
+.punkt{width:9px;height:9px;border-radius:50%;background:var(--b);display:inline-block}
+.chip.naechstes{color:var(--on-mint);background:var(--mint);border-color:var(--mint);font-weight:600}
+.bereiche{flex-wrap:wrap}
+.bereiche button{display:inline-flex;gap:6px;align-items:center}
+.teile{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.teil{display:flex;gap:8px;align-items:center}
+.teil input[type=checkbox]{width:24px;height:24px;accent-color:var(--mint);flex:none}
+.teil input[type=text]{flex:1;min-width:0;min-height:40px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);padding:6px 10px}
+.teil .weg{width:40px;height:40px;border-radius:10px;border:1px solid var(--line2);background:none;cursor:pointer;flex:none}
+.teil-neu{display:flex;gap:8px}
+.teil-neu input{flex:1;min-width:0;min-height:44px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);padding:8px 12px}
+.farben{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.farben label{display:flex;gap:8px;align-items:center;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:4px 10px}
+.farben input[type=color]{width:36px;height:28px;border:0;background:none;padding:0}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media (forced-colors:active){.haken[aria-checked="true"]{forced-color-adjust:none;background:Highlight}}
 `;
@@ -407,6 +445,7 @@ class PlanerPanel extends HTMLElement {
     try {
       this._ansicht = localStorage.getItem("planer.ansicht") || "heute";
       this._filter = localStorage.getItem("planer.filter") || "ich";
+      this._bereich = localStorage.getItem("planer.bereich") || "";
     } catch (e) { /* ohne Speicher weiter */ }
   }
 
@@ -498,7 +537,9 @@ class PlanerPanel extends HTMLElement {
     const d = this._daten;
     if (!d) return [];
     const f = this._filter;
+    const b = this._bereich;
     return d.aufgaben.filter((a) => {
+      if (b && (a.bereich || "") !== b) return false;
       if (f === "alle") return true;
       if (f === "ich") return a.person === d.ich || a.person === GEMEINSAM;
       return a.person === f;
@@ -510,10 +551,13 @@ class PlanerPanel extends HTMLElement {
     r.textContent = "";
     setTimeout(() => { r.textContent = text; }, 50);
   }
+  // Was als Nächstes fällig ist, steht oben: früheres Datum, dann Uhrzeit, dann Top-Rang, dann Reihenfolge
   _sortiert(liste) {
     return [...liste].sort((a, b) =>
+      (a.datum || "9999").localeCompare(b.datum || "9999") ||
+      (a.uhrzeit ? 0 : 1) - (b.uhrzeit ? 0 : 1) ||
+      (a.uhrzeit || "").localeCompare(b.uhrzeit || "") ||
       (a.top || 9) - (b.top || 9) ||
-      (a.uhrzeit || "99") .localeCompare(b.uhrzeit || "99") ||
       (a.reihenfolge || 0) - (b.reihenfolge || 0));
   }
 
@@ -578,6 +622,16 @@ class PlanerPanel extends HTMLElement {
         ${tabs.map(([k, t]) => `<button type="button" data-ansicht="${k}" data-fokus="t-${k}" ${this._ansicht === k ? 'aria-current="page"' : ""}>${t} <span class="zahl" aria-label="${zaehler[k]} offen">${zaehler[k]}</span></button>`).join("")}
       </nav>
 
+      ${(() => {
+        const liste = [...new Set(d.aufgaben.filter((a) => a.status === "offen").map((a) => a.bereich).filter(Boolean))].sort();
+        if (this._bereich && !liste.includes(this._bereich)) liste.push(this._bereich);
+        if (!liste.length) return "";
+        return `<div class="seg bereiche" role="group" aria-label="Nach Bereich filtern">
+          <button type="button" data-bereich="" data-fokus="b-alle" aria-pressed="${!this._bereich}">Alle Bereiche</button>
+          ${liste.map((x) => `<button type="button" data-bereich="${esc(x)}" data-fokus="b-${esc(x)}" aria-pressed="${this._bereich === x}" style="--b:${bereichFarbe(x, d.farben)}"><span class="punkt" aria-hidden="true"></span>${esc(x[0].toUpperCase() + x.slice(1))}</button>`).join("")}
+        </div>`;
+      })()}
+
       <main id="inhalt">${this._ansichtHtml(alle, offen)}</main>
     </div>
     </div>
@@ -638,6 +692,9 @@ class PlanerPanel extends HTMLElement {
     const fertig = alle.filter((a) => a.status === "erledigt" && (a.erledigt_am || "").slice(0, 10) === h);
     const wiederHeute = alle.filter((a) => a.wiederholung && (a.verlauf || []).includes(h) && a.status === "offen");
     let html = "";
+    const jetztUhr = new Date().toTimeString().slice(0, 5);
+    const naechste = ueber[0] || this._sortiert(heuteOffen.filter((a) => a.uhrzeit && a.uhrzeit >= jetztUhr))[0] || top[0] || rest[0];
+    this._naechste = naechste ? naechste.id : null;
     const kal = this._kalenderHeute(heuteOffen);
     if (this._narrow) html += kal;
     if (ueber.length) html += this._gruppe("Überfällig", ueber, "", "warn");
@@ -699,7 +756,7 @@ class PlanerPanel extends HTMLElement {
           <h3 id="wt-${t}"><span>${WOCHENTAGE[wt(d)]}${t === this._tag ? " · heute" : ""}</span><span class="d">${d.getDate()}.${d.getMonth() + 1}.</span></h3>
           ${ts.map((x) => `<button type="button" class="wpunkt t" style="--k:${this._farbe(x.kalender)}" data-termin="${esc(`${x.kalender}|${x.uid}|${x.start}`)}" aria-label="${esc(`Termin ${x.titel}, ${x.ganztag ? "ganztägig" : uhr(x.start)}, ${this._kal(x.kalender).name}`)}">
             <span class="z">${x.ganztag ? "ganzt." : uhr(x.start)}</span><span>${esc(x.titel)}</span></button>`).join("")}
-          ${as.map((a) => `<button type="button" class="wpunkt a ${a.top ? "top" : ""} ${a.status === "erledigt" ? "fertig" : ""}" draggable="${a.status === "offen"}" data-ziehen="${a.id}" data-aktion="oeffnen" data-id="${a.id}" data-fokus="w-${a.id}"
+          ${as.map((a) => `<button type="button" class="wpunkt a ${a.top ? "top" : ""} ${a.status === "erledigt" ? "fertig" : ""}" style="${a.bereich ? `border-left:3px solid ${bereichFarbe(a.bereich, this._daten.farben)}` : ""}" draggable="${a.status === "offen"}" data-ziehen="${a.id}" data-aktion="oeffnen" data-id="${a.id}" data-fokus="w-${a.id}"
             aria-label="${esc(`Aufgabe ${a.titel}${a.top ? `, Top ${a.top}` : ""}${a.status === "erledigt" ? ", erledigt" : ""}. Öffnen zum Bearbeiten oder Verschieben`)}">
             ${a.top ? `<span class="z">${a.top}</span>` : a.uhrzeit ? `<span class="z">${a.uhrzeit}</span>` : ""}<span>${esc(a.titel)}</span></button>`).join("")}
           ${!ts.length && !as.length ? `<span class="wleer">frei</span>` : ""}
@@ -797,17 +854,26 @@ class PlanerPanel extends HTMLElement {
     if (wiederErledigt) meta.push(`<span class="chip mint">nächstes Mal ${esc(datumText(a.datum))}</span>`);
     if (a.uhrzeit) meta.push(`<span class="chip">${esc(a.uhrzeit)} Uhr</span>`);
     if (this._filter !== "ich" || a.person !== this._daten.ich) meta.push(`<span class="chip">${esc(this._name(a.person))}</span>`);
-    if (a.bereich) meta.push(`<span class="chip">#${esc(a.bereich)}</span>`);
+    const farbe = bereichFarbe(a.bereich, this._daten.farben);
+    if (!fertig && this._ansicht === "heute" && this._naechste === a.id) meta.unshift(`<span class="chip naechstes">Als Nächstes</span>`);
+    if (a.bereich) meta.push(`<span class="chip" style="--b:${farbe}"><span class="punkt" aria-hidden="true"></span> ${esc(a.bereich)}</span>`);
+    const teile = a.teilaufgaben || [];
+    if (teile.length) {
+      const fertigT = teile.filter((t) => t.erledigt).length;
+      meta.push(`<span class="chip ${fertigT === teile.length ? "mint" : ""}"><span aria-hidden="true">☑</span> ${fertigT}/${teile.length}<span class="sr"> Teilaufgaben erledigt</span></span>`);
+      const naechster = teile.find((t) => !t.erledigt);
+      if (naechster && !fertig) meta.push(`<span class="chip">Nächster Schritt: ${esc(naechster.text)}</span>`);
+    }
     if (a.wiederholung) meta.push(`<span class="chip mint"><span aria-hidden="true">↻</span> ${esc(regelText(a.wiederholung))}</span>`);
     if (a.verschoben > 0) meta.push(`<span class="chip warn">${a.verschoben}× verschoben</span>`);
     const morgen = !fertig ? `<button type="button" class="knopf klein" data-aktion="morgen" data-id="${a.id}" data-fokus="m-${a.id}" aria-label="${esc(a.titel)} auf morgen verschieben">Morgen</button>` : "";
-    return `<li class="aufgabe ${a.top && !fertig ? "top" : ""} ${fertig ? "erledigt" : ""}" data-id="${a.id}">
+    return `<li class="aufgabe ${a.top && !fertig ? "top" : ""} ${fertig ? "erledigt" : ""} ${a.bereich ? "farbig" : ""}" data-id="${a.id}" ${a.bereich ? `style="--b:${farbe}"` : ""}>
       <div class="wisch rechts" aria-hidden="true">✓ Erledigt</div><div class="wisch links" aria-hidden="true">Morgen →</div>
       <div class="zeile">
         <button type="button" class="haken" role="checkbox" aria-checked="${fertig}" data-aktion="haken" data-id="${a.id}" data-fokus="h-${a.id}" aria-label="${esc(a.titel)} erledigt">${fertig ? HAKEN : ""}</button>
         ${a.top && !fertig ? `<span class="rang" aria-label="Top ${a.top}">${a.top}</span>` : ""}
-        <button type="button" class="inhalt" data-aktion="oeffnen" data-id="${a.id}" data-fokus="o-${a.id}" aria-label="${esc(a.titel)} bearbeiten">
-          <span class="titel">${esc(a.titel)}</span>
+        <button type="button" class="inhalt" data-aktion="oeffnen" data-id="${a.id}" data-fokus="o-${a.id}">
+          <span class="titel">${esc(a.titel)}<span class="sr">, bearbeiten</span></span>
           ${meta.length ? `<span class="meta">${meta.join("")}</span>` : ""}
         </button>
         <div class="aktionen">${morgen}</div>
@@ -842,6 +908,12 @@ class PlanerPanel extends HTMLElement {
       this._ansicht = b.dataset.ansicht;
       try { localStorage.setItem("planer.ansicht", this._ansicht); } catch (e) { /* egal */ }
       this._zeichnen();
+    }));
+    root.querySelectorAll("[data-bereich]").forEach((b) => b.addEventListener("click", () => {
+      this._bereich = b.dataset.bereich;
+      try { localStorage.setItem("planer.bereich", this._bereich); } catch (e) { /* egal */ }
+      this._zeichnen();
+      this._sagen(this._bereich ? `Nur Bereich ${this._bereich}` : "Alle Bereiche");
     }));
     root.querySelectorAll("[data-filter]").forEach((b) => b.addEventListener("click", () => {
       this._filter = b.dataset.filter;
@@ -986,6 +1058,15 @@ class PlanerPanel extends HTMLElement {
       ${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
       <h2 id="blatt-titel">Aufgabe bearbeiten</h2>
       <div class="feld"><label for="b-titel">Titel</label><input id="b-titel" required value="${esc(a.titel)}"></div>
+      <fieldset>
+        <legend>Teilaufgaben</legend>
+        <ul class="teile" id="b-teile">${(a.teilaufgaben || []).map((t, i) => this._teilHtml(t, i)).join("")}</ul>
+        <div class="teil-neu">
+          <label class="sr" for="b-teil-neu">Neue Teilaufgabe</label>
+          <input id="b-teil-neu" placeholder="Neue Teilaufgabe, Enter zum Hinzufügen" enterkeyhint="enter">
+          <button type="button" class="knopf klein" id="b-teil-plus">Hinzufügen</button>
+        </div>
+      </fieldset>
       <div class="feld"><span class="lbl" id="b-datum-l">Wann</span>
         <div class="schnellwahl" role="group" aria-labelledby="b-datum-l">
           <button type="button" class="knopf klein" data-tag="0">Heute</button>
@@ -1003,7 +1084,7 @@ class PlanerPanel extends HTMLElement {
         <div class="feld"><label for="b-person">Für</label><select id="b-person">${personen.map(([id, n]) => `<option value="${esc(id)}" ${a.person === id ? "selected" : ""}>${esc(n)}</option>`).join("")}</select></div>
         <div class="feld"><label for="b-top">Top 3</label><select id="b-top">
           <option value="">Keine Top-Aufgabe</option>${[1, 2, 3].map((i) => `<option value="${i}" ${a.top === i ? "selected" : ""}>Rang ${i}</option>`).join("")}</select></div>
-        <div class="feld"><label for="b-bereich">Bereich</label><input id="b-bereich" value="${esc(a.bereich || "")}" placeholder="z. B. werkstatt" list="b-bereiche"><datalist id="b-bereiche">${[...new Set(d.aufgaben.map((x) => x.bereich).filter(Boolean))].map((b) => `<option value="${esc(b)}">`).join("")}</datalist></div>
+        <div class="feld"><label for="b-bereich">Bereich</label><input id="b-bereich" value="${esc(a.bereich || "")}" placeholder="z. B. werkstatt" list="b-bereiche"><datalist id="b-bereiche">${[...new Set([...Object.keys(BEREICH_STANDARD), ...d.aufgaben.map((x) => x.bereich).filter(Boolean)])].map((b) => `<option value="${esc(b)}">`).join("")}</datalist></div>
       </div>
       ${wdhHtml("b", w)}
       ${erinnHtml("be", a.erinnerungen, d.einst.erinnerungen)}
@@ -1020,6 +1101,26 @@ class PlanerPanel extends HTMLElement {
     const $ = (id) => dlg.querySelector(`#${id}`);
     wdhBinden(dlg, "b");
     erinnBinden(dlg, "be", (t) => this._sagen(t));
+    const teilNeu = () => {
+      const text = $("b-teil-neu").value.trim();
+      if (!text) return;
+      const ul = $("b-teile");
+      ul.insertAdjacentHTML("beforeend", this._teilHtml({ id: "", text, erledigt: false }, ul.children.length));
+      $("b-teil-neu").value = "";
+      this._sagen(`Teilaufgabe hinzugefügt: ${text}`);
+    };
+    $("b-teil-plus").addEventListener("click", teilNeu);
+    $("b-teil-neu").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); teilNeu(); } });
+    $("b-teile").addEventListener("click", (e) => {
+      const weg = e.target.closest(".weg");
+      if (!weg) return;
+      const li = weg.closest("li");
+      const text = li.querySelector('input[type="text"]').value;
+      const nachbar = li.nextElementSibling || li.previousElementSibling;
+      li.remove();
+      (nachbar?.querySelector('input[type="text"]') || $("b-teil-neu")).focus();
+      this._sagen(`Teilaufgabe entfernt: ${text}`);
+    });
     dlg.querySelectorAll("[data-tag]").forEach((b) => b.addEventListener("click", () => {
       $("b-datum").value = b.dataset.tag === "eingang" ? "" : iso(plusTage(new Date(), +b.dataset.tag));
       this._sagen(b.dataset.tag === "eingang" ? "Datum entfernt, Aufgabe kommt in den Eingang" : `Datum ${datumText($("b-datum").value)}`);
@@ -1038,6 +1139,10 @@ class PlanerPanel extends HTMLElement {
       const titel = $("b-titel").value.trim();
       if (!titel) { $("b-fehler").textContent = "Bitte einen Titel eingeben."; $("b-titel").focus(); return; }
       const wiederholung = wdhLesen(dlg, "b");
+      if ($("b-teil-neu").value.trim()) teilNeu();
+      const teilaufgaben = [...$("b-teile").children].map((li) => ({
+        id: li.dataset.teil || "", text: li.querySelector('input[type="text"]').value.trim(), erledigt: li.querySelector('input[type="checkbox"]').checked,
+      })).filter((t) => t.text);
       let datum = $("b-datum").value || null;
       if (wiederholung && !datum) datum = heute();
       const top = $("b-top").value ? +$("b-top").value : null;
@@ -1045,7 +1150,7 @@ class PlanerPanel extends HTMLElement {
       try {
         await this._ws({ type: "planer/speichern", aufgabe: {
           id: a.id, titel, datum, uhrzeit: $("b-uhr").value || null, dauer: $("b-dauer").value || null,
-          person: $("b-person").value, top, bereich: $("b-bereich").value, notiz: $("b-notiz").value, wiederholung, erinnerungen: erinnLesen(dlg, "be"),
+          person: $("b-person").value, top, bereich: $("b-bereich").value, notiz: $("b-notiz").value, wiederholung, erinnerungen: erinnLesen(dlg, "be"), teilaufgaben,
         } });
       } catch (err) { $("b-fehler").textContent = err.message || "Speichern hat nicht geklappt."; return; }
       dlg.close();
@@ -1055,6 +1160,15 @@ class PlanerPanel extends HTMLElement {
     this._wischZu(dlg);
     dlg.showModal();
     $("b-titel").focus();
+  }
+
+  _teilHtml(t, i) {
+    const n = `b-t${i}-${Math.random().toString(36).slice(2, 6)}`;
+    return `<li class="teil" data-teil="${esc(t.id || "")}">
+      <input type="checkbox" id="${n}c" ${t.erledigt ? "checked" : ""} aria-label="${esc(t.text)} erledigt">
+      <label class="sr" for="${n}">Teilaufgabe</label><input type="text" id="${n}" value="${esc(t.text)}">
+      <button type="button" class="weg" aria-label="${esc(t.text)} entfernen">✕</button>
+    </li>`;
   }
 
   // Blatt auf dem Handy durch Wischen nach unten schließen (zusätzlich zu Abbrechen und Zurück-Taste)
@@ -1077,6 +1191,13 @@ class PlanerPanel extends HTMLElement {
       ${kal.some((k) => k.anlegen) ? `<div class="feld"><label for="gk">Kalender für gemeinsame Termine</label>
         <select id="gk"><option value="">Keiner</option>${kal.filter((k) => k.anlegen).map((k) => `<option value="${esc(k.id)}" ${d.gemeinsam_kalender === k.id ? "selected" : ""}>${esc(k.name)}</option>`).join("")}</select>
         <span class="hinweis">Termine mit „Gemeinsam“ oder @gemeinsam landen hier.</span></div>` : ""}
+      ${(() => {
+        const namen = [...new Set([...Object.keys(BEREICH_STANDARD), ...d.aufgaben.map((a) => a.bereich).filter(Boolean)])].sort();
+        return `<fieldset><legend>Bereiche und Farben</legend>
+          <p class="hinweis" style="display:block">Einen neuen Bereich legst du einfach mit #name in der Schnelleingabe oder im Feld „Bereich“ an.</p>
+          <div class="farben">${namen.map((x) => `<label><input type="color" data-farbe="${esc(x)}" value="${bereichFarbe(x, d.farben)}"> ${esc(x[0].toUpperCase() + x.slice(1))}</label>`).join("")}</div>
+        </fieldset>`;
+      })()}
       <p class="hinweis" style="display:block">Eigene und gemeinsame Aufgaben sieht jede Person immer. Pro Person legst du hier fest, was sie zusätzlich sieht, wo sie Termine eintragen darf und wie sie erinnert wird.</p>
       ${d.personen.map((p, i) => {
         const e = d.einstellungen[p.id] || {};
@@ -1107,6 +1228,12 @@ class PlanerPanel extends HTMLElement {
       <div class="fuss"><button type="submit" class="knopf primaer">Schließen</button></div>
     </form>`;
     d.personen.forEach((p, i) => erinnBinden(dlg, `se${i}`, (t) => this._sagen(t)));
+    dlg.querySelectorAll("[data-farbe]").forEach((f) => f.addEventListener("change", async () => {
+      const farben = {};
+      dlg.querySelectorAll("[data-farbe]").forEach((x) => { farben[x.dataset.farbe] = x.value; });
+      await this._ws({ type: "planer/allgemein", werte: { farben } });
+      this._sagen(`Farbe für ${f.dataset.farbe} gespeichert`);
+    }));
     dlg.querySelector("#gk")?.addEventListener("change", async (e) => {
       await this._ws({ type: "planer/allgemein", werte: { gemeinsam_kalender: e.target.value || null } });
       this._sagen("Kalender für gemeinsame Termine gespeichert");

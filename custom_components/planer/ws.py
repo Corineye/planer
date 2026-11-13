@@ -74,6 +74,7 @@ async def ws_lesen(hass: HomeAssistant, connection: websocket_api.ActiveConnecti
             "aufgaben": p.fuer(user.id),
             "wochen": p.wochen.get(user.id, {}),
             "gemeinsam_kalender": p.allgemein.get("gemeinsam_kalender"),
+            "farben": p.allgemein.get("farben", {}),
         },
     )
 

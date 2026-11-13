@@ -10,7 +10,7 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
 3. Einstellungen › Geräte & Dienste › Integration hinzufügen › **Planer**.
 4. In der Seitenleiste erscheint „Planer“.
 
-## Was es gibt (v0.3)
+## Was es gibt (v0.4)
 
 - **Heute** mit Top 3 (je Rang 1–3, nie mehr als drei), weiteren Aufgaben, Überfälligem und „Heute erledigt“.
 - **Demnächst** (nach Tagen gruppiert) und **Eingang** (alles ohne Datum).
@@ -37,6 +37,14 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
   zurückblättern. Aufgaben am PC auf einen Tag ziehen, auch aus dem Eingang; am Handy und mit Tastatur über „Öffnen“ und Datum.
 - **Gemeinsame Termine** (v0.3): In den Einstellungen einen Kalender für gemeinsame Termine wählen (z. B. „Linda und Corin“).
   Beim Termin „Gemeinsam“ wählen oder `@gemeinsam` tippen, dann landet er dort.
+
+- **Teilaufgaben** (v0.4): Checkliste in jeder Aufgabe, Fortschritt (z. B. 1/3) und „Nächster Schritt“ in der Liste.
+  Bei wiederkehrenden Aufgaben werden die Teilaufgaben beim nächsten Termin wieder geöffnet.
+- **Bereiche mit Farben** (v0.4): Arbeit, Lernen, Haushalt, Werkstatt, Privat … mit Farbstreifen und Filter.
+  Farben unter „Einstellungen“ änderbar, neue Bereiche einfach mit `#name`.
+- **Nächstes zuerst** (v0.4): Listen sind nach Fälligkeit sortiert (Datum, dann Uhrzeit, dann Top-Rang);
+  die nächste Aufgabe ist in „Heute“ mit „Als Nächstes“ markiert.
+- **Mehr Wiederholungen** (v0.4): werktags, am Wochenende, alle n Tage/Wochen/Monate/Jahre, mit Enddatum.
 
 ## Daten
 

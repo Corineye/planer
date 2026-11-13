@@ -170,6 +170,18 @@ class Planer:
             # None = Standard der Person, [] = keine Erinnerung
             e = roh["erinnerungen"]
             a["erinnerungen"] = None if e is None else sorted({int(m) for m in e if str(m).isdigit() and int(m) <= 43200})
+        if "teilaufgaben" in roh:
+            teile = []
+            for t in (roh["teilaufgaben"] or [])[:50]:
+                if isinstance(t, dict) and _text(t.get("text"), 200):
+                    teile.append(
+                        {
+                            "id": _text(t.get("id"), 12) or uuid.uuid4().hex[:8],
+                            "text": _text(t.get("text"), 200),
+                            "erledigt": bool(t.get("erledigt")),
+                        }
+                    )
+            a["teilaufgaben"] = teile
         if "reihenfolge" in roh:
             try:
                 a["reihenfolge"] = float(roh["reihenfolge"])
@@ -190,6 +202,7 @@ class Planer:
             for feld in ("datum", "uhrzeit", "dauer", "top", "wiederholung"):
                 a.setdefault(feld, None)
             a.setdefault("erinnerungen", None)
+            a.setdefault("teilaufgaben", [])
             a.setdefault("reihenfolge", dt_util.utcnow().timestamp())
         a["geaendert"] = jetzt
         return a
@@ -235,6 +248,8 @@ class Planer:
             weiter = fortschreiben(a["wiederholung"], basis, heute)
             if weiter is not None:
                 a.update(datum=weiter.isoformat(), status="offen", top=None, verschoben=0, erledigt_am=None)
+                for t in a.get("teilaufgaben") or []:
+                    t["erledigt"] = False
             else:
                 a.update(status="erledigt", erledigt_am=jetzt.isoformat(timespec="seconds"))
         elif erledigt:
@@ -268,6 +283,12 @@ class Planer:
         return eintrag
 
     async def allgemein_setzen(self, werte: dict[str, Any]) -> None:
+        if "farben" in werte and isinstance(werte["farben"], dict):
+            self.allgemein["farben"] = {
+                _text(k, 40).lower(): str(v)[:7]
+                for k, v in list(werte["farben"].items())[:40]
+                if re.match(r"^#[0-9a-fA-F]{6}$", str(v))
+            }
         if "gemeinsam_kalender" in werte:
             v = werte["gemeinsam_kalender"]
             self.allgemein["gemeinsam_kalender"] = str(v) if v and str(v).startswith("calendar.") else None
