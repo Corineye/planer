@@ -612,6 +612,7 @@ class PlanerPanel extends HTMLElement {
         <div class="eingabe">
           <input id="schnell" data-fokus="schnell" placeholder="Neue Aufgabe, z. B. morgen 15 Uhr !1 Filament bestellen #werkstatt" aria-describedby="vorschau tipp" enterkeyhint="done">
           <button class="knopf primaer" type="submit" aria-label="Aufgabe hinzufügen">${schmal ? "＋" : "Aufgabe"}</button>
+          <button class="knopf" type="button" data-aktion="erweitert" aria-label="Aufgabe mit allen Einstellungen anlegen">${schmal ? "⚙" : "Erweitert"}</button>
           ${(d.kalender || []).some((k) => k.schreiben) ? `<button class="knopf" type="button" data-aktion="termin" aria-label="Als Termin in den Kalender eintragen">${schmal ? "📅" : "Termin"}</button>` : ""}
         </div>
         <div class="hinweis" id="vorschau" aria-live="polite"></div>
@@ -989,12 +990,23 @@ class PlanerPanel extends HTMLElement {
     this.shadowRoot.getElementById("schnell")?.focus();
   }
 
+  _erweitert() {
+    const s = this.shadowRoot.getElementById("schnell");
+    const p = s.value.trim() ? parse(s.value, this._daten.personen) : {};
+    const aufgabe = { titel: "", teilaufgaben: [], ...p };
+    if (aufgabe.datum === undefined) aufgabe.datum = this._ansicht === "heute" ? heute() : null;
+    if (!aufgabe.person) aufgabe.person = this._filter !== "ich" && this._filter !== "alle" ? this._filter : this._daten.ich;
+    s.value = "";
+    this._oeffnen(aufgabe);
+  }
+
   _finde(id) { return this._daten.aufgaben.find((a) => a.id === id); }
 
   async _aktion(art, id) {
     const a = id ? this._finde(id) : null;
     if (art === "einstellungen") return this._einstellungen();
     if (art === "termin") return this._terminNeu();
+    if (art === "erweitert") return this._erweitert();
     if (!a) return;
     if (art === "oeffnen") return this._oeffnen(a);
     if (art === "haken") {
@@ -1056,7 +1068,7 @@ class PlanerPanel extends HTMLElement {
     const personen = [...d.personen.map((p) => [p.id, p.name]), [GEMEINSAM, "Gemeinsam"]];
     dlg.innerHTML = `<form method="dialog" id="bform" novalidate>
       ${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
-      <h2 id="blatt-titel">Aufgabe bearbeiten</h2>
+      <h2 id="blatt-titel">${a.id ? "Aufgabe bearbeiten" : "Neue Aufgabe"}</h2>
       <div class="feld"><label for="b-titel">Titel</label><input id="b-titel" required value="${esc(a.titel)}"></div>
       <fieldset>
         <legend>Teilaufgaben</legend>
