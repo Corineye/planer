@@ -200,7 +200,7 @@ function naechsterWochentag(i, abHeute = true) {
 export function parse(text, personen) {
   let t = ` ${text} `;
   const r = { titel: "", datum: undefined, uhrzeit: null, top: null, bereich: "", person: undefined, wiederholung: null };
-  const weg = (re, fn) => { t = t.replace(re, (...m) => { fn(m); return " "; }); };
+  const weg = (re, fn) => { let ok = false; t = t.replace(re, (...m) => { ok = true; fn(m); return " "; }); return ok; };
   const WT = "(montags?|dienstags?|mittwochs?|donnerstags?|freitags?|samstags?|sonntags?|mo|di|mi|do|fr|sa|so)";
 
   // Wiederholung
@@ -243,7 +243,11 @@ export function parse(text, personen) {
 
   // Top, Bereich, Person
   weg(/\s!([1-3])(?=\s)/, (m) => { r.top = +m[1]; });
-  weg(/\s#([\wäöüß-]+)(?=\s)/i, (m) => { r.bereich = m[1].toLowerCase(); });
+  r.tags = [];
+  while (true) {
+    const treffer = weg(/\s#([\wäöüß-]+)(?=\s)/i, (m) => { if (!r.bereich) r.bereich = m[1].toLowerCase(); else r.tags.push(m[1].toLowerCase()); });
+    if (!treffer) break;
+  }
   weg(/\s@([\wäöüß-]+)(?=\s)/i, (m) => {
     const w = m[1].toLowerCase();
     if (["gemeinsam", "beide", "alle"].includes(w)) r.person = GEMEINSAM;
@@ -539,7 +543,7 @@ class PlanerPanel extends HTMLElement {
     const f = this._filter;
     const b = this._bereich;
     return d.aufgaben.filter((a) => {
-      if (b && (a.bereich || "") !== b) return false;
+      if (b && (a.bereich || "") !== b && !(a.tags || []).includes(b)) return false;
       if (f === "alle") return true;
       if (f === "ich") return a.person === d.ich || a.person === GEMEINSAM;
       return a.person === f;
@@ -624,7 +628,7 @@ class PlanerPanel extends HTMLElement {
       </nav>
 
       ${(() => {
-        const liste = [...new Set(d.aufgaben.filter((a) => a.status === "offen").map((a) => a.bereich).filter(Boolean))].sort();
+        const liste = [...new Set(d.aufgaben.filter((a) => a.status === "offen").flatMap((a) => [a.bereich, ...(a.tags || [])]).filter(Boolean))].sort();
         if (this._bereich && !liste.includes(this._bereich)) liste.push(this._bereich);
         if (!liste.length) return "";
         return `<div class="seg bereiche" role="group" aria-label="Nach Bereich filtern">
@@ -858,6 +862,7 @@ class PlanerPanel extends HTMLElement {
     const farbe = bereichFarbe(a.bereich, this._daten.farben);
     if (!fertig && this._ansicht === "heute" && this._naechste === a.id) meta.unshift(`<span class="chip naechstes">Als Nächstes</span>`);
     if (a.bereich) meta.push(`<span class="chip" style="--b:${farbe}"><span class="punkt" aria-hidden="true"></span> ${esc(a.bereich)}</span>`);
+    for (const t of a.tags || []) meta.push(`<span class="chip">#${esc(t)}</span>`);
     const teile = a.teilaufgaben || [];
     if (teile.length) {
       const fertigT = teile.filter((t) => t.erledigt).length;
@@ -1096,6 +1101,7 @@ class PlanerPanel extends HTMLElement {
         <div class="feld"><label for="b-person">Für</label><select id="b-person">${personen.map(([id, n]) => `<option value="${esc(id)}" ${a.person === id ? "selected" : ""}>${esc(n)}</option>`).join("")}</select></div>
         <div class="feld"><label for="b-top">Top 3</label><select id="b-top">
           <option value="">Keine Top-Aufgabe</option>${[1, 2, 3].map((i) => `<option value="${i}" ${a.top === i ? "selected" : ""}>Rang ${i}</option>`).join("")}</select></div>
+        <div class="feld"><label for="b-tags">Hashtags</label><input id="b-tags" value="${esc((a.tags || []).map((t) => "#" + t).join(" "))}" placeholder="#filament #bestellen"></div>
         <div class="feld"><label for="b-bereich">Bereich</label><input id="b-bereich" value="${esc(a.bereich || "")}" placeholder="z. B. werkstatt" list="b-bereiche"><datalist id="b-bereiche">${[...new Set([...Object.keys(BEREICH_STANDARD), ...d.aufgaben.map((x) => x.bereich).filter(Boolean)])].map((b) => `<option value="${esc(b)}">`).join("")}</datalist></div>
       </div>
       ${wdhHtml("b", w)}
@@ -1162,7 +1168,7 @@ class PlanerPanel extends HTMLElement {
       try {
         await this._ws({ type: "planer/speichern", aufgabe: {
           id: a.id, titel, datum, uhrzeit: $("b-uhr").value || null, dauer: $("b-dauer").value || null,
-          person: $("b-person").value, top, bereich: $("b-bereich").value, notiz: $("b-notiz").value, wiederholung, erinnerungen: erinnLesen(dlg, "be"), teilaufgaben,
+          person: $("b-person").value, top, bereich: $("b-bereich").value, tags: $("b-tags").value, notiz: $("b-notiz").value, wiederholung, erinnerungen: erinnLesen(dlg, "be"), teilaufgaben,
         } });
       } catch (err) { $("b-fehler").textContent = err.message || "Speichern hat nicht geklappt."; return; }
       dlg.close();
