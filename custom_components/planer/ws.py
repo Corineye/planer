@@ -68,6 +68,7 @@ async def ws_lesen(hass: HomeAssistant, connection: websocket_api.ActiveConnecti
             "andere_sehen": p.sieht_andere(user.id),
             "einst": p.einst(user.id),
             "einstellungen": {x["id"]: p.einst(x["id"]) for x in personen} if user.is_admin else {},
+            "alle_benutzer": p.alle_benutzer if user.is_admin else [],
             "alle_kalender": kalender.liste(hass) if user.is_admin else [],
             "handys": hass.data[DOMAIN]["erinnerungen"].handys() if user.is_admin else [],
             "kalender": _kalender_fuer(hass, user.id),

@@ -1191,6 +1191,10 @@ class PlanerPanel extends HTMLElement {
       ${kal.some((k) => k.anlegen) ? `<div class="feld"><label for="gk">Kalender für gemeinsame Termine</label>
         <select id="gk"><option value="">Keiner</option>${kal.filter((k) => k.anlegen).map((k) => `<option value="${esc(k.id)}" ${d.gemeinsam_kalender === k.id ? "selected" : ""}>${esc(k.name)}</option>`).join("")}</select>
         <span class="hinweis">Termine mit „Gemeinsam“ oder @gemeinsam landen hier.</span></div>` : ""}
+      ${(d.alle_benutzer || []).length > 2 ? `<fieldset><legend>Wer nutzt den Planer?</legend>
+        <p class="hinweis" style="display:block">Nur angehakte Benutzer erscheinen im Planer. Entferne den Haken bei Konten wie Tablet, Gast oder Claude.</p>
+        ${d.alle_benutzer.map((b) => `<label class="check"><input type="checkbox" data-nutzer="${esc(b.id)}" ${b.ausgeblendet ? "" : "checked"} ${b.id === d.ich ? "disabled" : ""}> ${esc(b.name)}</label>`).join("")}
+      </fieldset>` : ""}
       ${(() => {
         const namen = [...new Set([...Object.keys(BEREICH_STANDARD), ...d.aufgaben.map((a) => a.bereich).filter(Boolean)])].sort();
         return `<fieldset><legend>Bereiche und Farben</legend>
@@ -1233,6 +1237,11 @@ class PlanerPanel extends HTMLElement {
       dlg.querySelectorAll("[data-farbe]").forEach((x) => { farben[x.dataset.farbe] = x.value; });
       await this._ws({ type: "planer/allgemein", werte: { farben } });
       this._sagen(`Farbe für ${f.dataset.farbe} gespeichert`);
+    }));
+    dlg.querySelectorAll("[data-nutzer]").forEach((c) => c.addEventListener("change", async () => {
+      const aus = [...dlg.querySelectorAll("[data-nutzer]")].filter((x) => !x.checked).map((x) => x.dataset.nutzer);
+      await this._ws({ type: "planer/allgemein", werte: { ausgeblendet: aus } });
+      this._sagen("Gespeichert. Die Liste aktualisiert sich beim Schließen.");
     }));
     dlg.querySelector("#gk")?.addEventListener("change", async (e) => {
       await this._ws({ type: "planer/allgemein", werte: { gemeinsam_kalender: e.target.value || null } });
