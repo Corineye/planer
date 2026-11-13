@@ -1,0 +1,30 @@
+hinzufuegen:
+  fields:
+    titel:
+      required: true
+      example: PETG bestellen
+      selector:
+        text:
+    datum:
+      selector:
+        date:
+    uhrzeit:
+      selector:
+        time:
+    person:
+      example: gemeinsam
+      selector:
+        text:
+    top:
+      selector:
+        number:
+          min: 1
+          max: 3
+          mode: box
+    notiz:
+      selector:
+        text:
+          multiline: true
+    bereich:
+      selector:
+        text:

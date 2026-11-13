@@ -1,0 +1,26 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Planer",
+        "description": "Fügt die Seite „Planer“ in der Seitenleiste hinzu: Tagesplan, Top 3, Eingang und Wiederholungen. Jede Person mit eigenem Home-Assistant-Benutzer bekommt eigene Aufgaben und eine eigene To-do-Liste."
+      }
+    },
+    "abort": { "single_instance_allowed": "Der Planer ist schon eingerichtet." }
+  },
+  "services": {
+    "hinzufuegen": {
+      "name": "Aufgabe hinzufügen",
+      "description": "Legt eine Aufgabe im Planer an.",
+      "fields": {
+        "titel": { "name": "Titel", "description": "Was zu tun ist." },
+        "datum": { "name": "Datum", "description": "Für welchen Tag. Leer = Eingang." },
+        "uhrzeit": { "name": "Uhrzeit", "description": "Optional, z. B. 15:00." },
+        "person": { "name": "Person", "description": "Vorname, Benutzer-ID oder „gemeinsam“. Leer = wer den Dienst aufruft, sonst gemeinsam." },
+        "top": { "name": "Top-Rang", "description": "1 bis 3 für die Top 3 des Tages." },
+        "notiz": { "name": "Notiz", "description": "Optionaler Text." },
+        "bereich": { "name": "Bereich", "description": "Kategorie, z. B. werkstatt." }
+      }
+    }
+  }
+}
