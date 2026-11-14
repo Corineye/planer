@@ -211,7 +211,7 @@ class Planer:
             a.setdefault("tags", [])
             for feld in ("datum", "uhrzeit", "dauer", "top", "wiederholung"):
                 a.setdefault(feld, None)
-            a.setdefault("erinnerungen", None)
+            a.setdefault("erinnerungen", [])
             a.setdefault("teilaufgaben", [])
             a.setdefault("reihenfolge", dt_util.utcnow().timestamp())
         a["geaendert"] = jetzt

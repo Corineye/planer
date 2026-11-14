@@ -10,7 +10,7 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
 3. Einstellungen › Geräte & Dienste › Integration hinzufügen › **Planer**.
 4. In der Seitenleiste erscheint „Planer“.
 
-## Was es gibt (v0.6)
+## Was es gibt (v0.7)
 
 - **Heute** mit Top 3 (je Rang 1–3, nie mehr als drei), weiteren Aufgaben, Überfälligem und „Heute erledigt“.
 - **Demnächst** (nach Tagen gruppiert) und **Eingang** (alles ohne Datum).
@@ -66,6 +66,14 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
 - **Eine Eingabeleiste** (v0.6): in jedem Reiter gleich und an derselben Stelle; in Einkauf landet der Text auf der Einkaufsliste.
 - **Automatisch speichern** (v0.6): Änderungen in einer bestehenden Aufgabe (auch Notiz) werden sofort gespeichert, „Fertig“ schließt nur. Details öffnen ohne Tastatur.
 - **Animationen** (v0.6): Pop-ups gleiten sanft auf und zu, Ansichten blenden ein, Abhaken mit kleiner Animation.
+
+- **Woche kompakt** (v0.7): heute und die nächsten 7 Tage als Karten mit Terminen und Aufgaben als Chips.
+  Antippen öffnet den Tag mit Stundenraster als Pop-up.
+- **Termin ziehen** (v0.7): Im Tages-Pop-up ein Zeitfenster ziehen (PC) oder auf eine freie Stunde tippen (Handy),
+  dann Titel eingeben und als Termin oder Aufgabe speichern. „Weitere Optionen“ öffnet das volle Formular.
+- **Pop-ups** (v0.7): schließen beim Klick außerhalb.
+- **Erinnerungen** (v0.7): Zeitpunkte direkt antippen (30 Min., 3 Std., 1 Tag …); neue Aufgaben haben keine Erinnerung, bis du eine wählst.
+- **Kleinigkeiten** (v0.7): Eingabeleiste auch in Einkauf, gewählte „Wann“-Option farbig, Top 3 nur sichtbar, wenn es Top-Aufgaben gibt.
 
 ## Daten
 
