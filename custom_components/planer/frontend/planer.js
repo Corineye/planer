@@ -269,274 +269,327 @@ export function parse(text, personen) {
 
 // ---------- Stil ----------
 const CSS = `
+/* ===== Planer Designsystem (Apple HIG + Liquid Glass) =====
+   Raster 4/8 px, Schriftstufen nach iOS, Glas nur für Navigation und Bedienelemente,
+   Inhalt auf festen Karten. HA setzt die Grundschrift auf 14 px, darum hier feste px-Werte. */
 :host{
-  --bg:#f2f2f7; --bg2:#ffffff; --card:#ffffff; --glass:#ffffff; --line:rgba(60,60,67,.16); --line2:rgba(60,60,67,.32);
-  --fg:#000000; --muted:#5f5f66; --mint:#007aff; --mint-dim:rgba(0,122,255,.12); --on-mint:#ffffff; --accent:#007aff;
-  --warn:#9a5200; --warn-dim:rgba(255,149,0,.16); --red:#d70015; --focus:#0a5fd0; --fill:rgba(120,120,128,.12); --navbg:rgba(249,249,249,.94);
-  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",system-ui,Roboto,sans-serif; --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-  display:block; min-height:100vh; min-height:100dvh; background:var(--bg); color:var(--fg); font-family:var(--font); font-size:1rem; line-height:1.5;
-  color-scheme:light dark;
+  /* Farben hell */
+  --bg:#f2f2f7; --card:#ffffff; --card2:#f2f2f7; --fg:#000000; --muted:#636366;
+  --line:rgba(60,60,67,.14); --line2:rgba(60,60,67,.30); --fill:rgba(120,120,128,.12); --fill2:rgba(120,120,128,.2);
+  --mint:#0066cc; --accent:#0066cc; --accent-fill:#0066cc; --on-mint:#ffffff; --mint-dim:rgba(0,102,204,.10);
+  --warn:#9a5200; --warn-dim:rgba(255,149,0,.16); --red:#d70015; --focus:#0066cc;
+  --thumb:#ffffff; --thumb-schatten:0 1px 4px rgba(0,0,0,.14),0 0 0 .5px rgba(0,0,0,.04);
+  --glas:rgba(255,255,255,.66); --glas-rand:rgba(255,255,255,.8); --glas-blur:blur(22px) saturate(180%);
+  --glas-schatten:0 8px 28px rgba(0,0,0,.10),0 1px 2px rgba(0,0,0,.06);
+  --karte-schatten:0 1px 2px rgba(0,0,0,.05);
+  /* Schrift (iOS-Stufen) */
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",system-ui,Roboto,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --t-gross:28px; --t-titel:20px; --t-kopf:17px; --t-text:16px; --t-sub:14px; --t-fuss:13px; --t-klein:12px; --t-tab:11px;
+  /* Abstände und Radien */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px;
+  --r-karte:14px; --r-feld:12px; --r-voll:999px;
+  --z-leiste:10; --z-fab:11;
+  display:block; min-height:100vh; min-height:100dvh; color:var(--fg); font-family:var(--font); font-size:var(--t-text); line-height:1.4;
+  color-scheme:light dark; -webkit-font-smoothing:antialiased;
+  background:
+    radial-gradient(60vmax 40vmax at 10% -10%,rgba(0,122,255,.08),transparent 60%),
+    radial-gradient(50vmax 40vmax at 100% 10%,rgba(175,82,222,.06),transparent 60%),
+    var(--bg);
+  background-attachment:fixed;
 }
 @media (prefers-color-scheme:dark){:host{
-  --bg:#000000; --bg2:#1c1c1e; --card:#1c1c1e; --glass:#1c1c1e; --line:rgba(255,255,255,.16); --line2:rgba(255,255,255,.34);
-  --fg:#ffffff; --muted:#aeaeb4; --mint:#0a84ff; --mint-dim:rgba(10,132,255,.22); --on-mint:#ffffff; --accent:#0a84ff;
-  --warn:#ffb340; --warn-dim:rgba(255,159,10,.2); --red:#ff6b61; --focus:#64d2ff; --fill:rgba(255,255,255,.1); --navbg:rgba(28,28,30,.94);
+  --bg:#000000; --card:#1c1c1e; --card2:#2c2c2e; --fg:#ffffff; --muted:#aeaeb4;
+  --line:rgba(255,255,255,.12); --line2:rgba(255,255,255,.28); --fill:rgba(118,118,128,.24); --fill2:rgba(118,118,128,.36);
+  --mint:#5aa9ff; --accent:#5aa9ff; --accent-fill:#0a6cd9; --on-mint:#ffffff; --mint-dim:rgba(90,169,255,.16);
+  --warn:#ffb340; --warn-dim:rgba(255,159,10,.18); --red:#ff6b61; --focus:#5aa9ff;
+  --thumb:#636366; --thumb-schatten:0 1px 4px rgba(0,0,0,.4);
+  --glas:rgba(40,40,44,.62); --glas-rand:rgba(255,255,255,.12);
+  --glas-schatten:0 8px 28px rgba(0,0,0,.55),0 1px 2px rgba(0,0,0,.4);
+  --karte-schatten:0 0 0 transparent;
+  background:
+    radial-gradient(60vmax 40vmax at 10% -10%,rgba(10,132,255,.16),transparent 60%),
+    radial-gradient(50vmax 40vmax at 100% 10%,rgba(191,90,242,.10),transparent 60%),
+    var(--bg);
+  background-attachment:fixed;
 }}
+.schmal{--t-gross:34px; --t-titel:20px; --t-kopf:17px; --t-text:17px; --t-sub:15px; --t-fuss:13px; --t-klein:12px; --t-tab:11px; font-size:var(--t-text)}
+
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-button,input,select,textarea{font:inherit;color:inherit}
-:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:8px}
+button,input,select,textarea{font:inherit;color:inherit;letter-spacing:inherit}
+button{-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.muted{color:var(--muted)}
+svg{flex:none}
+
+/* ---------- Glas (nur Navigation und Bedienelemente) ---------- */
+.glas,.seg,nav.tabs,.knopf:not(.primaer):not(.text),.rund,.fab{background:var(--glas);-webkit-backdrop-filter:var(--glas-blur);backdrop-filter:var(--glas-blur);border:1px solid var(--glas-rand);box-shadow:var(--glas-schatten)}
+@media (prefers-reduced-transparency:reduce){.glas,.seg,nav.tabs,.knopf:not(.primaer):not(.text),.rund,.fab{background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none}}
+
+/* ---------- Grundgerüst ---------- */
+.wrap{max-width:1040px;margin:0 auto;padding:var(--s4) var(--s5) var(--s6);display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s4)}
 .wrap>*{min-width:0}
-.eingabe .knopf{flex:none}
-.wrap{max-width:960px;margin:0 auto;padding:16px 16px 120px;display:grid;gap:18px}
-header{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-header h1{margin:0;font-size:2rem;font-weight:700;letter-spacing:-.02em}
-header .datum{color:var(--muted)}
-header .rechts{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.menu{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--glass);cursor:pointer;font-size:1.25rem}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--glass)}
-.seg button{border:0;background:none;padding:8px 12px;min-height:44px;cursor:pointer;color:var(--muted)}
-.seg button[aria-pressed="true"]{background:var(--mint-dim);color:var(--mint);font-weight:600}
-.knopf{border:1px solid var(--line2);background:var(--glass);border-radius:12px;padding:8px 14px;min-height:44px;cursor:pointer}
-.knopf:hover{border-color:var(--mint)}
-.knopf.primaer{background:var(--mint);color:var(--on-mint);border-color:var(--mint);font-weight:600}
-.knopf.gefahr{border-color:color-mix(in srgb,var(--red) 50%,transparent);color:var(--red)}
-.knopf.klein{min-height:36px;padding:4px 10px;font-size:.875rem}
+.schmal .wrap{padding:var(--s2) var(--s4) calc(112px + env(safe-area-inset-bottom,0px));gap:var(--s4)}
+header{display:flex;gap:var(--s3);align-items:center;min-width:0}
+header .titel-block{display:grid;min-width:0;flex:1}
+header h1{margin:0;font-size:var(--t-gross);font-weight:700;letter-spacing:-.02em;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+header .datum{font-size:var(--t-sub);color:var(--muted);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+header .rechts{margin-left:auto;display:flex;gap:var(--s2);align-items:center;flex:none}
+.schmal header{align-items:flex-start;padding-top:var(--s1)}
+.schmal header .titel-block{padding-top:2px}
 
-form.schnell{display:grid;gap:6px}
-.eingabe{display:flex;gap:8px;min-width:0;width:100%}
-.eingabe input{flex:1;width:0;min-width:0;min-height:52px;border-radius:14px;border:1px solid var(--line2);background:var(--glass);padding:0 16px;font-size:1.05rem}
+/* ---------- Bedienelemente ---------- */
+.rund{width:44px;height:44px;border-radius:50%;display:inline-grid;place-items:center;cursor:pointer;color:var(--fg);padding:0;position:relative;flex:none}
+.rund svg{width:22px;height:22px}
+.rund.aktiv{color:var(--on-mint);background:var(--accent-fill);border-color:var(--accent-fill)}
+.rund select{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;border-radius:50%}
+.knopf{display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);min-height:44px;padding:0 var(--s4);border-radius:var(--r-voll);cursor:pointer;font-weight:600;font-size:var(--t-sub);color:var(--fg);transition:transform .12s ease,filter .2s ease;white-space:nowrap}
+.knopf svg{width:20px;height:20px}
+.knopf.primaer{background:var(--accent-fill);color:var(--on-mint);border:1px solid var(--accent-fill)}
+.knopf.gefahr{color:var(--red)}
+.knopf.text{background:none;border:0;box-shadow:none;color:var(--accent);padding:0 var(--s2)}
+.knopf.text.fett{font-weight:700}
+.knopf.klein{min-height:36px;padding:0 var(--s3);font-size:var(--t-fuss)}
+.knopf:disabled{opacity:.45;cursor:default}
+.knopf:hover:not(:disabled){filter:brightness(1.05)}
+.knopf:active,.rund:active,.fab:active,.seg button:active,nav.tabs button:active{transform:scale(.96)}
+
+/* Segment-Schalter wie in iOS: fester „Daumen“ für die Auswahl */
+.seg{display:inline-flex;border-radius:var(--r-voll);padding:3px;gap:2px;max-width:100%}
+.seg button{flex:1 1 auto;border:0;background:none;border-radius:var(--r-voll);min-height:38px;padding:0 var(--s4);cursor:pointer;color:var(--fg);font-size:var(--t-sub);font-weight:500;white-space:nowrap;transition:background .2s ease}
+.seg button[aria-pressed="true"]{background:var(--thumb);box-shadow:var(--thumb-schatten);font-weight:700}
+.filterzeile .seg{display:flex;width:100%}
+.schmal .seg button{padding:0 var(--s2);min-height:40px}
+.schmal .knopf.klein{min-height:44px}
+.teile:empty{display:none}
+dialog .knopf:not(.primaer):not(.text){box-shadow:none;background:var(--card);border-color:var(--line);-webkit-backdrop-filter:none;backdrop-filter:none}
+fieldset .knopf:not(.primaer):not(.text){background:var(--card2);border-color:transparent}
+@media (orientation:landscape) and (max-height:520px){.schmal nav.tabs[aria-label]{left:var(--s3);right:var(--s3);margin:0 auto;max-width:600px}.schmal nav.tabs[aria-label] button{min-height:44px;flex-direction:row;gap:6px}.schmal nav.tabs[aria-label] button svg{width:20px;height:20px}.schmal nav.tabs[aria-label] .zahl{position:static;background:var(--fill);color:var(--muted)}.schmal{--t-gross:28px}.schmal .wrap{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}.fab{bottom:calc(72px + env(safe-area-inset-bottom,0px));right:calc(var(--s4) + env(safe-area-inset-right,0px))}}
+@media (max-width:359px){.schmal{--t-gross:28px}.schmal nav.tabs{left:var(--s2);right:var(--s2)}.schmal nav.tabs button{font-size:10px}}
+
+/* Filter-Chips für Bereiche (Desktop), ohne eigene Glasfläche */
+.bereiche{display:flex;flex-wrap:wrap;gap:var(--s2)}
+.bereiche button{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 var(--s3);border-radius:var(--r-voll);border:1px solid var(--line);background:var(--card);color:var(--fg);font-size:var(--t-fuss);font-weight:500;cursor:pointer;box-shadow:var(--karte-schatten)}
+.bereiche button[aria-pressed="true"]{background:var(--fg);color:var(--card);border-color:var(--fg);font-weight:700}
+.aktivfilter{display:flex;gap:var(--s2);align-items:center;flex-wrap:wrap;font-size:var(--t-sub);color:var(--muted)}
+.aktivfilter button{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 var(--s3);border-radius:var(--r-voll);border:0;background:var(--fg);color:var(--card);font-weight:600;font-size:var(--t-fuss);cursor:pointer}
+.aktivfilter button svg{width:14px;height:14px}
+
+/* ---------- Schnelleingabe ---------- */
+form.schnell{display:grid;gap:var(--s2)}
+.eingabe{display:flex;gap:var(--s2);min-width:0;width:100%;align-items:center}
+.eingabe input{flex:1;width:0;min-width:0;height:48px;border-radius:var(--r-voll);border:1px solid var(--line);background:var(--card);box-shadow:var(--karte-schatten);padding:0 var(--s4) 0 20px;font-size:var(--t-text)}
 .eingabe input::placeholder{color:var(--muted)}
-.hinweis{font-size:.875rem;color:var(--muted);min-height:1.5em;display:flex;gap:6px;flex-wrap:wrap}
-.chip{display:inline-flex;align-items:center;gap:4px;font-size:.8125rem;padding:1px 8px;border-radius:99px;border:1px solid var(--line2);color:var(--muted);white-space:nowrap}
-.chip.mint{color:var(--mint);border-color:color-mix(in srgb,var(--mint) 45%,transparent);background:var(--mint-dim)}
-.chip.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 45%,transparent);background:var(--warn-dim)}
+.eingabe .knopf{flex:none;height:48px}
+.eingabe .knopf.primaer{box-shadow:0 4px 14px color-mix(in srgb,var(--accent-fill) 35%,transparent)}
+.schmal .eingabe .knopf.primaer{width:48px;padding:0}
+.zusatz{display:flex;gap:var(--s1);align-items:center;min-width:0}
+.zusatz .knopf.text{padding:0 var(--s2) 0 var(--s1)}
+.hinweis{font-size:var(--t-fuss);color:var(--muted);display:flex;gap:6px;flex-wrap:wrap;margin:0}
+.hinweis:empty{display:none}
+.schmal form.schnell{background:var(--card);border-radius:20px;padding:var(--s3);box-shadow:var(--glas-schatten);border:1px solid var(--line)}
+.schmal form.schnell .eingabe input{box-shadow:none;background:var(--card2);border-color:transparent}
+.fab{position:fixed;right:var(--s4);bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:var(--z-fab);width:56px;height:56px;border-radius:50%;display:grid;place-items:center;cursor:pointer;background:var(--accent-fill);color:var(--on-mint);border:0;box-shadow:0 6px 20px color-mix(in srgb,var(--accent-fill) 45%,transparent),0 2px 6px rgba(0,0,0,.2)}
+.fab svg{width:26px;height:26px}
 
-nav.tabs{display:flex;gap:6px}
-nav.tabs button{border:1px solid transparent;background:none;border-radius:12px;padding:8px 14px;min-height:44px;cursor:pointer;color:var(--muted);display:flex;gap:6px;align-items:center}
-nav.tabs button[aria-current="page"]{background:var(--mint-dim);color:var(--mint);border-color:color-mix(in srgb,var(--mint) 35%,transparent);font-weight:600}
-nav.tabs .zahl{font-family:var(--mono);font-size:.75rem;background:var(--fill);border-radius:99px;padding:0 7px}
-.schmal .eingabe .primaer{min-width:52px;font-size:1.4rem}
-.schmal header .rechts{margin-left:0;width:100%}
-.schmal nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:5;justify-content:space-around;background:var(--navbg);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
-.schmal nav.tabs button{flex:1;flex-direction:column;gap:0;font-size:.8125rem;padding:6px 4px}
+/* ---------- Reiterleiste ---------- */
+nav.tabs{display:flex;gap:2px;border-radius:var(--r-voll);padding:4px;width:max-content;max-width:100%}
+nav.tabs button{display:flex;gap:var(--s2);align-items:center;border:0;background:none;border-radius:var(--r-voll);min-height:40px;padding:0 var(--s4);cursor:pointer;color:var(--fg);font-size:var(--t-sub);font-weight:500}
+nav.tabs button svg{width:20px;height:20px}
+nav.tabs button[aria-current="page"]{background:var(--mint-dim);color:var(--accent);font-weight:700}
+nav.tabs .zahl{font-size:var(--t-klein);font-variant-numeric:tabular-nums;background:var(--fill);color:var(--muted);border-radius:var(--r-voll);padding:0 7px;line-height:20px;font-weight:600}
+nav.tabs .zahl.null{display:none}
+.schmal nav.tabs{position:fixed;left:var(--s3);right:var(--s3);bottom:calc(var(--s2) + env(safe-area-inset-bottom,0px));z-index:var(--z-leiste);width:auto;justify-content:space-around;padding:4px}
+.schmal nav.tabs button{flex:1;flex-direction:column;gap:2px;justify-content:center;font-size:var(--t-tab);font-weight:600;padding:0 2px;min-height:56px;position:relative;min-width:0}
+.schmal nav.tabs button span:not(.zahl){max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.schmal nav.tabs button svg{width:24px;height:24px}
+.schmal nav.tabs .zahl{position:absolute;top:4px;left:calc(50% + 6px);font-size:var(--t-tab);line-height:16px;padding:0 5px;background:var(--accent-fill);color:var(--on-mint)}
 
-main{display:grid;grid-template-columns:minmax(0,1fr);gap:22px}
-section.gruppe{display:grid;gap:8px}
-.gruppe h2{margin:0;font-size:.8125rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;gap:8px;align-items:center}
-.gruppe h2 .zahl{font-family:var(--mono);letter-spacing:0}
-ul.liste{list-style:none;margin:0;padding:0;display:grid;gap:8px}
-li.aufgabe{position:relative;border-radius:14px;touch-action:pan-y}
-.zeile{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:14px;background:var(--glass);border:1px solid var(--line);transition:transform .15s ease}
-.top .zeile{border-color:color-mix(in srgb,var(--mint) 35%,transparent)}
+/* ---------- Inhalt ---------- */
+main{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s5)}
+section.gruppe{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2)}
+.gruppe h2{margin:0;font-size:var(--t-titel);font-weight:700;letter-spacing:-.01em;display:flex;gap:var(--s2);align-items:baseline;flex-wrap:wrap}
+.gruppe h2 .zahl{font-size:var(--t-sub);color:var(--muted);font-weight:500;font-variant-numeric:tabular-nums}
+.gruppe h2 .chip{align-self:center}
+ul.liste{list-style:none;margin:0;padding:0;display:grid;gap:var(--s2)}
+li.aufgabe{position:relative;border-radius:var(--r-karte);touch-action:pan-y;min-width:0}
+.zeile{display:flex;gap:var(--s1);align-items:center;padding:var(--s1) var(--s2) var(--s1) var(--s1);min-height:56px;border-radius:var(--r-karte);background:var(--card);box-shadow:var(--karte-schatten);transition:transform .15s ease;position:relative}
+li.aufgabe.farbig .zeile{box-shadow:inset 4px 0 0 var(--b),var(--karte-schatten)}
 .erledigt .zeile{opacity:.6}
 .erledigt .titel{text-decoration:line-through}
-.haken{flex:none;width:28px;height:28px;border-radius:50%;border:2px solid var(--muted);background:none;cursor:pointer;display:grid;place-items:center;padding:0}
-.haken[aria-checked="true"]{background:var(--mint);border-color:var(--mint);color:var(--on-mint)}
-.haken svg{width:16px;height:16px}
-.rang{flex:none;font-family:var(--mono);font-size:.8125rem;font-weight:700;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:var(--mint);color:var(--on-mint)}
-.inhalt{flex:1;min-width:0;display:grid;gap:2px;text-align:left;background:none;border:0;padding:4px 0;cursor:pointer}
-.titel{overflow-wrap:anywhere}
-.meta{display:flex;gap:6px;flex-wrap:wrap}
-.aktionen{display:flex;gap:6px;flex:none}
-.leer{color:var(--muted);padding:12px 14px;border:1px dashed var(--line2);border-radius:14px}
-.wisch{position:absolute;inset:0;border-radius:14px;display:flex;align-items:center;padding:0 18px;font-weight:600;pointer-events:none;opacity:0}
-.wisch.rechts{background:var(--mint-dim);color:var(--mint)}
-.wisch.links{background:var(--warn-dim);color:var(--warn);justify-content:flex-end}
-details.zu summary{cursor:pointer;color:var(--muted);min-height:44px;display:flex;align-items:center}
+/* Haken: sichtbar 24 px, Trefferfläche 44 px */
+.haken{flex:none;width:44px;height:44px;border:0;background:none;cursor:pointer;display:grid;place-items:center;padding:0;border-radius:50%;color:var(--on-mint)}
+.haken::before{content:"";grid-area:1/1;width:24px;height:24px;border-radius:50%;border:2px solid var(--line2);box-sizing:border-box}
+.haken svg{grid-area:1/1;width:14px;height:14px;position:relative}
+.haken[aria-checked="true"]::before{background:var(--accent-fill);border-color:var(--accent-fill)}
+.top .haken::before{border-color:var(--accent)}
+.rang{flex:none;font-size:var(--t-klein);font-weight:700;min-width:22px;height:22px;border-radius:6px;display:grid;place-items:center;background:var(--accent-fill);color:var(--on-mint);font-variant-numeric:tabular-nums;margin-right:var(--s1)}
+.inhalt{flex:1;min-width:0;min-height:44px;align-content:center;display:grid;gap:var(--s1);text-align:left;background:none;border:0;padding:var(--s2) var(--s1);cursor:pointer;color:var(--fg)}
+.titel{overflow-wrap:anywhere;font-size:var(--t-text);line-height:1.3}
+.unter{font-size:var(--t-sub);color:var(--muted);overflow-wrap:anywhere}
+.meta{display:flex;gap:6px;flex-wrap:wrap;min-width:0}
+.aktionen{display:flex;gap:var(--s2);flex:none}
+.leer{color:var(--muted);padding:var(--s3) var(--s4);border-radius:var(--r-karte);background:var(--fill);margin:0;font-size:var(--t-sub)}
+.wisch{position:absolute;inset:0;border-radius:var(--r-karte);display:flex;align-items:center;padding:0 var(--s4);font-weight:700;pointer-events:none;opacity:0;gap:var(--s2)}
+.wisch svg{width:20px;height:20px}
+.wisch.rechts{background:var(--accent-fill);color:var(--on-mint)}
+.wisch.links{background:#ff9500;color:#000;justify-content:flex-end}
+details.zu summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:var(--t-sub);min-height:44px;display:flex;align-items:center;list-style:none}
+details.zu summary::-webkit-details-marker{display:none}
+details.zu summary::before{content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);margin:0 10px 0 4px;transition:transform .2s ease}
+details.zu[open] summary::before{transform:rotate(45deg)}
+details.zu>ul,details.zu>p{margin-top:var(--s2)}
 
-dialog{border:1px solid var(--line2);border-radius:18px;background:var(--card);color:var(--fg);padding:0;width:min(560px,calc(100vw - 24px));max-height:calc(100dvh - 24px)}
-dialog::backdrop{background:rgba(0,0,0,.6)}
-.schmal dialog{margin:auto auto 0;width:100vw;max-width:100vw;border-radius:18px 18px 0 0;border-bottom:0}
-dialog form{display:grid;gap:14px;padding:20px;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))}
-dialog h2{margin:0;font-size:1.2rem}
-.griff{width:40px;height:4px;border-radius:2px;background:var(--line2);margin:-8px auto 0}
-.feld{display:grid;gap:4px}
-.feld>label,.feld>.lbl,fieldset legend{font-size:.875rem;color:var(--muted)}
-.feld input,.feld select,.feld textarea{min-height:44px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);padding:8px 12px;width:100%}
-.feld textarea{min-height:80px;resize:vertical}
-.reihe{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
-.schnellwahl{display:flex;gap:6px;flex-wrap:wrap}
-fieldset{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0;display:grid;gap:10px}
-.tage{display:flex;gap:6px;flex-wrap:wrap}
-.tage label{display:flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;border:1px solid var(--line2);border-radius:10px;cursor:pointer}
-.tage input{position:absolute;opacity:0;width:1px;height:1px}
-.tage input:checked+span{color:var(--mint);font-weight:700}
-.tage label:has(input:checked){background:var(--mint-dim);border-color:var(--mint)}
-.tage label:has(input:focus-visible){outline:3px solid var(--focus);outline-offset:2px}
-.fuss{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-.fuss .links{margin-right:auto}
-.fehler{color:var(--red)}
-.check{display:flex;gap:10px;align-items:center;min-height:44px}
-.check input{width:22px;height:22px;accent-color:var(--mint)}
-.spalten{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px;align-items:start}
-.spalten>div{display:grid;grid-template-columns:minmax(0,1fr);gap:22px;min-width:0}
-.schmal .spalten{grid-template-columns:minmax(0,1fr)}
+/* Chips: ruhig, Farbe nur als Zusatz zum Text */
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:var(--t-klein);font-weight:500;line-height:20px;padding:0 var(--s2);border-radius:var(--r-voll);background:var(--fill);color:var(--muted);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.chip svg{width:12px;height:12px}
+.chip.mint{color:var(--accent);background:var(--mint-dim)}
+.chip.warn{color:var(--warn);background:var(--warn-dim)}
+.chip.naechstes{color:var(--on-mint);background:var(--accent-fill);font-weight:700}
+.punkt{width:8px;height:8px;border-radius:50%;background:var(--b);display:inline-block;flex:none}
+
+/* ---------- Heute: zwei Spalten am PC ---------- */
+.spalten{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:var(--s5);align-items:start}
+.spalten>div{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s5);min-width:0}
 .spalten>*{min-width:0}
-.termin .was,.termin .wo{min-width:0;overflow-wrap:anywhere}
-aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;position:sticky;top:12px}
-.termine{list-style:none;margin:0;padding:0;display:grid;gap:6px}
-.termin{width:100%;display:grid;grid-template-columns:6.8em 1fr;gap:2px 10px;text-align:left;padding:8px 12px;border-radius:12px;border:1px solid var(--line);border-left:4px solid var(--k,var(--mint));background:var(--glass);cursor:pointer}
-.termin .zeit{font-family:var(--mono);font-size:.8125rem;color:var(--muted);white-space:nowrap;padding-top:2px}
-.termin .was{overflow-wrap:anywhere}
-.termin .wo{grid-column:2;font-size:.8125rem;color:var(--muted)}
-.termin.block{border-style:dashed;border-left-style:solid;background:none}
-.frei{font-family:var(--mono);font-size:.8125rem;color:var(--mint)}
-.tag-termine{display:grid;gap:6px}
-.wahl label{min-width:auto;padding:0 12px}
-.eigen{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.feld .eigen input{width:110px;min-height:40px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);padding:6px 10px}
-.feld .eigen select{width:auto;min-height:40px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);padding:6px 10px}
-.person-einst{border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;gap:12px}
-.person-einst h3{margin:0;font-size:1.05rem}
-.kal-tab{width:100%;border-collapse:collapse;font-size:.9rem}
-.kal-tab th,.kal-tab td{padding:6px 4px;border-bottom:1px solid var(--line);text-align:center}
-.kal-tab th:first-child,.kal-tab td:first-child{text-align:left}
-.kal-tab input{width:22px;height:22px;accent-color:var(--mint)}
-.tab-wrap{overflow-x:auto}
-.infos{display:grid;gap:6px;margin:0}
-.infos dt{font-size:.8125rem;color:var(--muted)}
-.infos dd{margin:0 0 6px}
-.wkopf{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.wkopf h2{margin:0 8px 0 0;font-size:1.15rem}
-.wkopf .knopf{min-width:44px}
-.ziele{display:grid;gap:8px}
-.ziel{display:flex;gap:10px;align-items:center}
-.ziel input[type=text]{flex:1;min-width:0;min-height:44px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);padding:6px 12px}
-.ziel input[type=checkbox]{width:24px;height:24px;accent-color:var(--mint);flex:none}
-.ziel .nr{font-family:var(--mono);font-weight:700;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:var(--mint-dim);color:var(--mint);flex:none}
-.woche{display:grid;grid-template-columns:repeat(7,minmax(118px,1fr));gap:8px;min-width:860px}
-.woche-wrap{overflow-x:auto;padding-bottom:4px}
-.schmal .woche{grid-template-columns:1fr;min-width:0}
-.wtag{background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:8px;display:grid;gap:6px;align-content:start;min-height:180px;min-width:0}
-.schmal .wtag{min-height:0}
-.wtag.heute{border-color:color-mix(in srgb,var(--mint) 50%,transparent)}
-.wtag.ziel-drop{outline:2px dashed var(--mint);outline-offset:2px}
-.wtag h3{margin:0;font-size:.9rem;display:flex;justify-content:space-between;gap:6px}
-.wtag h3 .d{color:var(--muted);font-weight:400}
-.wpunkt{display:block;width:100%;text-align:left;font-size:.8125rem;line-height:1.35;padding:5px 7px;border-radius:8px;border:1px solid transparent;background:var(--fill);cursor:pointer;overflow-wrap:anywhere}
-.wpunkt.t{border-left:3px solid var(--k,var(--mint));background:var(--fill)}
-.wpunkt.a.top{background:var(--mint-dim);color:var(--mint)}
-.wpunkt.a.fertig{opacity:.55;text-decoration:line-through}
-.wpunkt .z{font-family:var(--mono);color:var(--muted);margin-right:6px}
-.wpunkt[draggable=true]{cursor:grab}
-.wleer{font-size:.8125rem;color:var(--muted)}
-.ablage{display:flex;gap:6px;flex-wrap:wrap}
-.ablage .wpunkt{width:auto}
-li.aufgabe.farbig .zeile{border-left:4px solid var(--b)}
-.punkt{width:9px;height:9px;border-radius:50%;background:var(--b);display:inline-block}
-.chip.naechstes{color:var(--on-mint);background:var(--mint);border-color:var(--mint);font-weight:600}
-.bereiche{flex-wrap:wrap}
-.kalumschalter{margin-bottom:12px}
-.monat{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;min-width:560px}
-.mkopf{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:2px 6px;font-weight:700}
-.mtag{display:flex;flex-direction:column;align-items:stretch;gap:2px;text-align:left;min-height:96px;padding:6px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg);font:inherit;cursor:pointer;min-width:0;overflow:hidden}
-.mtag:hover{border-color:var(--accent)}
-.mtag.fremd{opacity:.55}
-.mtag.heute{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
-.mnr{font-weight:700;font-size:.9rem}
-.mtag.heute .mnr{color:var(--accent)}
-.mpunkt{display:block;font-size:.72rem;line-height:1.3;padding:1px 4px;border-left:3px solid var(--k,var(--accent));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mpunkt.aufg{border-left-color:var(--muted);color:var(--muted)}
-.mmehr{font-size:.7rem;color:var(--muted)}
-.schmal .mtag{min-height:64px}
-.schmal .mpunkt{font-size:.62rem}
-.bereiche button{display:inline-flex;gap:6px;align-items:center}
-.teile{list-style:none;margin:0;padding:0;display:grid;gap:6px}
-.teil{display:flex;gap:8px;align-items:center}
-.teil input[type=checkbox]{width:24px;height:24px;accent-color:var(--mint);flex:none}
-.teil input[type=text]{flex:1;min-width:0;min-height:40px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);padding:6px 10px}
-.teil .weg{width:40px;height:40px;border-radius:10px;border:1px solid var(--line2);background:none;cursor:pointer;flex:none}
-.teil-neu{display:flex;gap:8px}
-.teil-neu input{flex:1;min-width:0;min-height:44px;border-radius:10px;border:1px solid var(--line2);background:var(--bg2);padding:8px 12px}
-.farben{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
-.farben label{display:flex;gap:8px;align-items:center;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:4px 10px}
-.farben input[type=color]{width:36px;height:28px;border:0;background:none;padding:0}
+aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);position:sticky;top:var(--s3)}
+.termine{list-style:none;margin:0;padding:0;display:grid;gap:var(--s2)}
+.termin{width:100%;display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px var(--s3);text-align:left;padding:10px var(--s3) 10px var(--s4);border-radius:var(--r-karte);border:0;background:var(--card);box-shadow:inset 4px 0 0 var(--k,var(--accent)),var(--karte-schatten);cursor:pointer;color:var(--fg);min-height:52px;align-items:baseline}
+.termin .zeit{font-size:var(--t-fuss);color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums;min-width:5.6em}
+.termin .was{overflow-wrap:anywhere;min-width:0;font-size:var(--t-text);font-weight:500}
+.termin .was svg{width:14px;height:14px;vertical-align:-2px;color:var(--muted)}
+.termin .wo{grid-column:2;font-size:var(--t-fuss);color:var(--muted);min-width:0;overflow-wrap:anywhere}
+.termin.block{background:transparent;box-shadow:inset 0 0 0 1.5px var(--line2);border-radius:var(--r-karte)}
+.frei{font-size:var(--t-fuss);color:var(--muted);margin:0}
 
-/* ===== Liquid Glass: Glas nur für Navigation und Bedienelemente, Inhalt bleibt auf festen Karten ===== */
-:host{
-  --glas:rgba(255,255,255,.62); --glas-rand:rgba(255,255,255,.75); --glas-schatten:0 8px 32px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.06);
-  --glas-blur:blur(22px) saturate(180%); --karte-schatten:0 1px 3px rgba(0,0,0,.06),0 1px 1px rgba(0,0,0,.04);
-  --wahl:rgba(0,122,255,.14);
-  background:
-    radial-gradient(60vmax 40vmax at 10% -10%,rgba(0,122,255,.10),transparent 60%),
-    radial-gradient(50vmax 40vmax at 100% 10%,rgba(175,82,222,.08),transparent 60%),
-    radial-gradient(60vmax 50vmax at 50% 110%,rgba(52,199,89,.07),transparent 60%),
-    var(--bg);
-  background-attachment:fixed;
-}
-@media (prefers-color-scheme:dark){:host{
-  --glas:rgba(44,44,48,.55); --glas-rand:rgba(255,255,255,.14); --glas-schatten:0 8px 32px rgba(0,0,0,.5),0 1px 2px rgba(0,0,0,.4);
-  --karte-schatten:none; --wahl:rgba(10,132,255,.28);
-  background:
-    radial-gradient(60vmax 40vmax at 10% -10%,rgba(10,132,255,.20),transparent 60%),
-    radial-gradient(50vmax 40vmax at 100% 10%,rgba(191,90,242,.14),transparent 60%),
-    radial-gradient(60vmax 50vmax at 50% 110%,rgba(48,209,88,.10),transparent 60%),
-    var(--bg);
-  background-attachment:fixed;
-}}
-.glas,.seg,nav.tabs,.knopf:not(.primaer),.menu,.rund{background:var(--glas);-webkit-backdrop-filter:var(--glas-blur);backdrop-filter:var(--glas-blur);border:1px solid var(--glas-rand);box-shadow:var(--glas-schatten)}
-@media (prefers-reduced-transparency:reduce){.glas,.seg,nav.tabs,.knopf:not(.primaer),.menu,.rund{background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none}}
-.seg{border-radius:999px;padding:3px;gap:2px}
-.seg button{border-radius:999px;min-height:38px;padding:6px 14px;color:var(--fg);transition:background .2s ease}
-.seg button[aria-pressed="true"]{background:var(--wahl);color:var(--mint)}
-.knopf{border-radius:999px;font-weight:500;transition:transform .12s ease,background .2s ease}
-.knopf:active,.seg button:active,nav.tabs button:active{transform:scale(.96)}
-.knopf.primaer{border-radius:999px;box-shadow:0 4px 14px color-mix(in srgb,var(--mint) 40%,transparent)}
-.knopf:hover{border-color:var(--glas-rand);filter:brightness(1.04)}
-.knopf svg,nav.tabs svg,.rund svg{width:20px;height:20px;flex:none}
-.knopf{display:inline-flex;align-items:center;justify-content:center;gap:6px}
-.rund{width:44px;height:44px;border-radius:50%;display:inline-grid;place-items:center;cursor:pointer;color:var(--mint);padding:0}
-.menu{border-radius:50%}
-header{gap:4px 12px}
-header .titel-block{display:grid;gap:0;min-width:0}
-header .eyebrow{font-size:.8125rem;font-weight:600;color:var(--mint);letter-spacing:.02em}
-header h1{font-size:2.125rem;line-height:1.15}
-header .datum{font-size:.9375rem}
-.eingabe input{border-radius:999px;background:var(--card);border:1px solid var(--line);box-shadow:var(--karte-schatten);padding:0 20px}
-.zeile,.termin,.wtag,.mtag,.leer,.person-einst{box-shadow:var(--karte-schatten)}
-.zeile{border-radius:16px;background:var(--card);border-color:transparent}
-.termin{background:var(--card);border-color:transparent;border-radius:14px}
-.wtag,.mtag{background:var(--card);border-color:transparent}
-.gruppe h2{letter-spacing:.04em;text-transform:none;font-size:1.0625rem;color:var(--fg);font-weight:700}
-.gruppe h2 .zahl{font-size:.8125rem;color:var(--muted);font-weight:500}
-nav.tabs{border-radius:999px;padding:4px;gap:2px;width:max-content;max-width:100%}
-nav.tabs button{border-radius:999px;color:var(--fg);border:0;min-height:40px;padding:6px 16px}
-nav.tabs button[aria-current="page"]{background:var(--wahl);color:var(--mint);border:0}
-nav.tabs .zahl{background:var(--fill);color:var(--muted)}
-dialog{border-radius:24px;border:1px solid var(--glas-rand);box-shadow:0 24px 64px rgba(0,0,0,.3)}
-.schmal .wrap{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))}
-.schmal nav.tabs{left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));width:auto;border-radius:999px;padding:5px;border-top:1px solid var(--glas-rand);background:var(--glas)}
-.schmal nav.tabs button{gap:2px;font-size:.6875rem;font-weight:600;padding:6px 2px;min-height:52px;position:relative}
-.schmal nav.tabs button svg{width:24px;height:24px}
-.schmal nav.tabs .zahl{position:absolute;top:2px;left:calc(50% + 6px);font-size:.625rem;padding:0 5px;line-height:1.5;background:var(--mint);color:var(--on-mint)}
-.schmal nav.tabs .zahl.null{display:none}
-.schmal header{flex-wrap:nowrap;align-items:flex-start}
-.schmal header .rechts{order:0;width:auto;margin-left:auto;flex:none}
-.schmal header .titel-block{flex:1}
-.filterzeile .seg{width:100%}
-.filterzeile .seg button{flex:1}
-.meta{flex-wrap:wrap;min-width:0}
-.chip{max-width:100%;overflow:hidden;text-overflow:ellipsis}
-.schmal header h1{font-size:2.125rem}
-.termin.block{border:1px dashed var(--line2);background:transparent;box-shadow:none}
-.kalumschalter{width:max-content}
-.schmal .eingabe .knopf{width:48px;min-width:48px;height:48px;min-height:48px;padding:0}
-.schmal .eingabe input{min-height:48px}
-.schmal .bereiche button{min-height:34px;padding:4px 12px;font-size:.875rem}
-.schmal .monat{min-width:0;gap:3px}
-.schmal .mtag{min-height:58px;padding:5px 4px;border-radius:10px;gap:3px}
-.schmal .mkopf{padding:2px 2px;text-align:center;letter-spacing:.02em}
-.schmal .mnr{text-align:center}
-.schmal .mpunkt{font-size:0;height:4px;padding:0;border-left:0;background:var(--k,var(--mint));border-radius:2px}
+/* ---------- Kalender ---------- */
+.wkopf{display:flex;gap:var(--s2) var(--s3);align-items:center;flex-wrap:wrap}
+.wkopf h2{margin:0 auto 0 0;font-size:var(--t-titel);font-weight:700;display:flex;gap:var(--s2);align-items:baseline;flex-wrap:wrap}
+.wkopf h2 .zahl{font-size:var(--t-sub);color:var(--muted);font-weight:500}
+.kalumschalter{justify-self:start;margin-bottom:var(--s1)}
+.wkopf .navi .knopf{padding:0 var(--s3)}
+.wkopf .navi{display:flex;gap:var(--s2);align-items:center}
+.kalleiste{display:flex;gap:var(--s3);align-items:center;flex-wrap:wrap;justify-content:space-between}
+.kalleiste .seg{flex:none}
+.monat{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:var(--s1)}
+.mkopf{font-size:var(--t-klein);text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:0 6px var(--s1);font-weight:600}
+.mtag{display:flex;flex-direction:column;align-items:stretch;gap:2px;text-align:left;min-height:104px;padding:6px;border-radius:10px;border:0;background:var(--card);box-shadow:var(--karte-schatten);color:var(--fg);font:inherit;cursor:pointer;min-width:0;overflow:hidden}
+.mtag:hover{box-shadow:inset 0 0 0 1.5px var(--line2)}
+.mtag.fremd{background:transparent;box-shadow:none;color:var(--muted)}
+.mnr{font-weight:600;font-size:var(--t-sub);font-variant-numeric:tabular-nums;width:26px;height:26px;display:grid;place-items:center;border-radius:50%;margin-bottom:2px}
+.mtag.heute .mnr{background:#d70015;color:#fff;font-weight:700}
+.mpunkt{display:block;font-size:var(--t-klein);line-height:1.35;padding:1px 5px;border-radius:4px;background:color-mix(in srgb,var(--k,var(--accent)) 16%,transparent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mpunkt.aufg{background:var(--fill);color:var(--fg)}
+.mmehr{font-size:var(--t-klein);color:var(--muted);padding-left:5px}
+.schmal .monat{gap:2px}
+.schmal .mkopf{text-align:center;padding:0 0 var(--s1)}
+.schmal .mtag{min-height:60px;padding:var(--s1) 2px;border-radius:10px;gap:3px;align-items:center}
+.schmal .mnr{font-size:var(--t-sub)}
+.schmal .mpunkt{font-size:0;height:4px;width:100%;padding:0;border-radius:2px;background:var(--k,var(--accent))}
 .schmal .mpunkt.aufg{background:var(--muted)}
-.schmal .mmehr{font-size:.625rem;text-align:center}
+.schmal .mmehr{font-size:var(--t-tab);padding:0;line-height:1}
+.woche-wrap{overflow-x:auto;padding-bottom:var(--s1)}
+.schmal .woche-wrap{overflow:visible}
+.woche{display:grid;grid-template-columns:repeat(7,minmax(118px,1fr));gap:var(--s2);min-width:860px}
+.schmal .woche{grid-template-columns:minmax(0,1fr);min-width:0}
+.wtag{background:var(--card);border-radius:var(--r-karte);padding:var(--s2);display:grid;gap:6px;align-content:start;min-height:180px;min-width:0;box-shadow:var(--karte-schatten)}
+.schmal .wtag{min-height:0;padding:var(--s3)}
+.wtag.heute{box-shadow:inset 0 0 0 2px var(--accent),var(--karte-schatten)}
+.wtag.ziel-drop{outline:2px dashed var(--accent);outline-offset:2px}
+.wtag h3{margin:0 0 2px;font-size:var(--t-sub);font-weight:700;display:flex;justify-content:space-between;gap:6px}
+.wtag h3 .d{color:var(--muted);font-weight:500;font-variant-numeric:tabular-nums}
+.wpunkt{display:block;width:100%;text-align:left;font-size:var(--t-fuss);line-height:1.35;padding:6px var(--s2);border-radius:var(--s2);border:0;background:var(--fill);cursor:pointer;overflow-wrap:anywhere;color:var(--fg);min-height:32px}
+.schmal .wpunkt{font-size:var(--t-sub);min-height:44px;padding:var(--s2) var(--s3)}
+.wpunkt.t{background:color-mix(in srgb,var(--k,var(--accent)) 14%,transparent);box-shadow:inset 3px 0 0 var(--k,var(--accent))}
+.wpunkt.a.top{background:var(--mint-dim)}
+.wpunkt.a.fertig{opacity:.55;text-decoration:line-through}
+.wpunkt .z{color:var(--muted);margin-right:6px;font-variant-numeric:tabular-nums}
+.wpunkt[draggable=true]{cursor:grab}
+.wleer{font-size:var(--t-fuss);color:var(--muted)}
+.ablage{display:flex;gap:var(--s2);flex-wrap:wrap}
+.ablage .wpunkt{width:auto}
+.ziele{display:grid;gap:var(--s2)}
+.ziel{display:flex;gap:var(--s3);align-items:center;background:var(--card);border-radius:var(--r-karte);padding:var(--s1) var(--s3);box-shadow:var(--karte-schatten);min-height:52px}
+.ziel input[type=text]{flex:1;min-width:0;min-height:44px;border:0;background:none;padding:0}
+.ziel input[type=checkbox]{width:24px;height:24px;accent-color:var(--accent-fill);flex:none}
+.ziel .nr{font-weight:700;font-size:var(--t-klein);width:22px;height:22px;border-radius:6px;display:grid;place-items:center;background:var(--mint-dim);color:var(--accent);flex:none}
+
+/* ---------- Einkauf: gruppierte Liste wie in Erinnerungen ---------- */
+ul.liste.gruppiert{gap:0;background:var(--card);border-radius:var(--r-karte);box-shadow:var(--karte-schatten);overflow:hidden}
+.gruppiert li.aufgabe{border-radius:0}
+.gruppiert .zeile{border-radius:0;box-shadow:none;background:none;min-height:52px}
+.gruppiert li+li .zeile::before{content:"";position:absolute;top:0;left:56px;right:0;height:1px;background:var(--line)}
+.weg-knopf{width:44px;height:44px;border:0;background:none;border-radius:50%;display:grid;place-items:center;color:var(--muted);cursor:pointer;flex:none}
+.weg-knopf svg{width:18px;height:18px}
+.weg-knopf:hover{color:var(--red)}
+
+/* ---------- Blätter und Dialoge ---------- */
+dialog{border:0;border-radius:20px;background:var(--bg);color:var(--fg);padding:0;width:min(600px,calc(100vw - 32px));max-height:calc(100dvh - 48px);box-shadow:0 24px 64px rgba(0,0,0,.3);overflow:auto;overscroll-behavior:contain}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.schmal dialog{margin:auto auto 0;width:100%;max-width:100%;max-height:calc(100dvh - 12px);border-radius:16px 16px 0 0}
+dialog form{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s4);padding:0 var(--s4) calc(var(--s5) + env(safe-area-inset-bottom,0px))}
+.blatt-kopf{position:sticky;top:0;z-index:2;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:var(--s2);margin:0 calc(-1 * var(--s4));padding:var(--s2) var(--s2);background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:var(--glas-blur);backdrop-filter:var(--glas-blur);border-bottom:1px solid var(--line)}
+.blatt-kopf h2{margin:0;font-size:var(--t-kopf);font-weight:700;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.blatt-kopf .l{justify-self:start}
+.blatt-kopf .r{justify-self:end}
+.griff{width:36px;height:5px;border-radius:3px;background:var(--line2);position:absolute;top:5px;left:50%;transform:translateX(-50%)}
+.feld{display:grid;gap:6px;min-width:0}
+.feld>label,.feld>.lbl,fieldset legend{font-size:var(--t-fuss);color:var(--muted);font-weight:600}
+fieldset legend{padding:0 var(--s1)}
+.feld input,.feld select,.feld textarea{min-height:44px;border-radius:var(--r-feld);border:1px solid var(--line);background:var(--card);padding:var(--s2) var(--s3);width:100%;min-width:0;font-size:var(--t-text)}
+.feld textarea{min-height:88px;resize:vertical}
+.reihe{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:var(--s3)}
+.schnellwahl{display:flex;gap:var(--s2);flex-wrap:wrap}
+fieldset{border:0;border-radius:var(--r-karte);padding:var(--s3) var(--s4) var(--s4);margin:0;display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s3);background:var(--card);min-width:0}
+fieldset legend{float:left;width:100%;padding:0;margin-bottom:0}
+fieldset legend+*{clear:both}
+fieldset .feld input,fieldset .feld select,fieldset .feld textarea,fieldset .teil-neu input,fieldset .teil input[type=text]{background:var(--card2);border-color:transparent}
+.tage{display:flex;gap:6px;flex-wrap:wrap}
+.tage label{display:flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;border-radius:var(--r-feld);cursor:pointer;background:var(--card2);font-weight:600;font-size:var(--t-sub);position:relative}
+.tage input{position:absolute;opacity:0;width:1px;height:1px}
+.tage label:has(input:checked){background:var(--accent-fill);color:var(--on-mint)}
+.tage label:has(input:focus-visible){outline:3px solid var(--focus);outline-offset:2px}
+.wahl label{min-width:auto;padding:0 var(--s3)}
+.fuss{display:flex;gap:var(--s2);flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.fuss .links{margin-right:auto}
+.fuss:not(:has(button)){display:none}
+.fuss .knopf.gefahr{flex:1 1 auto}
+.fehler{color:var(--red);margin:0;font-size:var(--t-sub)}
+.fehler:empty{display:none}
+.check{display:flex;gap:var(--s3);align-items:center;min-height:44px}
+.check input{width:22px;height:22px;accent-color:var(--accent-fill);flex:none}
+.eigen{display:flex;gap:var(--s2);flex-wrap:wrap;align-items:center}
+.feld .eigen input{width:96px;min-height:44px}
+.feld .eigen select{width:auto;min-height:44px}
+.teile{list-style:none;margin:0;padding:0;display:grid;gap:var(--s2)}
+.teil{display:flex;gap:var(--s2);align-items:center}
+.teil input[type=checkbox]{width:24px;height:24px;accent-color:var(--accent-fill);flex:none;margin:0 var(--s2) 0 var(--s1)}
+.teil input[type=text]{flex:1;min-width:0;min-height:44px;border-radius:var(--r-feld);border:1px solid var(--line);padding:var(--s2) var(--s3)}
+.teil-neu{display:flex;gap:var(--s2);align-items:center}
+.teil-neu input{flex:1;min-width:0;min-height:44px;border-radius:var(--r-feld);border:1px solid var(--line);padding:var(--s2) var(--s3)}
+.person-einst{background:var(--card);border-radius:var(--r-karte);padding:var(--s4);display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s3)}
+.person-einst h3{margin:0;font-size:var(--t-kopf)}
+.person-einst .feld select{background:var(--card2);border-color:transparent}
+.kal-tab{width:100%;border-collapse:collapse;font-size:var(--t-sub)}
+.kal-tab th,.kal-tab td{padding:var(--s2) var(--s1);border-bottom:1px solid var(--line);text-align:center}
+.kal-tab thead th{font-size:var(--t-klein);color:var(--muted);font-weight:600}
+.kal-tab th:first-child,.kal-tab td:first-child{text-align:left}
+.kal-tab input{width:22px;height:22px;accent-color:var(--accent-fill)}
+.tab-wrap{overflow-x:auto}
+.infos{display:grid;gap:var(--s1);margin:0;background:var(--card);border-radius:var(--r-karte);padding:var(--s4)}
+.infos dt{font-size:var(--t-fuss);color:var(--muted);font-weight:600}
+.infos dd{margin:0 0 var(--s2)}
+.farben{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:var(--s2)}
+.farben label{display:flex;gap:var(--s2);align-items:center;min-height:44px;border-radius:var(--r-feld);padding:var(--s1) var(--s3);background:var(--card2)}
+.farben input[type=color]{width:32px;height:28px;border:0;background:none;padding:0}
+
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-@media (forced-colors:active){.haken[aria-checked="true"]{forced-color-adjust:none;background:Highlight}}
+@media (forced-colors:active){.haken[aria-checked="true"]::before{forced-color-adjust:none;background:Highlight}.seg button[aria-pressed="true"],nav.tabs button[aria-current="page"]{outline:2px solid Highlight}}
 `;
 
-const HAKEN = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const HAKEN = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
 
 const ICON = {
@@ -549,6 +602,14 @@ const ICON = {
   regler: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>`,
   termin: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></svg>`,
   einstellungen: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>`,
+  filter: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M7 12h10M10 17h4"/></svg>`,
+  zu: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`,
+  wdh: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a8 8 0 0 1 14-5l2 2M20 4v4h-4M20 13a8 8 0 0 1-14 5l-2-2M4 20v-4h4"/></svg>`,
+  teile: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l1.5 1.5L8 5M4 12l1.5 1.5L8 11M4 18l1.5 1.5L8 17M12 6h8M12 12h8M12 18h8"/></svg>`,
+  zurueck: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>`,
+  vor: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>`,
+  haken: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`,
+  pfeil: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`,
   menu: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>`,
 };
 
@@ -724,56 +785,74 @@ class PlanerPanel extends HTMLElement {
             .map(([k, t]) => `<button type="button" data-filter="${esc(k)}" data-fokus="f-${esc(k)}" aria-pressed="${this._filter === k}">${esc(t)}</button>`).join("")}
         </div>` : "";
 
+    const tabName = (tabs.find(([k]) => k === this._ansicht) || tabs[0])[1];
+    const einkauf = this._ansicht === "einkauf";
+    const bListe = [...new Set(d.aufgaben.filter((a) => a.status === "offen").flatMap((a) => [a.bereich, ...(a.tags || [])]).filter(Boolean))].sort();
+    if (this._bereich && !bListe.includes(this._bereich)) bListe.push(this._bereich);
+    const gross = (x) => x[0].toUpperCase() + x.slice(1);
+    const bereichChips = !schmal && bListe.length && !einkauf
+      ? `<div class="bereiche" role="group" aria-label="Nach Bereich filtern">
+          <button type="button" data-bereich="" data-fokus="b-alle" aria-pressed="${!this._bereich}">Alle Bereiche</button>
+          ${bListe.map((x) => `<button type="button" data-bereich="${esc(x)}" data-fokus="b-${esc(x)}" aria-pressed="${this._bereich === x}" style="--b:${bereichFarbe(x, d.farben)}"><span class="punkt" aria-hidden="true"></span>${esc(gross(x))}</button>`).join("")}
+        </div>` : "";
+    const bereichWahl = schmal && bListe.length && !einkauf
+      ? `<span class="rund ${this._bereich ? "aktiv" : ""}" title="Nach Bereich filtern">${ICON.filter}
+          <label class="sr" for="bwahl">Nach Bereich filtern</label>
+          <select id="bwahl" data-fokus="bwahl"><option value="">Alle Bereiche</option>${bListe.map((x) => `<option value="${esc(x)}" ${this._bereich === x ? "selected" : ""}>${esc(gross(x))}</option>`).join("")}</select>
+        </span>` : "";
+    const aktivFilter = schmal && this._bereich && !einkauf
+      ? `<div class="aktivfilter"><span>Nur</span><button type="button" data-bereich="" data-fokus="b-weg" aria-label="Filter ${esc(gross(this._bereich))} aufheben"><span class="punkt" style="--b:${bereichFarbe(this._bereich, d.farben)}" aria-hidden="true"></span>${esc(gross(this._bereich))}${ICON.zu}</button></div>` : "";
+    const eingabeSichtbar = !einkauf && (!schmal || this._eingabeOffen);
+    const kannTermin = (d.kalender || []).some((k) => k.schreiben);
+
     root.innerHTML = `<style>${CSS}</style>
     <div class="${schmal ? "schmal" : ""}">
     <div class="wrap">
       <header>
         ${this._menuKnopf()}
         <div class="titel-block">
-          <span class="eyebrow">Planer · ${WOCHENTAGE[wt(heuteD)]}, ${heuteD.getDate()}. ${MONATE[heuteD.getMonth()]}</span>
-          <h1>${esc((tabs.find(([k]) => k === this._ansicht) || tabs[0])[1])}</h1>
+          <h1>${esc(tabName)}</h1>
+          <span class="datum">${schmal ? WT_KURZ[wt(heuteD)] + "." : WOCHENTAGE[wt(heuteD)]}, ${heuteD.getDate()}. ${MONATE[heuteD.getMonth()]}</span>
         </div>
         <div class="rechts">
-          ${this._ansicht === "einkauf" || schmal ? "" : filterKnoepfe}
+          ${einkauf || schmal ? "" : filterKnoepfe}
+          ${bereichWahl}
           ${d.admin ? `<button type="button" class="rund" data-aktion="einstellungen" data-fokus="einst" aria-label="Einstellungen" title="Einstellungen">${ICON.einstellungen}</button>` : ""}
         </div>
       </header>
-      ${schmal && this._ansicht !== "einkauf" && filterKnoepfe ? `<div class="filterzeile">${filterKnoepfe}</div>` : ""}
+      ${schmal && !einkauf && filterKnoepfe ? `<div class="filterzeile">${filterKnoepfe}</div>` : ""}
+      ${aktivFilter}
 
-      <form class="schnell" id="schnellform" autocomplete="off" ${this._ansicht === "einkauf" ? "hidden" : ""}>
+      <form class="schnell" id="schnellform" autocomplete="off" ${eingabeSichtbar ? "" : "hidden"}>
         <label class="sr" for="schnell">Neue Aufgabe</label>
         <div class="eingabe">
-          <input id="schnell" data-fokus="schnell" placeholder="Neue Aufgabe, z. B. morgen 15 Uhr !1 Filament bestellen #werkstatt" aria-describedby="vorschau tipp" enterkeyhint="done">
+          <input id="schnell" data-fokus="schnell" placeholder="${schmal ? "Neue Aufgabe" : "Neue Aufgabe, z. B. morgen 15 Uhr !1 Filament bestellen #werkstatt"}" aria-describedby="vorschau tipp" enterkeyhint="done">
           <button class="knopf primaer" type="submit" aria-label="Aufgabe hinzufügen">${ICON.plus}${schmal ? "" : "Aufgabe"}</button>
-          <button class="knopf" type="button" data-aktion="erweitert" aria-label="Aufgabe mit allen Einstellungen anlegen" title="Erweitert">${ICON.regler}${schmal ? "" : "Erweitert"}</button>
-          ${(d.kalender || []).some((k) => k.schreiben) ? `<button class="knopf" type="button" data-aktion="termin" aria-label="Termin in den Kalender eintragen" title="Termin">${ICON.termin}${schmal ? "" : "Termin"}</button>` : ""}
+          ${schmal ? "" : `<button class="knopf" type="button" data-aktion="erweitert" title="Aufgabe mit allen Einstellungen anlegen">${ICON.regler}Erweitert</button>
+          ${kannTermin ? `<button class="knopf" type="button" data-aktion="termin" title="Termin in den Kalender eintragen">${ICON.termin}Termin</button>` : ""}`}
         </div>
+        ${schmal ? `<div class="zusatz">
+          <button class="knopf text" type="button" data-aktion="erweitert">${ICON.regler}Erweitert</button>
+          ${kannTermin ? `<button class="knopf text" type="button" data-aktion="termin">${ICON.termin}Termin</button>` : ""}
+          <button class="rund" type="button" data-aktion="eingabe-zu" aria-label="Eingabe schließen" title="Schließen" style="margin-left:auto;box-shadow:none">${ICON.zu}</button>
+        </div>` : ""}
         <div class="hinweis" id="vorschau" aria-live="polite"></div>
         <span class="sr" id="tipp">Erkennt heute, morgen, Wochentage, Datum wie 24.12., Uhrzeit wie 15 Uhr, !1 bis !3 für Top 3, # für Bereich, @ für Person und Wiederholungen wie jeden Montag oder täglich. Taste N springt hierher.</span>
       </form>
 
       <nav class="tabs" aria-label="Ansichten">
-        ${tabs.map(([k, t]) => `<button type="button" data-ansicht="${k}" data-fokus="t-${k}" ${this._ansicht === k ? 'aria-current="page"' : ""}>${ICON[k] || ""}<span>${t}</span> <span class="zahl ${!zaehler[k] ? "null" : ""}" aria-label="${zaehler[k]} offen">${zaehler[k]}</span></button>`).join("")}
+        ${tabs.map(([k, t]) => `<button type="button" data-ansicht="${k}" data-fokus="t-${k}" ${this._ansicht === k ? 'aria-current="page"' : ""}>${ICON[k] || ""}<span>${t}</span><span class="zahl ${!zaehler[k] ? "null" : ""}" aria-label="${zaehler[k]} offen">${zaehler[k]}</span></button>`).join("")}
       </nav>
-
-      ${(() => {
-        const liste = [...new Set(d.aufgaben.filter((a) => a.status === "offen").flatMap((a) => [a.bereich, ...(a.tags || [])]).filter(Boolean))].sort();
-        if (this._bereich && !liste.includes(this._bereich)) liste.push(this._bereich);
-        if (!liste.length) return "";
-        if (this._ansicht === "einkauf") return "";
-        return `<div class="seg bereiche" role="group" aria-label="Nach Bereich filtern">
-          <button type="button" data-bereich="" data-fokus="b-alle" aria-pressed="${!this._bereich}">Alle Bereiche</button>
-          ${liste.map((x) => `<button type="button" data-bereich="${esc(x)}" data-fokus="b-${esc(x)}" aria-pressed="${this._bereich === x}" style="--b:${bereichFarbe(x, d.farben)}"><span class="punkt" aria-hidden="true"></span>${esc(x[0].toUpperCase() + x.slice(1))}</button>`).join("")}
-        </div>`;
-      })()}
+      ${bereichChips}
 
       <main id="inhalt">${this._ansichtHtml(alle, offen)}</main>
     </div>
-    </div>
+    ${schmal && !einkauf && !this._eingabeOffen ? `<button type="button" class="fab" data-aktion="neu" data-fokus="fab" aria-label="Neue Aufgabe">${ICON.plus}</button>` : ""}
     <div id="ansage" class="sr" role="status" aria-live="polite"></div>
     <dialog id="blatt" aria-labelledby="blatt-titel"></dialog>
     <dialog id="einst" aria-labelledby="einst-titel"></dialog>
-    <dialog id="tdlg" aria-labelledby="t-titel-h"></dialog>`;
+    <dialog id="tdlg" aria-labelledby="t-titel-h"></dialog>
+    </div>`;
 
     const s = root.getElementById("schnell");
     s.value = eingabe;
@@ -800,7 +879,7 @@ class PlanerPanel extends HTMLElement {
       const liste = this._sortiert(offen.filter((a) => !a.datum));
       return this._gruppe("Eingang", liste, "Der Eingang ist leer. Alles ohne Datum landet hier, auch was du per Sprache oder in der HA-App zur Planer-Liste hinzufügst.");
     }
-    if (this._ansicht === "woche") return this._kalenderUmschalter() + (this._kalAnsicht === "monat" ? this._monatHtml(alle) : this._wocheHtml(alle));
+    if (this._ansicht === "woche") return this._kalAnsicht === "monat" ? this._monatHtml(alle) : this._wocheHtml(alle);
     if (this._ansicht === "demnaechst") {
       const kommend = offen.filter((a) => a.datum && a.datum > h).sort((a, b) => a.datum.localeCompare(b.datum));
       const tage = new Set(kommend.map((a) => a.datum));
@@ -832,11 +911,11 @@ class PlanerPanel extends HTMLElement {
     const naechste = ueber[0] || this._sortiert(heuteOffen.filter((a) => a.uhrzeit && a.uhrzeit >= jetztUhr))[0] || top[0] || rest[0];
     this._naechste = naechste ? naechste.id : null;
     const kal = this._kalenderHeute(heuteOffen);
-    if (this._narrow) html += kal;
     if (ueber.length) html += this._gruppe("Überfällig", ueber, "", "warn");
     const freie = 3 - top.length;
     html += this._gruppe("Top 3", top, "Noch keine Top-Aufgabe für heute. Öffne eine Aufgabe und wähle einen Rang, oder tippe !1 in die Schnelleingabe.",
       "", freie > 0 && top.length ? `${freie} ${freie === 1 ? "Platz" : "Plätze"} frei` : "");
+    if (this._narrow) html += kal;
     html += this._gruppe("Weitere Aufgaben heute", rest, "Sonst steht heute nichts an.");
     const erledigtHeute = [...fertig, ...wiederHeute];
     if (erledigtHeute.length) {
@@ -878,22 +957,24 @@ class PlanerPanel extends HTMLElement {
     const fertig = geladen ? geladen.items.filter((x) => x.erledigt) : [];
     const zeile = (x) => `<li class="aufgabe ${x.erledigt ? "erledigt" : ""}"><div class="zeile">
         <button type="button" class="haken" role="checkbox" aria-checked="${x.erledigt}" data-ehaken="${esc(x.uid)}" data-fokus="eh-${esc(x.uid)}" aria-label="${esc(x.text)} ${x.erledigt ? "wieder auf die Liste" : "gekauft"}">${x.erledigt ? HAKEN : ""}</button>
-        <div class="inhalt" style="cursor:default"><span class="titel">${esc(x.text)}</span>${x.beschreibung ? `<span class="meta"><span class="muted">${esc(x.beschreibung)}</span></span>` : ""}</div>
-        <button type="button" class="knopf klein" data-eweg="${esc(x.uid)}" aria-label="${esc(x.text)} löschen">✕</button>
+        <div class="inhalt" style="cursor:default"><span class="titel">${esc(x.text)}</span>${x.beschreibung ? `<span class="unter">${esc(x.beschreibung)}</span>` : ""}</div>
+        <button type="button" class="weg-knopf" data-eweg="${esc(x.uid)}" data-fokus="ew-${esc(x.uid)}" aria-label="${esc(x.text)} löschen">${ICON.zu}</button>
       </div></li>`;
-    return `${listen.length > 1 ? `<div class="seg" role="group" aria-label="Einkaufsliste wählen">${listen.map((l) => `<button type="button" data-eliste="${esc(l.id)}" aria-pressed="${l.id === liste}">${esc(l.name)}</button>`).join("")}</div>` : ""}
+    return `${listen.length > 1 ? `<div class="seg filterzeile" style="display:flex" role="group" aria-label="Einkaufsliste wählen">${listen.map((l) => `<button type="button" data-eliste="${esc(l.id)}" aria-pressed="${l.id === liste}">${esc(l.name)}</button>`).join("")}</div>` : ""}
+      <form class="schnell" id="eform" autocomplete="off">
+        <div class="eingabe">
+          <label class="sr" for="e-neu">Artikel für ${esc(name)} hinzufügen</label>
+          <input id="e-neu" data-fokus="e-neu" placeholder="Artikel, z. B. Milch, 2 Liter" enterkeyhint="done" aria-describedby="e-tipp">
+          <button class="knopf primaer" type="submit" aria-label="Artikel hinzufügen">${ICON.plus}${this._narrow ? "" : "Hinzufügen"}</button>
+        </div>
+        <p class="hinweis" id="e-tipp">Menge nach dem Komma. Erscheint sofort auch in Bring!.</p>
+      </form>
       <section class="gruppe" aria-labelledby="e-titel">
-        <h2 id="e-titel">${esc(name)} <span class="zahl">${offen.length}</span></h2>
-        <form class="eingabe" id="eform" autocomplete="off">
-          <label class="sr" for="e-neu">Artikel hinzufügen</label>
-          <input id="e-neu" data-fokus="e-neu" placeholder="Artikel, z. B. Milch, 2 Liter" enterkeyhint="done">
-          <button class="knopf primaer" type="submit">${this._narrow ? "＋" : "Hinzufügen"}</button>
-        </form>
-        <p class="hinweis" style="display:block">Nach dem Komma steht die Menge oder ein Hinweis. Alles ist sofort auch in der Bring!-App.</p>
+        <h2 id="e-titel" class="sr">${esc(name)}, ${offen.length} offen</h2>
         ${geladen?.fehler ? `<p class="leer" role="alert">${esc(geladen.fehler)}</p>` : ""}
-        ${!geladen ? `<p class="hinweis" role="status">Liste wird geladen …</p>` : offen.length ? `<ul class="liste">${offen.map(zeile).join("")}</ul>` : `<p class="leer">Alles eingekauft.</p>`}
+        ${!geladen ? `<p class="hinweis" role="status">Liste wird geladen …</p>` : offen.length ? `<ul class="liste gruppiert">${offen.map(zeile).join("")}</ul>` : `<p class="leer">Alles eingekauft.</p>`}
       </section>
-      ${fertig.length ? `<details class="zu"><summary>Zuletzt gekauft (${fertig.length})</summary><p class="hinweis" style="display:block">Antippen setzt den Artikel wieder auf die Liste.</p><ul class="liste">${fertig.slice(0, 40).map(zeile).join("")}</ul></details>` : ""}`;
+      ${fertig.length ? `<details class="zu"><summary>Zuletzt gekauft (${fertig.length})</summary><p class="hinweis">Antippen setzt den Artikel wieder auf die Liste.</p><ul class="liste gruppiert">${fertig.slice(0, 40).map(zeile).join("")}</ul></details>` : ""}`;
   }
 
   _einkaufBinden(root) {
@@ -937,8 +1018,15 @@ class PlanerPanel extends HTMLElement {
   _kalenderUmschalter() {
     const m = this._kalAnsicht === "monat";
     return `<div class="seg kalumschalter" role="group" aria-label="Kalenderansicht">
-      <button type="button" data-kal-ansicht="monat" aria-pressed="${m}">Monat</button>
-      <button type="button" data-kal-ansicht="woche" aria-pressed="${!m}">Woche</button>
+      <button type="button" data-kal-ansicht="monat" data-fokus="ka-m" aria-pressed="${m}">Monat</button>
+      <button type="button" data-kal-ansicht="woche" data-fokus="ka-w" aria-pressed="${!m}">Woche</button>
+    </div>`;
+  }
+  _kalNavi(art, heuteText, istJetzt, label) {
+    return `<div class="navi" role="group" aria-label="${label}">
+      <button type="button" class="rund" data-${art}="-1" data-fokus="${art}-z" aria-label="${art === "monat" ? "Voriger Monat" : "Vorige Woche"}">${ICON.zurueck}</button>
+      <button type="button" class="knopf" data-${art}="0" data-fokus="${art}-h" ${istJetzt ? "disabled" : ""}>${heuteText}</button>
+      <button type="button" class="rund" data-${art}="1" data-fokus="${art}-v" aria-label="${art === "monat" ? "Nächster Monat" : "Nächste Woche"}">${ICON.vor}</button>
     </div>`;
   }
 
@@ -958,12 +1046,8 @@ class PlanerPanel extends HTMLElement {
     const dieserMonat = erster.getMonth(), dieserJahr = erster.getFullYear();
     const zeilen = tage.slice(35).every((t) => ausIso(t).getMonth() !== dieserMonat) ? 35 : 42;
     return `<section class="gruppe" aria-labelledby="m-titel">
-      <div class="wkopf">
-        <h2 id="m-titel">${MONATE[dieserMonat]} ${dieserJahr}</h2>
-        <button type="button" class="knopf klein" data-monat="-1" aria-label="Voriger Monat">←</button>
-        <button type="button" class="knopf klein" data-monat="0">Heute</button>
-        <button type="button" class="knopf klein" data-monat="1" aria-label="Nächster Monat">→</button>
-      </div>
+      ${this._kalenderUmschalter()}
+      <div class="wkopf"><h2 id="m-titel">${MONATE[dieserMonat]} ${dieserJahr}</h2>${this._kalNavi("monat", "Heute", dieserMonat === new Date().getMonth() && dieserJahr === new Date().getFullYear(), "Monat wechseln")}</div>
       <div class="woche-wrap"><div class="monat" role="grid" aria-labelledby="m-titel">
         ${["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((n) => `<div class="mkopf" role="columnheader">${n}</div>`).join("")}
         ${tage.slice(0, zeilen).map((t) => {
@@ -981,7 +1065,7 @@ class PlanerPanel extends HTMLElement {
         }).join("")}
       </div></div>
       ${termine === null ? `<p class="hinweis" role="status">Termine werden geladen …</p>` : ""}
-      <p class="hinweis" style="display:block">Tippe auf einen Tag, um die Woche mit allen Details zu öffnen.</p>
+      <p class="hinweis">Tippe auf einen Tag, um die Woche mit allen Details zu öffnen.</p>
     </section>`;
   }
 
@@ -1017,12 +1101,8 @@ class PlanerPanel extends HTMLElement {
     const spanne = `${d0.getDate()}. ${d0.getMonth() !== d6.getMonth() ? MONATE[d0.getMonth()] + " " : ""}– ${d6.getDate()}. ${MONATE[d6.getMonth()]}`;
     const eingang = this._sortiert(alle.filter((a) => a.status === "offen" && !a.datum));
     return `<section class="gruppe" aria-labelledby="w-titel">
-      <div class="wkopf">
-        <h2 id="w-titel">KW ${nr} <span class="muted" style="font-weight:400;color:var(--muted)">· ${esc(spanne)}</span></h2>
-        <button type="button" class="knopf klein" data-woche="-1" aria-label="Vorige Woche">←</button>
-        <button type="button" class="knopf klein" data-woche="0" ${iso(start) === iso(montag(new Date())) ? "disabled" : ""}>Diese Woche</button>
-        <button type="button" class="knopf klein" data-woche="1" aria-label="Nächste Woche">→</button>
-      </div>
+      ${this._kalenderUmschalter()}
+      <div class="wkopf"><h2 id="w-titel">KW ${nr} <span class="zahl">${esc(spanne)}</span></h2>${this._kalNavi("woche", "Heute", iso(start) === iso(montag(new Date())), "Woche wechseln")}</div>
     </section>
     <section class="gruppe" aria-labelledby="z-titel">
       <h2 id="z-titel">Wochenziele</h2>
@@ -1053,7 +1133,7 @@ class PlanerPanel extends HTMLElement {
     ${termine === null ? `<p class="hinweis" role="status">Termine werden geladen …</p>` : ""}
     ${eingang.length ? `<section class="gruppe" aria-labelledby="ab-titel">
       <h2 id="ab-titel">Aus dem Eingang einplanen</h2>
-      <p class="hinweis" style="display:block">${this._narrow ? "Aufgabe antippen und ein Datum wählen." : "Auf einen Tag ziehen oder öffnen und ein Datum wählen."}</p>
+      <p class="hinweis">${this._narrow ? "Aufgabe antippen und ein Datum wählen." : "Auf einen Tag ziehen oder öffnen und ein Datum wählen."}</p>
       <div class="ablage">${eingang.map((a) => `<button type="button" class="wpunkt a" draggable="true" data-ziehen="${a.id}" data-aktion="oeffnen" data-id="${a.id}">${esc(a.titel)}</button>`).join("")}</div>
     </section>` : ""}`;
   }
@@ -1083,7 +1163,7 @@ class PlanerPanel extends HTMLElement {
     const key = `${t.kalender}|${t.uid}|${t.start}`;
     return `<li><button type="button" class="termin" style="--k:${this._farbe(t.kalender)}" data-termin="${esc(key)}" data-fokus="k-${esc(key)}"
       aria-label="${esc(`${t.titel}, ${zeit}, Kalender ${k.name}`)}">
-      <span class="zeit">${esc(zeit)}</span><span class="was">${esc(t.titel)}${t.wiederholt ? ' <span aria-hidden="true">↻</span>' : ""}</span>
+      <span class="zeit">${esc(zeit)}</span><span class="was">${esc(t.titel)}${t.wiederholt ? ` ${ICON.wdh}` : ""}</span>
       <span class="wo">${esc(k.name)}${t.ort ? ` · ${esc(t.ort)}` : ""}</span>
     </button></li>`;
   }
@@ -1129,7 +1209,7 @@ class PlanerPanel extends HTMLElement {
   _gruppe(titel, liste, leer = "", art = "", zusatz = "") {
     const id = `g-${titel.replace(/\W+/g, "-").toLowerCase()}`;
     return `<section class="gruppe" aria-labelledby="${id}">
-      <h2 id="${id}">${esc(titel)} ${titel === "Top 3" ? "" : `<span class="zahl">${liste.length || ""}</span>`}${zusatz ? ` <span class="chip">${esc(zusatz)}</span>` : ""}${art === "warn" ? ' <span class="chip warn">nachholen oder verschieben</span>' : ""}</h2>
+      <h2 id="${id}">${esc(titel)} ${titel === "Top 3" ? "" : `<span class="zahl">${liste.length || ""}</span>`}${zusatz ? ` <span class="chip">${esc(zusatz)}</span>` : ""}</h2>
       ${liste.length ? `<ul class="liste">${liste.map((a) => this._zeile(a)).join("")}</ul>` : leer ? `<p class="leer">${esc(leer)}</p>` : ""}
     </section>`;
   }
@@ -1148,15 +1228,15 @@ class PlanerPanel extends HTMLElement {
     const teile = a.teilaufgaben || [];
     if (teile.length) {
       const fertigT = teile.filter((t) => t.erledigt).length;
-      meta.push(`<span class="chip ${fertigT === teile.length ? "mint" : ""}"><span aria-hidden="true">☑</span> ${fertigT}/${teile.length}<span class="sr"> Teilaufgaben erledigt</span></span>`);
+      meta.push(`<span class="chip ${fertigT === teile.length ? "mint" : ""}">${ICON.teile}${fertigT}/${teile.length}<span class="sr"> Teilaufgaben erledigt</span></span>`);
       const naechster = teile.find((t) => !t.erledigt);
       if (naechster && !fertig) meta.push(`<span class="chip">Nächster Schritt: ${esc(naechster.text)}</span>`);
     }
-    if (a.wiederholung) meta.push(`<span class="chip mint"><span aria-hidden="true">↻</span> ${esc(regelText(a.wiederholung))}</span>`);
+    if (a.wiederholung) meta.push(`<span class="chip mint">${ICON.wdh}${esc(regelText(a.wiederholung))}</span>`);
     if (a.verschoben > 0) meta.push(`<span class="chip warn">${a.verschoben}× verschoben</span>`);
-    const morgen = !fertig ? `<button type="button" class="knopf klein" data-aktion="morgen" data-id="${a.id}" data-fokus="m-${a.id}" aria-label="${esc(a.titel)} auf morgen verschieben">Morgen</button>` : "";
+    const morgen = !fertig && !this._narrow ? `<button type="button" class="knopf klein" data-aktion="morgen" data-id="${a.id}" data-fokus="m-${a.id}" aria-label="${esc(a.titel)} auf morgen verschieben">Morgen</button>` : "";
     return `<li class="aufgabe ${a.top && !fertig ? "top" : ""} ${fertig ? "erledigt" : ""} ${a.bereich ? "farbig" : ""}" data-id="${a.id}" ${a.bereich ? `style="--b:${farbe}"` : ""}>
-      <div class="wisch rechts" aria-hidden="true">✓ Erledigt</div><div class="wisch links" aria-hidden="true">Morgen →</div>
+      <div class="wisch rechts" aria-hidden="true">${ICON.haken}Erledigt</div><div class="wisch links" aria-hidden="true">Morgen${ICON.pfeil}</div>
       <div class="zeile">
         <button type="button" class="haken" role="checkbox" aria-checked="${fertig}" data-aktion="haken" data-id="${a.id}" data-fokus="h-${a.id}" aria-label="${esc(a.titel)} erledigt">${fertig ? HAKEN : ""}</button>
         ${a.top && !fertig ? `<span class="rang" aria-label="Top ${a.top}">${a.top}</span>` : ""}
@@ -1182,7 +1262,7 @@ class PlanerPanel extends HTMLElement {
     if (p.top) teile.push(`<span class="chip mint">Top ${p.top}</span>`);
     if (p.bereich) teile.push(`<span class="chip">#${esc(p.bereich)}</span>`);
     if (p.person) teile.push(`<span class="chip">${esc(this._name(p.person))}</span>`);
-    if (p.wiederholung) teile.push(`<span class="chip mint">↻ ${esc(regelText(p.wiederholung))}</span>`);
+    if (p.wiederholung) teile.push(`<span class="chip mint">${ICON.wdh}${esc(regelText(p.wiederholung))}</span>`);
     v.innerHTML = teile.join("");
   }
 
@@ -1194,6 +1274,7 @@ class PlanerPanel extends HTMLElement {
     root.getElementById("schnellform").addEventListener("submit", (e) => { e.preventDefault(); this._schnellAnlegen(); });
     root.querySelectorAll("[data-ansicht]").forEach((b) => b.addEventListener("click", () => {
       this._ansicht = b.dataset.ansicht;
+      if (!root.getElementById("schnell")?.value.trim()) this._eingabeOffen = false;
       try { localStorage.setItem("planer.ansicht", this._ansicht); } catch (e) { /* egal */ }
       this._zeichnen();
     }));
@@ -1203,6 +1284,12 @@ class PlanerPanel extends HTMLElement {
       this._zeichnen();
       this._sagen(this._bereich ? `Nur Bereich ${this._bereich}` : "Alle Bereiche");
     }));
+    root.getElementById("bwahl")?.addEventListener("change", (e) => {
+      this._bereich = e.target.value;
+      try { localStorage.setItem("planer.bereich", this._bereich); } catch (err) { /* egal */ }
+      this._zeichnen();
+      this._sagen(this._bereich ? `Nur Bereich ${this._bereich}` : "Alle Bereiche");
+    });
     root.querySelectorAll("[data-filter]").forEach((b) => b.addEventListener("click", () => {
       this._filter = b.dataset.filter;
       try { localStorage.setItem("planer.filter", this._filter); } catch (e) { /* egal */ }
@@ -1279,6 +1366,7 @@ class PlanerPanel extends HTMLElement {
     if (!pfad.includes(this)) return;
     if (this.shadowRoot.querySelector("dialog[open]")) return;
     e.preventDefault();
+    if (this._narrow && !this._eingabeOffen) { this._aktion("neu"); return; }
     this.shadowRoot.getElementById("schnell")?.focus();
   }
 
@@ -1313,6 +1401,14 @@ class PlanerPanel extends HTMLElement {
     if (art === "einstellungen") return this._einstellungen();
     if (art === "termin") return this._terminNeu();
     if (art === "erweitert") return this._erweitert();
+    if (art === "neu" || art === "eingabe-zu") {
+      this._eingabeOffen = art === "neu";
+      if (!this._eingabeOffen) { const s = this.shadowRoot.getElementById("schnell"); if (s) s.value = ""; }
+      this._zeichnen();
+      if (this._eingabeOffen) { this.shadowRoot.getElementById("schnell")?.focus(); this.scrollIntoView?.({ block: "start" }); }
+      else this.shadowRoot.querySelector(".fab")?.focus();
+      return;
+    }
     if (!a) return;
     if (art === "oeffnen") return this._oeffnen(a);
     if (art === "haken") {
@@ -1373,8 +1469,11 @@ class PlanerPanel extends HTMLElement {
     const w = a.wiederholung || {};
     const personen = [...d.personen.map((p) => [p.id, p.name]), [GEMEINSAM, "Gemeinsam"]];
     dlg.innerHTML = `<form method="dialog" id="bform" novalidate>
-      ${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
-      <h2 id="blatt-titel">${a.id ? "Aufgabe bearbeiten" : "Neue Aufgabe"}</h2>
+      <div class="blatt-kopf">${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
+        <button type="button" class="knopf text l" id="b-abbrechen">Abbrechen</button>
+        <h2 id="blatt-titel">${a.id ? "Aufgabe" : "Neue Aufgabe"}</h2>
+        <button type="submit" class="knopf text fett r">${a.id ? "Sichern" : "Hinzufügen"}</button>
+      </div>
       <div class="feld"><label for="b-titel">Titel</label><input id="b-titel" required value="${esc(a.titel)}"></div>
       <fieldset>
         <legend>Teilaufgaben</legend>
@@ -1407,14 +1506,10 @@ class PlanerPanel extends HTMLElement {
       </div>
       ${wdhHtml("b", w)}
       ${erinnHtml("be", a.erinnerungen, d.einst.erinnerungen)}
-      <p class="hinweis" style="display:block">Ohne Uhrzeit wird um 9:00 Uhr am Fälligkeitstag gerechnet. Erinnert wird nur, wenn für die Person ein Handy eingestellt ist.</p>
+      <p class="hinweis">Ohne Uhrzeit wird um 9:00 Uhr am Fälligkeitstag gerechnet. Erinnert wird nur, wenn für die Person ein Handy eingestellt ist.</p>
       <div class="feld"><label for="b-notiz">Notiz</label><textarea id="b-notiz">${esc(a.notiz || "")}</textarea></div>
       <p class="fehler" id="b-fehler" role="alert"></p>
-      <div class="fuss">
-        <button type="button" class="knopf gefahr links" id="b-loeschen">Löschen</button>
-        <button type="button" class="knopf" id="b-abbrechen">Abbrechen</button>
-        <button type="submit" class="knopf primaer">Speichern</button>
-      </div>
+      ${a.id ? `<div class="fuss"><button type="button" class="knopf gefahr" id="b-loeschen" style="width:100%">Aufgabe löschen</button></div>` : ""}
     </form>`;
 
     const $ = (id) => dlg.querySelector(`#${id}`);
@@ -1446,7 +1541,7 @@ class PlanerPanel extends HTMLElement {
     }));
     $("b-abbrechen").addEventListener("click", () => dlg.close());
     let sicher = false;
-    $("b-loeschen").addEventListener("click", async () => {
+    $("b-loeschen")?.addEventListener("click", async () => {
       if (!sicher) { sicher = true; $("b-loeschen").textContent = "Wirklich löschen?"; $("b-loeschen").focus(); return; }
       await this._ws({ type: "planer/loeschen", aufgabe_id: a.id });
       dlg.close();
@@ -1486,7 +1581,7 @@ class PlanerPanel extends HTMLElement {
     return `<li class="teil" data-teil="${esc(t.id || "")}">
       <input type="checkbox" id="${n}c" ${t.erledigt ? "checked" : ""} aria-label="${esc(t.text)} erledigt">
       <label class="sr" for="${n}">Teilaufgabe</label><input type="text" id="${n}" value="${esc(t.text)}">
-      <button type="button" class="weg" aria-label="${esc(t.text)} entfernen">✕</button>
+      <button type="button" class="weg weg-knopf" aria-label="${esc(t.text)} entfernen">${ICON.zu}</button>
     </li>`;
   }
 
@@ -1505,27 +1600,27 @@ class PlanerPanel extends HTMLElement {
     const dlg = this.shadowRoot.getElementById("einst");
     const d = this._daten;
     const kal = d.alle_kalender || [];
-    dlg.innerHTML = `<form method="dialog" id="eform">
-      <h2 id="einst-titel">Einstellungen</h2>
+    dlg.innerHTML = `<form method="dialog" id="einform">
+      <div class="blatt-kopf">${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}<span class="l"></span><h2 id="einst-titel">Einstellungen</h2><button type="submit" class="knopf text fett r">Fertig</button></div>
       ${kal.some((k) => k.anlegen) ? `<div class="feld"><label for="gk">Kalender für gemeinsame Termine</label>
         <select id="gk"><option value="">Keiner</option>${kal.filter((k) => k.anlegen).map((k) => `<option value="${esc(k.id)}" ${d.gemeinsam_kalender === k.id ? "selected" : ""}>${esc(k.name)}</option>`).join("")}</select>
         <span class="hinweis">Termine mit „Gemeinsam“ oder @gemeinsam landen hier.</span></div>` : ""}
       ${(d.alle_todo || []).length ? `<fieldset><legend>Einkaufslisten</legend>
-        <p class="hinweis" style="display:block">Diese Listen erscheinen im Reiter „Einkauf“. Ohne Auswahl werden alle Bring!-Listen gezeigt.</p>
+        <p class="hinweis">Diese Listen erscheinen im Reiter „Einkauf“. Ohne Auswahl werden alle Bring!-Listen gezeigt.</p>
         ${d.alle_todo.map((l) => `<label class="check"><input type="checkbox" data-eliste-wahl="${esc(l.id)}" ${(d.einkauf_eingestellt == null ? l.bring : d.einkauf_eingestellt.includes(l.id)) ? "checked" : ""}> ${esc(l.name)}${l.bring ? " (Bring!)" : ""}</label>`).join("")}
       </fieldset>` : ""}
       ${(d.alle_benutzer || []).length > 2 ? `<fieldset><legend>Wer nutzt den Planer?</legend>
-        <p class="hinweis" style="display:block">Nur angehakte Benutzer erscheinen im Planer. Entferne den Haken bei Konten wie Tablet, Gast oder Claude.</p>
+        <p class="hinweis">Nur angehakte Benutzer erscheinen im Planer. Entferne den Haken bei Konten wie Tablet, Gast oder Claude.</p>
         ${d.alle_benutzer.map((b) => `<label class="check"><input type="checkbox" data-nutzer="${esc(b.id)}" ${b.ausgeblendet ? "" : "checked"} ${b.id === d.ich ? "disabled" : ""}> ${esc(b.name)}</label>`).join("")}
       </fieldset>` : ""}
       ${(() => {
         const namen = [...new Set([...Object.keys(BEREICH_STANDARD), ...d.aufgaben.map((a) => a.bereich).filter(Boolean)])].sort();
         return `<fieldset><legend>Bereiche und Farben</legend>
-          <p class="hinweis" style="display:block">Einen neuen Bereich legst du einfach mit #name in der Schnelleingabe oder im Feld „Bereich“ an.</p>
+          <p class="hinweis">Einen neuen Bereich legst du einfach mit #name in der Schnelleingabe oder im Feld „Bereich“ an.</p>
           <div class="farben">${namen.map((x) => `<label><input type="color" data-farbe="${esc(x)}" value="${bereichFarbe(x, d.farben)}"> ${esc(x[0].toUpperCase() + x.slice(1))}</label>`).join("")}</div>
         </fieldset>`;
       })()}
-      <p class="hinweis" style="display:block">Eigene und gemeinsame Aufgaben sieht jede Person immer. Pro Person legst du hier fest, was sie zusätzlich sieht, wo sie Termine eintragen darf und wie sie erinnert wird.</p>
+      <p class="hinweis">Eigene und gemeinsame Aufgaben sieht jede Person immer. Pro Person legst du hier fest, was sie zusätzlich sieht, wo sie Termine eintragen darf und wie sie erinnert wird.</p>
       ${d.personen.map((p, i) => {
         const e = d.einstellungen[p.id] || {};
         const sehen = e.kalender_sehen, schreiben = e.kalender_schreiben;
@@ -1552,7 +1647,6 @@ class PlanerPanel extends HTMLElement {
           <div class="fuss"><button type="button" class="knopf" data-speichern="${i}">Für ${esc(p.name.split(" ")[0])} speichern</button></div>
         </section>`;
       }).join("")}
-      <div class="fuss"><button type="submit" class="knopf primaer">Schließen</button></div>
     </form>`;
     d.personen.forEach((p, i) => erinnBinden(dlg, `se${i}`, (t) => this._sagen(t)));
     dlg.querySelectorAll("[data-farbe]").forEach((f) => f.addEventListener("change", async () => {
@@ -1592,7 +1686,7 @@ class PlanerPanel extends HTMLElement {
         werte.standard_kalender = sec.querySelector('[data-feld="standard_kalender"]').value || null;
       }
       await this._ws({ type: "planer/einstellung", person: d.personen[i].id, werte });
-      b.textContent = "Gespeichert ✓";
+      b.textContent = "Gespeichert";
       this._sagen(`Einstellungen für ${d.personen[i].name} gespeichert`);
     }));
     dlg.addEventListener("close", async () => { await this._lesen(); this._termineLaden(); }, { once: true });
@@ -1614,8 +1708,11 @@ class PlanerPanel extends HTMLElement {
     const von = v.uhrzeit || "";
     const bis = von ? (() => { const [h, m] = von.split(":").map(Number); return `${String(Math.min(23, h + 1)).padStart(2, "0")}:${String(m).padStart(2, "0")}`; })() : "";
     dlg.innerHTML = `<form method="dialog" id="tform" novalidate>
-      ${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
-      <h2 id="t-titel-h">Neuer Termin</h2>
+      <div class="blatt-kopf">${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
+        <button type="button" class="knopf text l" id="t-abbrechen">Abbrechen</button>
+        <h2 id="t-titel-h">Neuer Termin</h2>
+        <button type="submit" class="knopf text fett r">Eintragen</button>
+      </div>
       <div class="feld"><label for="t-titel">Titel</label><input id="t-titel" required value="${esc(v.titel || "")}"></div>
       ${d.gemeinsam_kalender && schreibbar.some((k) => k.id === d.gemeinsam_kalender) ? `<div class="schnellwahl" role="radiogroup" aria-label="Für wen">
         <label class="check"><input type="radio" name="t-fuer" value="ich" ${v.person === GEMEINSAM ? "" : "checked"}> Für mich</label>
@@ -1633,12 +1730,9 @@ class PlanerPanel extends HTMLElement {
       ${wdhHtml("tw", v.wiederholung || {})}
       <div class="feld"><label for="t-ort">Ort (optional)</label><input id="t-ort"></div>
       <div class="feld"><label for="t-beschr">Beschreibung (optional)</label><textarea id="t-beschr"></textarea></div>
-      <p class="hinweis" style="display:block">Erinnert wird mit deinem Standard (${esc(minKurz(d.einst.erinnerungen))}), wenn der Kalender in den Einstellungen unter „Erinnern“ angehakt ist.</p>
+      <p class="hinweis">Erinnert wird mit deinem Standard (${esc(minKurz(d.einst.erinnerungen))}), wenn der Kalender in den Einstellungen unter „Erinnern“ angehakt ist.</p>
       <p class="fehler" id="t-fehler" role="alert"></p>
-      <div class="fuss">
-        <button type="button" class="knopf" id="t-abbrechen">Abbrechen</button>
-        <button type="submit" class="knopf primaer">Eintragen</button>
-      </div>
+
     </form>`;
     const $ = (id) => dlg.querySelector(`#${id}`);
     const ganz = () => { const g = $("t-ganz").checked; $("t-von-f").hidden = g; $("t-bis-f").hidden = g; $("t-ende-f").hidden = !g; };
@@ -1685,21 +1779,22 @@ class PlanerPanel extends HTMLElement {
       ? (t.ende.slice(0, 10) > iso(plusTage(ausIso(t.start.slice(0, 10)), 1)) ? `${datumText(t.start.slice(0, 10))} bis ${datumText(iso(plusTage(ausIso(t.ende.slice(0, 10)), -1)))}, ganztägig` : `${datumText(t.start.slice(0, 10))}, ganztägig`)
       : `${datumText(t.start.slice(0, 10))}, ${uhr(t.start)}–${uhr(t.ende)} Uhr`;
     dlg.innerHTML = `<form method="dialog">
-      ${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
-      <h2 id="t-titel-h">${esc(t.titel)}</h2>
+      <div class="blatt-kopf">${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
+        <span class="l"></span><h2 id="t-titel-h">${esc(t.titel)}</h2>
+        <button type="submit" class="knopf text fett r">Fertig</button>
+      </div>
       <dl class="infos">
         <dt>Wann</dt><dd>${esc(wann)}${t.wiederholt ? " · wiederholt sich" : ""}</dd>
         <dt>Kalender</dt><dd>${esc(k.name)}</dd>
         ${t.ort ? `<dt>Ort</dt><dd>${esc(t.ort)}</dd>` : ""}
         ${t.beschreibung ? `<dt>Beschreibung</dt><dd style="white-space:pre-wrap">${esc(t.beschreibung)}</dd>` : ""}
       </dl>
-      <p class="hinweis" style="display:block">Termine änderst du in Google Kalender. Hier kannst du sie ansehen und löschen.</p>
+      <p class="hinweis">Termine änderst du in Google Kalender. Hier kannst du sie ansehen und löschen.</p>
       <p class="fehler" id="t-fehler" role="alert"></p>
       <div class="fuss">
         ${k.loeschen && t.uid ? (t.recurrence_id
-          ? `<button type="button" class="knopf gefahr links" data-loeschen="einer">Nur diesen löschen</button><button type="button" class="knopf gefahr" data-loeschen="folgende">Diesen und alle folgenden löschen</button>`
-          : `<button type="button" class="knopf gefahr links" data-loeschen="einer">Löschen</button>`) : ""}
-        <button type="submit" class="knopf primaer">Schließen</button>
+          ? `<button type="button" class="knopf gefahr" data-loeschen="einer">Nur diesen löschen</button><button type="button" class="knopf gefahr" data-loeschen="folgende">Diesen und alle folgenden löschen</button>`
+          : `<button type="button" class="knopf gefahr" data-loeschen="einer">Termin löschen</button>`) : ""}
       </div>
     </form>`;
     const sicher = {};
