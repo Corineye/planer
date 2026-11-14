@@ -64,6 +64,7 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
 - **Suche** (v0.6): Lupe oder Taste `/` durchsucht Aufgaben, Termine und Einkauf.
 - **Termin-Details** (v0.6): Beschreibung bleibt im Fenster, ab 3 Zeilen „Mehr lesen“, Links anklickbar, Ort öffnet Google Maps.
 - **Eine Eingabeleiste** (v0.6): in jedem Reiter gleich und an derselben Stelle; in Einkauf landet der Text auf der Einkaufsliste.
+- **Automatisch speichern** (v0.6): Änderungen in einer bestehenden Aufgabe (auch Notiz) werden sofort gespeichert, „Fertig“ schließt nur. Details öffnen ohne Tastatur.
 - **Animationen** (v0.6): Pop-ups gleiten sanft auf und zu, Ansichten blenden ein, Abhaken mit kleiner Animation.
 
 ## Daten

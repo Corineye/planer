@@ -545,6 +545,8 @@ dialog form{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s4);paddi
 .blatt-kopf h2{margin:0;font-size:var(--t-kopf);font-weight:700;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .blatt-kopf .l{justify-self:start}
 .blatt-kopf .r{justify-self:end}
+.blatt-kopf .stand{font-size:var(--t-fuss);color:var(--muted);padding-left:var(--s2)}
+.blatt-kopf h2:focus{outline:none}
 .griff{width:36px;height:5px;border-radius:3px;background:var(--line2);position:absolute;top:5px;left:50%;transform:translateX(-50%)}
 .feld{display:grid;gap:6px;min-width:0}
 .feld>label,.feld>.lbl,fieldset legend{font-size:var(--t-fuss);color:var(--muted);font-weight:600}
@@ -1863,9 +1865,9 @@ class PlanerPanel extends HTMLElement {
     const personen = [...d.personen.map((p) => [p.id, p.name]), [GEMEINSAM, "Gemeinsam"]];
     dlg.innerHTML = `<form method="dialog" id="bform" novalidate>
       <div class="blatt-kopf">${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
-        <button type="button" class="knopf text l" id="b-abbrechen">Abbrechen</button>
+        ${a.id ? '<span class="l stand" id="b-stand" aria-live="polite"></span>' : '<button type="button" class="knopf text l" id="b-abbrechen">Abbrechen</button>'}
         <h2 id="blatt-titel">${a.id ? "Aufgabe" : "Neue Aufgabe"}</h2>
-        <button type="submit" class="knopf text fett r">${a.id ? "Sichern" : "Hinzufügen"}</button>
+        <button type="submit" class="knopf text fett r">${a.id ? "Fertig" : "Hinzufügen"}</button>
       </div>
       <div class="feld"><label for="b-titel">Titel</label><input id="b-titel" required value="${esc(a.titel)}"></div>
       <fieldset>
@@ -1932,10 +1934,64 @@ class PlanerPanel extends HTMLElement {
       $("b-datum").value = b.dataset.tag === "eingang" ? "" : iso(plusTage(new Date(), +b.dataset.tag));
       this._sagen(b.dataset.tag === "eingang" ? "Datum entfernt, Aufgabe kommt in den Eingang" : `Datum ${datumText($("b-datum").value)}`);
     }));
-    $("b-abbrechen").addEventListener("click", () => this._zu(dlg));
+    $("b-abbrechen")?.addEventListener("click", () => this._zu(dlg));
     let sicher = false;
+    // Automatisch speichern (nur bestehende Aufgaben): kurz nach jeder Änderung und beim Schließen.
+    let uhr = null, aenderung = false, geaendert = false, weg = false, laeuft = Promise.resolve();
+    const sammeln = () => {
+      const wiederholung = wdhLesen(dlg, "b");
+      const lis = [...$("b-teile").children];
+      const teilaufgaben = lis.map((li) => ({
+        id: li.dataset.teil || "", text: li.querySelector('input[type="text"]').value.trim(), erledigt: li.querySelector('input[type="checkbox"]').checked,
+      })).filter((t) => t.text);
+      let datum = $("b-datum").value || null;
+      if (wiederholung && !datum) datum = heute();
+      const top = $("b-top").value ? +$("b-top").value : null;
+      if (top && !datum) datum = heute();
+      return { lis, aufgabe: {
+        id: a.id, titel: $("b-titel").value.trim(), datum, uhrzeit: $("b-uhr").value || null, dauer: $("b-dauer").value || null,
+        person: $("b-person").value, top, bereich: $("b-bereich").value, tags: $("b-tags").value, notiz: $("b-notiz").value, wiederholung, erinnerungen: erinnLesen(dlg, "be"), teilaufgaben,
+      } };
+    };
+    const stand = (t) => { const el = $("b-stand"); if (el) el.textContent = t; };
+    const autoSpeichern = () => {
+      clearTimeout(uhr); uhr = null;
+      if (!a.id || weg || !aenderung) return laeuft;
+      const { lis, aufgabe } = sammeln();
+      if (!aufgabe.titel) { stand("Titel fehlt"); return laeuft; }
+      aenderung = false;
+      stand("Speichert …");
+      laeuft = laeuft.then(async () => {
+        try {
+          const neu = await this._hass.callWS({ type: "planer/speichern", aufgabe });
+          geaendert = true;
+          // Neue Teilaufgaben bekommen ihre ID, damit sie beim nächsten Speichern nicht doppelt entstehen.
+          const mitText = lis.filter((li) => li.querySelector('input[type="text"]').value.trim());
+          (neu?.teilaufgaben || []).forEach((t, i) => { if (mitText[i]) mitText[i].dataset.teil = t.id; });
+          stand(aenderung ? "" : "Gespeichert");
+        } catch (err) { aenderung = true; stand(""); $("b-fehler").textContent = err.message || "Speichern hat nicht geklappt."; }
+      });
+      return laeuft;
+    };
+    if (a.id) {
+      const merken = (e) => {
+        if (e.target.id === "b-teil-neu") return;
+        aenderung = true; stand(""); $("b-fehler").textContent = "";
+        clearTimeout(uhr); uhr = setTimeout(autoSpeichern, 700);
+      };
+      $("bform").addEventListener("input", merken);
+      $("bform").addEventListener("change", merken);
+      $("bform").addEventListener("click", (e) => { if (e.target.closest(".weg, [data-tag], #b-teil-plus")) merken(e); });
+    }
+    dlg.onclose = async () => {
+      if (!a.id || weg) return;
+      await autoSpeichern();
+      if (geaendert) { geaendert = false; await this._lesen(); }
+    };
     $("b-loeschen")?.addEventListener("click", async () => {
       if (!sicher) { sicher = true; $("b-loeschen").textContent = "Wirklich löschen?"; $("b-loeschen").focus(); return; }
+      weg = true; clearTimeout(uhr);
+      await laeuft;
       await this._ws({ type: "planer/loeschen", aufgabe_id: a.id });
       this._zu(dlg);
       this._sagen(`Gelöscht: ${a.titel}`);
@@ -1949,20 +2005,16 @@ class PlanerPanel extends HTMLElement {
       e.preventDefault();
       const titel = $("b-titel").value.trim();
       if (!titel) { $("b-fehler").textContent = "Bitte einen Titel eingeben."; $("b-titel").focus(); return; }
-      const wiederholung = wdhLesen(dlg, "b");
-      if ($("b-teil-neu").value.trim()) teilNeu();
-      const teilaufgaben = [...$("b-teile").children].map((li) => ({
-        id: li.dataset.teil || "", text: li.querySelector('input[type="text"]').value.trim(), erledigt: li.querySelector('input[type="checkbox"]').checked,
-      })).filter((t) => t.text);
-      let datum = $("b-datum").value || null;
-      if (wiederholung && !datum) datum = heute();
-      const top = $("b-top").value ? +$("b-top").value : null;
-      if (top && !datum) datum = heute();
+      if ($("b-teil-neu").value.trim()) { teilNeu(); aenderung = true; }
+      if (a.id) {
+        // Bestehende Aufgabe: „Fertig“ speichert den letzten Stand und schließt.
+        await autoSpeichern();
+        if ($("b-fehler").textContent) return;
+        this._zu(dlg);
+        return;
+      }
       try {
-        await this._ws({ type: "planer/speichern", aufgabe: {
-          id: a.id, titel, datum, uhrzeit: $("b-uhr").value || null, dauer: $("b-dauer").value || null,
-          person: $("b-person").value, top, bereich: $("b-bereich").value, tags: $("b-tags").value, notiz: $("b-notiz").value, wiederholung, erinnerungen: erinnLesen(dlg, "be"), teilaufgaben,
-        } });
+        await this._ws({ type: "planer/speichern", aufgabe: sammeln().aufgabe });
       } catch (err) { $("b-fehler").textContent = err.message || "Speichern hat nicht geklappt."; return; }
       this._zu(dlg);
       this._sagen(`Gespeichert: ${titel}`);
@@ -1970,7 +2022,9 @@ class PlanerPanel extends HTMLElement {
     });
     this._wischZu(dlg);
     dlg.showModal();
-    $("b-titel").focus();
+    // Nur bei neuen Aufgaben direkt ins Titelfeld (öffnet die Tastatur); Details öffnen ohne Tastatur.
+    if (a.id) { dlg.querySelector("#blatt-titel").setAttribute("tabindex", "-1"); dlg.querySelector("#blatt-titel").focus({ preventScroll: true }); }
+    else $("b-titel").focus();
   }
 
   _teilHtml(t, i) {
