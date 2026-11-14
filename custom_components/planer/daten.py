@@ -300,6 +300,9 @@ class Planer:
         if "gemeinsam_kalender" in werte:
             v = werte["gemeinsam_kalender"]
             self.allgemein["gemeinsam_kalender"] = str(v) if v and str(v).startswith("calendar.") else None
+        if "einkauf_listen" in werte:
+            v = werte["einkauf_listen"]
+            self.allgemein["einkauf_listen"] = None if v is None else [str(x) for x in v if str(x).startswith("todo.")][:10]
         if "ausgeblendet" in werte and isinstance(werte["ausgeblendet"], list):
             self.allgemein["ausgeblendet"] = [str(x) for x in werte["ausgeblendet"]][:100]
             await self.async_personen()

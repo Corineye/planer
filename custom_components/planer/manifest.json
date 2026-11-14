@@ -3,11 +3,11 @@
   "name": "Planer",
   "codeowners": ["@Corineye"],
   "config_flow": true,
-  "dependencies": ["http", "frontend", "panel_custom", "websocket_api", "calendar"],
+  "dependencies": ["http", "frontend", "panel_custom", "websocket_api", "calendar", "todo"],
   "documentation": "https://github.com/Corineye/planer",
   "integration_type": "service",
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/Corineye/planer/issues",
   "single_config_entry": true,
-  "version": "0.4.1"
+  "version": "0.5.0"
 }

@@ -10,7 +10,7 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
 3. Einstellungen › Geräte & Dienste › Integration hinzufügen › **Planer**.
 4. In der Seitenleiste erscheint „Planer“.
 
-## Was es gibt (v0.4)
+## Was es gibt (v0.5)
 
 - **Heute** mit Top 3 (je Rang 1–3, nie mehr als drei), weiteren Aufgaben, Überfälligem und „Heute erledigt“.
 - **Demnächst** (nach Tagen gruppiert) und **Eingang** (alles ohne Datum).
@@ -45,6 +45,13 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
 - **Nächstes zuerst** (v0.4): Listen sind nach Fälligkeit sortiert (Datum, dann Uhrzeit, dann Top-Rang);
   die nächste Aufgabe ist in „Heute“ mit „Als Nächstes“ markiert.
 - **Mehr Wiederholungen** (v0.4): werktags, am Wochenende, alle n Tage/Wochen/Monate/Jahre, mit Enddatum.
+
+- **Kalender-Reiter** (v0.4.1): Monatsansicht und Wochenansicht zum Umschalten.
+- **Hashtags** (v0.4.1): beliebig viele `#tags` pro Aufgabe, filterbar; das erste ist der Bereich.
+- **Einkauf** (v0.5): Bring!-Listen (oder jede andere To-do-Liste in HA) im Reiter „Einkauf“. Artikel
+  hinzufügen (`Milch, 2 Liter`), abhaken, löschen. Alles läuft über die HA-Dienste und ist sofort in der Bring!-App.
+  Welche Listen erscheinen, stellt ein Admin unter Einstellungen › Einkaufslisten ein (Standard: alle Bring!-Listen).
+- **Design** (v0.5): Liquid-Glass-Stil nach Apple-Vorbild, hell und dunkel nach Gerät, schwebende Tab-Leiste am Handy.
 
 ## Daten
 
