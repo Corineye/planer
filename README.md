@@ -10,7 +10,7 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
 3. Einstellungen › Geräte & Dienste › Integration hinzufügen › **Planer**.
 4. In der Seitenleiste erscheint „Planer“.
 
-## Was es gibt (v0.5)
+## Was es gibt (v0.6)
 
 - **Heute** mit Top 3 (je Rang 1–3, nie mehr als drei), weiteren Aufgaben, Überfälligem und „Heute erledigt“.
 - **Demnächst** (nach Tagen gruppiert) und **Eingang** (alles ohne Datum).
@@ -53,10 +53,23 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
   Welche Listen erscheinen, stellt ein Admin unter Einstellungen › Einkaufslisten ein (Standard: alle Bring!-Listen).
 - **Design** (v0.5): Liquid-Glass-Stil nach Apple-Vorbild, hell und dunkel nach Gerät, schwebende Tab-Leiste am Handy.
 
+- **Zeitraster** (v0.6): Woche (heute oben, dann die nächsten 7 Tage) und Tages-Pop-up (Tag im Monat antippen)
+  mit Stundenzeilen wie im Google-Kalender, ganztägige Termine oben, Blöcke nach Dauer. Bereich pro Person
+  unter Einstellungen („Kalender-Raster ab/bis“).
+- **Heute als Zeitleiste** (v0.6): Termine und Aufgaben mit Uhrzeit im Tagesverlauf mit „Jetzt“-Markierung.
+- **Aufgaben-Reiter** (v0.6, vorher „Eingang“): alle offenen Aufgaben, gruppiert nach Überfällig, Heute, Demnächst, Ohne Datum.
+  Überfälliges rot mit „Alle auf heute“.
+- **Gesten und Rückgängig** (v0.6): rechts wischen = erledigt, links = verschieben (Morgen, Montag, Datum …).
+  Nach Erledigen, Verschieben und Löschen erscheint „Rückgängig“. Auch in Einkauf (rechts gekauft, links löschen).
+- **Suche** (v0.6): Lupe oder Taste `/` durchsucht Aufgaben, Termine und Einkauf.
+- **Termin-Details** (v0.6): Beschreibung bleibt im Fenster, ab 3 Zeilen „Mehr lesen“, Links anklickbar, Ort öffnet Google Maps.
+- **Eine Eingabeleiste** (v0.6): in jedem Reiter gleich und an derselben Stelle; in Einkauf landet der Text auf der Einkaufsliste.
+- **Animationen** (v0.6): Pop-ups gleiten sanft auf und zu, Ansichten blenden ein, Abhaken mit kleiner Animation.
+
 ## Daten
 
 Gespeichert in `.storage/planer.daten` (im HA-Backup enthalten).
 
 ## Geplant
 
-Bring!-Einkaufsliste, Assist-Sätze, Verknüpfung mit der Filament-Werkstatt.
+Assist-Sätze, Verknüpfung mit der Filament-Werkstatt.
