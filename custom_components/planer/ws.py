@@ -111,12 +111,13 @@ async def ws_speichern(hass: HomeAssistant, connection: websocket_api.ActiveConn
 
 
 @websocket_api.websocket_command(
-    {vol.Required("type"): f"{DOMAIN}/erledigen", vol.Required("aufgabe_id"): ID, vol.Optional("erledigt", default=True): bool}
+    {vol.Required("type"): f"{DOMAIN}/erledigen", vol.Required("aufgabe_id"): ID, vol.Optional("erledigt", default=True): bool,
+     vol.Optional("rueckgaengig"): vol.Schema({vol.Optional("datum"): vol.Any(None, str), vol.Optional("top"): vol.Any(None, int)})}
 )
 @websocket_api.async_response
 async def ws_erledigen(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
     try:
-        a = await _planer(hass).erledigen(msg["aufgabe_id"], msg["erledigt"], connection.user.id)
+        a = await _planer(hass).erledigen(msg["aufgabe_id"], msg["erledigt"], connection.user.id, msg.get("rueckgaengig"))
     except (KeyError, PermissionError) as err:
         _fehler(connection, msg["id"], err)
         return

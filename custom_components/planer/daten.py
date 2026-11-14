@@ -112,6 +112,8 @@ class Planer:
             "handy": e.get("handy"),
             "standard_kalender": e.get("standard_kalender"),
             "erinnerungen": e.get("erinnerungen", STANDARD_ERINNERUNGEN),
+            "tag_von": e.get("tag_von", 7),
+            "tag_bis": e.get("tag_bis", 22),
         }
 
     def sichtbar(self, aufgabe: dict[str, Any], benutzer_id: str | None) -> bool:
@@ -241,7 +243,9 @@ class Planer:
         await self._sichern()
         return a
 
-    async def erledigen(self, aufgabe_id: str, erledigt: bool, benutzer_id: str | None) -> dict[str, Any]:
+    async def erledigen(
+        self, aufgabe_id: str, erledigt: bool, benutzer_id: str | None, rueckgaengig: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         a = self.aufgaben.get(aufgabe_id)
         if a is None:
             raise KeyError("Aufgabe nicht gefunden.")
@@ -264,6 +268,18 @@ class Planer:
             a.update(status="erledigt", erledigt_am=jetzt.isoformat(timespec="seconds"))
         else:
             a.update(status="offen", erledigt_am=None)
+            # Rückgängig bei Wiederholungen: Datum, Rang und Verlauf wie vor dem Abhaken
+            if rueckgaengig is not None:
+                if "datum" in rueckgaengig:
+                    d = rueckgaengig["datum"]
+                    a["datum"] = date.fromisoformat(d).isoformat() if d else None
+                if "top" in rueckgaengig:
+                    t = rueckgaengig["top"]
+                    a["top"] = t if t in (1, 2, 3) else None
+                    if a["top"]:
+                        self._top_freimachen(a)
+                if a.get("wiederholung") and (a.get("verlauf") or [])[-1:] == [heute.isoformat()]:
+                    a["verlauf"] = a["verlauf"][:-1]
         a["geaendert"] = jetzt.isoformat(timespec="seconds")
         await self._sichern()
         return a
@@ -320,6 +336,11 @@ class Planer:
             e["standard_kalender"] = str(werte["standard_kalender"]) if werte["standard_kalender"] else None
         if "handy" in werte:
             e["handy"] = str(werte["handy"]) if werte["handy"] else None
+        for feld, lo, hi in (("tag_von", 0, 23), ("tag_bis", 1, 24)):
+            if feld in werte and str(werte[feld]).isdigit():
+                e[feld] = min(hi, max(lo, int(werte[feld])))
+        if e.get("tag_bis", 22) <= e.get("tag_von", 7):
+            e["tag_bis"] = min(24, e.get("tag_von", 7) + 1)
         if "erinnerungen" in werte:
             e["erinnerungen"] = sorted({int(m) for m in werte["erinnerungen"] or [] if str(m).isdigit() and int(m) <= 43200})
         await self._sichern()
