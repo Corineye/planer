@@ -354,7 +354,6 @@ header .rechts{margin-left:auto;display:flex;gap:var(--s2);align-items:center;fl
 .rund{width:44px;height:44px;border-radius:50%;display:inline-grid;place-items:center;cursor:pointer;color:var(--fg);padding:0;position:relative;flex:none}
 .rund svg{width:22px;height:22px}
 .rund.aktiv{color:var(--on-mint);background:var(--accent-fill);border-color:var(--accent-fill)}
-.rund select{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;border-radius:50%}
 .knopf{display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);min-height:44px;padding:0 var(--s4);border-radius:var(--r-voll);cursor:pointer;font-weight:600;font-size:var(--t-sub);color:var(--fg);transition:transform .12s ease,filter .2s ease;white-space:nowrap}
 .knopf svg{width:20px;height:20px}
 .knopf.primaer{background:var(--accent-fill);color:var(--on-mint);border:1px solid var(--accent-fill)}
@@ -370,7 +369,6 @@ header .rechts{margin-left:auto;display:flex;gap:var(--s2);align-items:center;fl
 .seg{display:inline-flex;border-radius:var(--r-voll);padding:3px;gap:2px;max-width:100%}
 .seg button{flex:1 1 auto;border:0;background:none;border-radius:var(--r-voll);min-height:38px;padding:0 var(--s4);cursor:pointer;color:var(--fg);font-size:var(--t-sub);font-weight:500;white-space:nowrap;transition:background .2s ease}
 .seg button[aria-pressed="true"]{background:var(--thumb);box-shadow:var(--thumb-schatten);font-weight:700}
-.filterzeile .seg{display:flex;width:100%}
 .schmal .seg button{padding:0 var(--s2);min-height:40px}
 .schmal .knopf.klein{min-height:44px}
 .teile:empty{display:none}
@@ -380,12 +378,6 @@ fieldset .knopf:not(.primaer):not(.text){background:var(--card2);border-color:tr
 @media (max-width:359px){.schmal{--t-gross:28px}.schmal nav.tabs{left:var(--s2);right:var(--s2)}.schmal nav.tabs button{font-size:10px}}
 
 /* Filter-Chips für Bereiche (Desktop), ohne eigene Glasfläche */
-.bereiche{display:flex;flex-wrap:wrap;gap:var(--s2)}
-.bereiche button{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 var(--s3);border-radius:var(--r-voll);border:1px solid var(--line);background:var(--card);color:var(--fg);font-size:var(--t-fuss);font-weight:500;cursor:pointer;box-shadow:var(--karte-schatten)}
-.bereiche button[aria-pressed="true"]{background:var(--fg);color:var(--card);border-color:var(--fg);font-weight:700}
-.aktivfilter{display:flex;gap:var(--s2);align-items:center;flex-wrap:wrap;font-size:var(--t-sub);color:var(--muted)}
-.aktivfilter button{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 var(--s3);border-radius:var(--r-voll);border:0;background:var(--fg);color:var(--card);font-weight:600;font-size:var(--t-fuss);cursor:pointer}
-.aktivfilter button svg{width:14px;height:14px}
 
 /* ---------- Schnelleingabe ---------- */
 form.schnell{display:grid;gap:var(--s2)}
@@ -489,7 +481,8 @@ aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);positio
 .mtag:hover{box-shadow:inset 0 0 0 1.5px var(--line2)}
 .mtag.fremd{background:transparent;box-shadow:none;color:var(--muted)}
 .mnr{font-weight:600;font-size:var(--t-sub);font-variant-numeric:tabular-nums;width:26px;height:26px;display:grid;place-items:center;border-radius:50%;margin-bottom:2px}
-.mtag.heute .mnr{background:#d70015;color:#fff;font-weight:700}
+.mtag.heute .mnr,.schichtmonat .stag.heute .mnr{background:var(--rot);color:#fff;font-weight:700}
+.mtag.heute,.schichtmonat .stag.heute,.wtag.heute{box-shadow:inset 0 0 0 2.5px var(--rot),var(--karte-schatten)}
 .mpunkt{display:block;font-size:var(--t-klein);line-height:1.35;padding:1px 5px;border-radius:4px;background:color-mix(in srgb,var(--k,var(--accent)) 16%,transparent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mpunkt.aufg{background:var(--fill);color:var(--fg)}
 .mmehr{font-size:var(--t-klein);color:var(--muted);padding-left:5px}
@@ -506,7 +499,7 @@ aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);positio
 .schmal .woche{grid-template-columns:minmax(0,1fr);min-width:0}
 .wtag{background:var(--card);border-radius:var(--r-karte);padding:var(--s2);display:grid;gap:6px;align-content:start;min-height:180px;min-width:0;box-shadow:var(--karte-schatten)}
 .schmal .wtag{min-height:0;padding:var(--s3)}
-.wtag.heute{box-shadow:inset 0 0 0 2px var(--accent),var(--karte-schatten)}
+
 .wtag.ziel-drop{outline:2px dashed var(--accent);outline-offset:2px}
 .wtag h3{margin:0 0 2px;font-size:var(--t-sub);font-weight:700;display:flex;justify-content:space-between;gap:6px}
 .wtag h3 .d{color:var(--muted);font-weight:500;font-variant-numeric:tabular-nums}
@@ -523,7 +516,7 @@ aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);positio
 .wleer{font-size:var(--t-fuss);color:var(--muted)}
 .ablage{display:flex;gap:var(--s2);flex-wrap:wrap}
 .ablage .wpunkt{width:auto}
-.ziele{display:grid;gap:var(--s2)}
+.ziele{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);min-width:0}
 .ziel{display:flex;gap:var(--s3);align-items:center;background:var(--card);border-radius:var(--r-karte);padding:var(--s1) var(--s3);box-shadow:var(--karte-schatten);min-height:52px}
 .ziel input[type=text]{flex:1;min-width:0;min-height:44px;border:0;background:none;padding:0}
 .ziel input[type=checkbox]{width:24px;height:24px;accent-color:var(--accent-fill);flex:none}
@@ -738,7 +731,6 @@ dialog.pop form{display:grid;gap:var(--s3);padding:var(--s3) var(--s5) var(--s5)
 .tl-scroll{-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 24px),transparent);padding-bottom:var(--s5)}
 .tl-scroll:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:var(--s2)}
 .kalleiste{display:flex;align-items:center;gap:var(--s2);flex-wrap:wrap}
-.kalwahl .zahl{font-size:var(--t-klein);color:var(--muted);font-variant-numeric:tabular-nums}
 .kalzeile{display:grid;grid-template-columns:12px minmax(0,1fr) auto;align-items:center;gap:var(--s3);cursor:pointer}
 .kalzeile .punkt{width:12px;height:12px;border-radius:50%;background:var(--b)}
 .kalzeile .n{overflow-wrap:anywhere;color:var(--fg);font-weight:500}
@@ -754,7 +746,7 @@ dialog.pop form{display:grid;gap:var(--s3);padding:var(--s3) var(--s5) var(--s5)
 .schichtmonat .stag{display:grid;grid-template-rows:auto 1fr auto;justify-items:center;align-items:center;gap:2px;min-height:72px;padding:6px 2px;border:0;border-radius:12px;background:var(--card);color:var(--fg);cursor:pointer;font:inherit}
 .schmal .schichtmonat .stag{min-height:58px}
 .schichtmonat .stag .mnr{font-size:var(--t-fuss);font-weight:600;color:var(--muted)}
-.schichtmonat .stag.heute .mnr{color:var(--rot)}
+.schichtmonat .stag .mnr{width:26px;height:26px;display:grid;place-items:center;border-radius:50%}
 .schichtmonat .stag.fremd{opacity:.4}
 .schichtmonat .stag.belegt{background:color-mix(in srgb,var(--k) 16%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--k) 55%,transparent)}
 .schichtmonat .stag .skurz{display:inline-grid;place-items:center;min-width:30px;height:30px;padding:0 4px;border-radius:9px;background:var(--k);color:#fff;font-weight:800;font-size:var(--t-sub)}
@@ -763,7 +755,6 @@ dialog.pop form{display:grid;gap:var(--s3);padding:var(--s3) var(--s5) var(--s5)
 .schichtmonat .stag:active{transform:scale(.96)}
 .schicht-fuss{display:grid;gap:var(--s3);margin-top:var(--s3)}
 .schicht-summe{display:flex;flex-wrap:wrap;gap:var(--s2);align-items:center;font-size:var(--t-sub)}
-.schicht-knoepfe{display:flex;flex-wrap:wrap;gap:var(--s2)}
 .mschicht{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 3px;margin-left:4px;border-radius:5px;background:var(--k);color:#fff;font-size:11px;font-weight:800;vertical-align:1px}
 .wpunkt.s{background:color-mix(in srgb,var(--k) 16%,var(--card));box-shadow:inset 3px 0 0 var(--k)}
 .wpunkt.s b{color:var(--k);filter:brightness(.85)}
@@ -828,8 +819,9 @@ dialog.pop form{display:grid;gap:var(--s3);padding:var(--s3) var(--s5) var(--s5)
 .nrow-zeit{flex:none;color:var(--fg);opacity:.75;font-variant-numeric:tabular-nums}
 .nrow-vor{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .nrow-vor .fort{font-variant-numeric:tabular-nums}
-.nz-leiste{display:flex;gap:var(--s2);padding:var(--s1) 0 var(--s2);border-bottom:1px solid var(--line);margin-bottom:var(--s2);position:sticky;top:0;background:var(--card);z-index:2}
-.nz-leiste .knopf{background:var(--fill)}
+.nz-leiste{display:flex;gap:var(--s2);padding:var(--s2) 0;margin-bottom:var(--s1);background:transparent}
+.nz-leiste .knopf{font:inherit;font-size:var(--t-sub);font-weight:600;min-height:40px;gap:6px;background:var(--fill);border:0;box-shadow:none;color:var(--fg)}
+.nz-leiste .knopf svg{width:20px;height:20px;color:var(--accent)}
 .nz-leiste .knopf[aria-pressed="true"]{color:var(--accent)}
 .nz-liste{display:flex;flex-direction:column;min-height:40vh;padding-bottom:var(--s4)}
 .nz{display:flex;gap:var(--s2);align-items:flex-start;min-width:0}
@@ -848,7 +840,6 @@ dialog.pop form{display:grid;gap:var(--s3);padding:var(--s3) var(--s5) var(--s5)
 /* Handy-Feinschliff (v0.9) */
 .schmal header h1{font-size:clamp(24px,7.4vw,var(--t-gross))}
 .schmal .seg button{min-height:44px}
-#bwahl{min-height:44px;min-width:44px}
 .q-zeiten input[type=time],#w-datum{min-height:44px;padding:0 var(--s2);border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--fg);font:inherit;font-size:max(16px,var(--t-text))}
 .kalzeile .schalter,.kal-tab input[type=checkbox]{position:relative}
 .kalzeile .schalter::before,.kal-tab input[type=checkbox]::before{content:"";position:absolute;inset:-11px}
@@ -870,6 +861,159 @@ dialog.pop form{display:grid;gap:var(--s3);padding:var(--s3) var(--s5) var(--s5)
 .t-zeiten{flex-wrap:wrap}
 .t-zeiten .t-datum-f{flex-basis:100%}
 .t-zeiten #t-von-f,.t-zeiten #t-bis-f{flex:1 1 0;min-width:0}
+/* Schicht-Formular (iOS-Stil) */
+.sliste{list-style:none;margin:0;padding:0;border-radius:var(--r-karte);background:var(--card);overflow:hidden}
+.sliste li+li{border-top:1px solid var(--line)}
+.szeile{display:flex;align-items:center;gap:var(--s3);width:100%;min-height:60px;padding:var(--s2) var(--s4);border:0;background:none;color:var(--fg);font:inherit;text-align:left;cursor:pointer}
+.szeile:active{background:var(--fill)}
+.szeile .skurz{flex:none;display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--k);color:#fff;font-weight:800}
+.szeile.neu .skurz{background:var(--fill);color:var(--accent)}
+.szeile.neu b{color:var(--accent)}
+.szeile svg{width:18px;height:18px;color:var(--muted);flex:none}
+.szeile .skurz svg{color:inherit}
+.sz-text{flex:1;min-width:0;display:grid;gap:2px}
+.sz-text small{color:var(--muted);font-size:var(--t-sub)}
+.sform{display:grid;gap:var(--s4);padding-top:var(--s2)}
+.svorschau{display:flex;align-items:center;justify-content:center;gap:var(--s3);padding:var(--s3);font-size:var(--t-titel,20px);font-weight:700}
+.svorschau .skurz{display:inline-grid;place-items:center;width:52px;height:52px;border-radius:50%;background:var(--k);color:#fff;font-size:22px;font-weight:800;box-shadow:0 4px 14px color-mix(in srgb,var(--k) 45%,transparent)}
+.sgruppe{border-radius:var(--r-karte);background:var(--card);overflow:hidden}
+.sgruppe .szeile-feld+.szeile-feld,.sgruppe > * + *,#sf-zeiten .szeile-feld{border-top:1px solid var(--line)}
+.szeile-feld{display:flex;align-items:center;gap:var(--s3);min-height:52px;padding:0 var(--s4);font-size:var(--t-text)}
+.szeile-feld > span{flex:none;min-width:90px}
+.szeile-feld input:not([type=checkbox]),.szeile-feld select{flex:1;min-width:0;min-height:44px;border:0;background:transparent;color:var(--fg);font:inherit;font-size:max(16px,var(--t-text));text-align:right;padding:0;outline:none}
+.szeile-feld input::placeholder{color:var(--muted)}
+.szeile-feld input[type=time]{justify-content:flex-end}
+.schalter-zeile{justify-content:space-between}
+.schalter-zeile > span{flex:1}
+input[role=switch]{appearance:none;-webkit-appearance:none;flex:none;width:51px;height:31px;border-radius:16px;background:var(--fill);position:relative;cursor:pointer;transition:background .2s ease;margin:0}
+input[role=switch]::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.25);transition:transform .2s var(--bewegung)}
+input[role=switch]:checked{background:#34c759}
+input[role=switch]:checked::after{transform:translateX(20px)}
+input[role=switch]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sfarben{flex:1;display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;padding:var(--s2) 0}
+.sfarbe{width:30px;height:30px;border-radius:50%;border:0;background:var(--k);cursor:pointer;position:relative}
+.sfarbe[aria-checked="true"]{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--k)}
+.knopf.gefahr{color:var(--rot)}
+.knopf.breit{width:100%;justify-content:center}
+/* Aufgeräumt (v0.9.1) */
+.schmal header .datum{overflow:visible}
+.stempel-hinweis:empty{display:none}
+.schmal .kalleiste{flex-wrap:nowrap}
+.schmal .kalleiste .seg{flex:1;min-width:0}
+.schmal .schicht-summe{font-size:var(--t-klein)}
+.stempelleiste.unten{margin-top:var(--s3)}
+.schmal .stempelleiste.unten{position:sticky;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:3;padding:var(--s2);margin:var(--s3) calc(-1 * var(--s2)) 0;border-radius:var(--r-voll);background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+/* ---------- Kontextmenü (iOS-Stil) ---------- */
+.menue{position:fixed;z-index:1000;min-width:220px;max-width:min(300px,calc(100vw - 16px));overflow:auto;overscroll-behavior:contain;padding:6px 0;border-radius:14px;background:color-mix(in srgb,var(--card) 97%,transparent);-webkit-backdrop-filter:var(--glas-blur);backdrop-filter:var(--glas-blur);box-shadow:0 12px 40px rgba(0,0,0,.22),0 0 0 .5px var(--line2);color:var(--fg);animation:menue-auf .18s var(--bewegung)}
+.menue[data-seite="oben"]{animation-name:menue-auf-oben}
+@keyframes menue-auf{from{opacity:0;transform:translateY(-6px) scale(.97)}}
+@keyframes menue-auf-oben{from{opacity:0;transform:translateY(6px) scale(.97)}}
+.menue-punkt{display:flex;align-items:center;gap:var(--s2);width:100%;min-height:44px;padding:0 var(--s4) 0 var(--s2);border:0;background:none;color:inherit;font:inherit;font-size:var(--t-text);text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.menue-punkt:hover,.menue-punkt:focus-visible{background:var(--fill);outline:none}
+.menue-punkt:focus-visible{box-shadow:inset 0 0 0 2px var(--focus)}
+.menue-punkt:active{background:var(--fill2)}
+.menue-punkt:disabled{opacity:.4;cursor:default}
+.menue-punkt.gefahr{color:var(--rot)}
+.menue-haken{flex:none;width:18px;display:grid;place-items:center;color:var(--accent)}
+.menue-haken svg{width:16px;height:16px}
+.menue-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.menue-pfeil{flex:none;color:var(--muted);font-size:20px;line-height:1}
+.menue-icon{flex:none;width:22px;display:grid;place-items:center;color:var(--fg)}
+.menue-punkt.gefahr .menue-icon{color:var(--rot)}
+.menue-icon svg{width:20px;height:20px}
+.menue-icon .g-h1{font-weight:800;font-size:19px}
+.menue-icon .g-h2{font-weight:700;font-size:16px}
+.menue-icon .g-t{font-weight:600;font-size:15px}
+.menue-trenner{height:1px;margin:5px 0;background:var(--line)}
+.menue-eingabe{display:flex;align-items:center;gap:var(--s1);padding:var(--s1) var(--s2) var(--s1) var(--s4)}
+.menue-eingabe input{flex:1;min-width:0;min-height:40px;padding:0 var(--s2);border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--fg);font:inherit;font-size:max(16px,var(--t-text))}
+.menue-eingabe .knopf{min-height:44px;padding:0 var(--s2)}
+/* ---------- Notizen: Format, Tabellen, Links, Ordner ---------- */
+.nz-leiste{position:sticky;z-index:1;align-items:center;margin:0 calc(-1 * var(--s4));padding:var(--s2) var(--s4);background:var(--bg)}
+.nz-leiste .knopf{min-height:44px}
+.nz-aa{font-weight:700;font-size:17px;letter-spacing:-.02em;color:var(--accent)}
+.nz-leiste-luecke{flex:1}
+.nz-mehr{width:44px;padding:0;justify-content:center}
+.nz-mehr svg{width:22px!important;height:22px!important}
+.nz-geteilt{display:inline-flex;align-items:center;gap:4px;font-size:var(--t-klein);font-weight:600;color:var(--accent);background:var(--mint-dim);border-radius:var(--r-voll);padding:3px var(--s2)}
+.nz-geteilt[hidden]{display:none}
+.nz-geteilt svg{width:15px;height:15px}
+.nz-meta{display:flex;flex-wrap:wrap;gap:var(--s2);margin-top:calc(-1 * var(--s2))}
+.nz-meta[hidden]{display:none}
+.nz-chip{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 var(--s3);border:0;border-radius:var(--r-voll);background:var(--fill);color:var(--fg);font:inherit;font-size:var(--t-fuss);font-weight:500;cursor:pointer;position:relative}
+.nz-chip::before{content:"";position:absolute;inset:-6px 0}
+.nz-chip svg{width:15px;height:15px;color:var(--muted)}
+.nz-punkt{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--nf);box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.menue-icon .nz-punkt{width:16px;height:16px}
+dialog.nz-farbig .blatt-kopf{box-shadow:inset 0 -3px 0 var(--nf)}
+.nz-h1 textarea{font-size:22px;font-weight:700;letter-spacing:-.01em;line-height:1.3;padding-top:var(--s2)}
+.nz-h2 textarea{font-size:18px;font-weight:650;line-height:1.35;padding-top:6px}
+.nz-mark{flex:none;min-width:22px;padding-top:5px;text-align:right;color:var(--muted);font-size:max(16px,var(--t-text));line-height:1.45;font-variant-numeric:tabular-nums}
+.nz[data-art="num"] .nz-mark{min-width:26px}
+.nz-tab{flex-direction:column;align-items:stretch;gap:var(--s1);padding:var(--s2) 0}
+.nz-tab-scroll{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
+.nz-tabelle{border-collapse:collapse;min-width:100%;table-layout:fixed}
+.nz-tabelle td{border:1px solid var(--line2);padding:0;min-width:96px;background:var(--card)}
+.nz-tabelle tr:first-child td{background:var(--fill)}
+.nz-tabelle tr:first-child .nz-zelle{font-weight:600}
+.nz-zelle{display:block;width:100%;min-width:96px;min-height:40px;box-sizing:border-box;border:0;background:transparent;color:var(--fg);padding:6px var(--s2);font:inherit;font-size:max(16px,var(--t-sub));outline:none;border-radius:0}
+.nz-zelle:focus{box-shadow:inset 0 0 0 2px var(--focus)}
+.nz-tab-knoepfe{display:flex;gap:var(--s2)}
+.nz-tab-knoepfe .knopf{min-height:36px;font-size:var(--t-fuss);gap:4px;background:var(--fill);border:0;box-shadow:none;color:var(--fg);position:relative}
+.nz-tab-knoepfe .knopf::before{content:"";position:absolute;inset:-4px 0}
+.nz-tab-knoepfe svg{width:16px;height:16px;color:var(--accent)}
+.nz-tab-mehr{width:44px;padding:0;justify-content:center}
+.nz-links{display:grid;gap:var(--s2)}
+.nz-links[hidden]{display:none}
+.nz-links-t{font-size:var(--t-klein);font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.nz-links ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:var(--s2)}
+.nz-link{display:inline-flex;align-items:center;gap:6px;min-height:44px;max-width:100%;padding:0 var(--s3);border-radius:var(--r-voll);background:var(--mint-dim);color:var(--accent);font-size:var(--t-sub);font-weight:600;text-decoration:none}
+.nz-link span:not(.sr){overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px}
+.nz-link svg{flex:none;width:17px;height:17px}
+.nz-toast{display:flex;align-items:center;justify-content:space-between;gap:var(--s2);padding:var(--s1) var(--s1) var(--s1) var(--s4);border-radius:var(--r-feld);background:var(--fg);color:var(--bg);font-size:var(--t-sub);position:sticky;bottom:calc(var(--s2) + env(safe-area-inset-bottom,0px));z-index:2;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.nz-toast[hidden]{display:none}
+.nz-toast .knopf{color:var(--bg);min-height:44px}
+.nsuche{margin:0 0 var(--s3);min-height:40px;background:var(--fill);border:0}
+.nsuche input{min-height:40px;color:var(--fg);font-size:max(16px,var(--t-text))}
+.nrow-farbe .nrow-zeile{box-shadow:inset 4px 0 0 var(--nf)}
+.nrow-meta{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;margin-top:2px;min-width:0}
+.nrow-ordner{display:inline-flex;align-items:center;gap:3px;font-size:var(--t-klein);color:var(--muted)}
+.nrow-ordner svg{width:13px;height:13px}
+.nrow-tag{font-size:var(--t-klein);font-weight:600;color:var(--accent);background:var(--mint-dim);border-radius:var(--r-voll);padding:0 6px;line-height:18px}
+/* ---------- Menüs überall: Filter-Pillen, ⋯ pro Zeile, Personen-Kreis ---------- */
+.pillen{display:flex;flex-wrap:wrap;gap:var(--s2);align-items:center;min-width:0;margin-top:calc(-1 * var(--s2))}
+.pille{display:inline-flex;align-items:center;gap:6px;min-height:36px;max-width:100%;min-width:0;padding:0 10px 0 12px;border:0;border-radius:var(--r-voll);background:var(--fill);color:var(--fg);font:inherit;font-size:var(--t-sub);font-weight:600;line-height:1.2;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent;transition:background .15s ease}
+.pille::before{content:"";position:absolute;inset:-4px 0}
+.pille:has(.wer-av){padding-left:6px}
+.pille:active,.pille[aria-expanded="true"]{background:var(--fill2)}
+@media (hover:hover){.pille:hover{background:var(--fill2)}}
+.pille.aktiv{background:var(--mint-dim);color:var(--accent)}
+.pille-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.pille .pfeil-runter{width:14px;height:14px;opacity:.65;margin-left:-2px}
+.pille>svg:not(.pfeil-runter){width:16px;height:16px}
+.pille .punkt{width:10px;height:10px}
+.wer-av{flex:none;display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--pf);color:#fff;font-size:11px;font-weight:700;line-height:1;letter-spacing:0;font-style:normal}
+.wer-av.alle{background:var(--fill2);color:var(--fg)}
+.wer-av.alle svg{width:15px;height:15px}
+.pille .wer-av{width:24px;height:24px;font-size:12px}
+.menue-icon .wer-av{width:22px;height:22px;font-size:12px}
+.menue-icon .rang{margin:0;min-width:20px;height:20px}
+.zeile-av{margin:0 2px}
+.nrow-av{margin-left:auto}
+.mehr-knopf:focus-visible{outline-offset:-3px}
+@media (hover:hover){
+  .mehr-knopf:hover{background:var(--fill);color:var(--fg)}
+  #rahmen:not(.schmal) li.aufgabe .mehr-knopf,#rahmen:not(.schmal) .nrow-mehr{opacity:0;transition:opacity .15s ease}
+  #rahmen:not(.schmal) li.aufgabe:hover .mehr-knopf,#rahmen:not(.schmal) li.aufgabe:focus-within .mehr-knopf,
+  #rahmen:not(.schmal) .nrow:hover .nrow-mehr,#rahmen:not(.schmal) .nrow:focus-within .nrow-mehr,
+  #rahmen:not(.schmal) .mehr-knopf[aria-expanded="true"]{opacity:1}
+}
+#rahmen:not(.schmal) .aktionen{align-items:center}
+#rahmen:not(.schmal) .aktionen .mehr-knopf{margin:-6px -4px}
+.nrow-mehr{position:absolute;z-index:2;right:var(--s2);top:50%;margin:-22px 0 0}
+#rahmen:not(.schmal) .nrow-zeile{padding-right:56px}
+li.aufgabe .zeile,.nrow-zeile{-webkit-touch-callout:none}
+.schmal li.aufgabe .zeile{-webkit-user-select:none;user-select:none}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media (forced-colors:active){.haken[aria-checked="true"]::before{forced-color-adjust:none;background:Highlight}.seg button[aria-pressed="true"],nav.tabs button[aria-current="page"]{outline:2px solid Highlight}}
 `;
@@ -877,7 +1021,13 @@ dialog.pop form{display:grid;gap:var(--s3);padding:var(--s3) var(--s5) var(--s5)
 const HAKEN = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
 
+// Kennfarben für Personen (weiße Schrift, Kontrast ≥ 4.5:1); Gemeinsam immer Lila
+const PERSON_FARBEN = ["#0064c8", "#c23d00", "#1d7a36", "#b0007a", "#5b5bd6"];
+const PERSON_GEMEINSAM = "#8040a6";
 const ICON = {
+  runter: `<svg class="pfeil-runter" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>`,
+  kopie: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="11.5" height="11.5" rx="2.5"/><path d="M15.5 8.5V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7.5a2 2 0 0 0 2 2h2.5"/></svg>`,
+  stift: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>`,
   heute: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16.5 9.5"/></svg>`,
   woche: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>`,
   demnaechst: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>`,
@@ -901,7 +1051,76 @@ const ICON = {
   aufgaben: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="6.5" r="1.6"/><circle cx="5.5" cy="12" r="1.6"/><circle cx="5.5" cy="17.5" r="1.6"/><path d="M10 6.5h10M10 12h10M10 17.5h10"/></svg>`,
   ort: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>`,
   menu: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>`,
+  mehr: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><circle cx="5.5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="18.5" cy="12" r="1.9"/></svg>`,
+  ordner: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3.5 7.5A2 2 0 0 1 5.5 5.5h4l2 2.2h7a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>`,
+  tabelle: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M3.5 10h17M3.5 14.5h17M12 5v14"/></svg>`,
+  muell: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l1 12.2h9L17.5 7M10.2 10.5v5.5M13.8 10.5v5.5"/></svg>`,
+  personen: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="16.8" cy="9.3" r="2.5"/><path d="M15.8 14.2c2.4-.3 4.3 1.3 4.8 4.3"/></svg>`,
+  link: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>`,
+  telefon: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6.5 3.8l2.6-.3 1.6 4-2 1.5a11 11 0 0 0 6.3 6.3l1.5-2 4 1.6-.3 2.6a2 2 0 0 1-2.1 1.8A16 16 0 0 1 4.7 5.9a2 2 0 0 1 1.8-2.1z"/></svg>`,
+  mail: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4 7l8 6 8-6"/></svg>`,
 };
+
+// ---------- Notiz-Format ----------
+// Gespeichert wird reiner Text, damit Notizen überall lesbar bleiben:
+// „# “ Überschrift, „## “ Zwischenüberschrift, „• “ Aufzählung, „1. “ Nummerierung, „☐ “/„☑ “ Checkliste,
+// „| a | b |“ Tabellenzeile, **fett**. Die erste Zeile ist der Titel.
+const NOTIZ_FARBEN = [["Rot", "#ff3b30"], ["Orange", "#ff9500"], ["Gelb", "#ffcc00"], ["Grün", "#34c759"], ["Türkis", "#00c7be"], ["Blau", "#007aff"], ["Lila", "#af52de"], ["Grau", "#8e8e93"]];
+function notizZeileLesen(z) {
+  z = String(z ?? "");
+  if (z.startsWith("## ")) return { art: "h2", wert: z.slice(3) };
+  if (z.startsWith("# ")) return { art: "h1", wert: z.slice(2) };
+  if (z === "•" || z.startsWith("• ")) return { art: "bullet", wert: z.slice(2) };
+  let m = /^(\d{1,3})\. /.exec(z);
+  if (m) return { art: "num", wert: z.slice(m[0].length) };
+  m = /^([☐☑]) ?/.exec(z);
+  if (m) return { art: "check", wert: z.slice(m[0].length), ok: m[1] === "☑" };
+  if (z === "|" || z.startsWith("| ")) return { art: "table", wert: z };
+  return { art: "text", wert: z };
+}
+function notizZellen(z) {
+  let s = z === "|" ? "" : z.slice(2);
+  if (s.endsWith(" |")) s = s.slice(0, -2); else if (s.endsWith("|")) s = s.slice(0, -1);
+  return s.split(" | ");
+}
+const notizOhneFett = (s) => String(s || "").replace(/\*\*(.+?)\*\*/g, "$1");
+// Zeile als lesbarer Text für Vorschau und Suche (ohne Präfixe)
+function notizKlartext(z) {
+  const p = notizZeileLesen(z);
+  return notizOhneFett(p.art === "table" ? notizZellen(z).map((c) => c.trim()).filter(Boolean).join(" · ") : p.wert).trim();
+}
+function notizTags(text) {
+  const raus = new Set();
+  for (const m of String(text || "").matchAll(/(^|[^\p{L}\p{N}_&/#])#([\p{L}\p{N}][\p{L}\p{N}_-]{0,39})/gu)) {
+    if (/\p{L}/u.test(m[2])) raus.add(m[2].toLowerCase());
+  }
+  return [...raus];
+}
+// Links, E-Mail-Adressen und Telefonnummern im Text
+function notizLinks(text) {
+  const t = String(text || "");
+  const raus = [], gesehen = new Set(), belegt = [];
+  const frei = (a, b) => !belegt.some(([x, y]) => a < y && b > x);
+  const dazu = (art, roh, href, a) => {
+    belegt.push([a, a + roh.length]);
+    if (gesehen.has(href)) return;
+    gesehen.add(href); raus.push({ art, text: roh, href });
+  };
+  for (const m of t.matchAll(/\b(?:https?:\/\/|www\.)[^\s<>"'|]+/gi)) {
+    const u = m[0].replace(/[.,;:!?)\]}*]+$/, "");
+    if (u.length > 4) dazu("web", u, /^www\./i.test(u) ? `https://${u}` : u, m.index);
+  }
+  for (const m of t.matchAll(/[\p{L}\p{N}._%+-]+@[\p{L}\p{N}-]+(?:\.[\p{L}\p{N}-]+)*\.\p{L}{2,}/gu)) {
+    if (frei(m.index, m.index + m[0].length)) dazu("mail", m[0], `mailto:${m[0]}`, m.index);
+  }
+  for (const m of t.matchAll(/(^|[^\p{L}\p{N}+])((?:\+\d{1,3}|0)[\d /-]{5,18}\d)(?!\d)/gu)) {
+    const a = m.index + m[1].length, roh = m[2].trim();
+    const ziffern = roh.replace(/\D/g, "");
+    if (ziffern.length < 6 || ziffern.length > 16 || !frei(a, a + roh.length)) continue;
+    dazu("tel", roh, `tel:${roh.replace(/[ /-]/g, "")}`, a);
+  }
+  return raus;
+}
 
 class PlanerPanel extends HTMLElement {
   constructor() {
@@ -992,6 +1211,8 @@ class PlanerPanel extends HTMLElement {
       this._fehler = `Der Planer konnte nicht geladen werden (${e.message || e.code}). Ist die Integration unter Geräte & Dienste eingerichtet?`;
     }
     this._zeichnen();
+    // Offene Notiz bekommt Änderungen von anderen Geräten mit
+    try { this._notizLive?.(); } catch (e) { /* egal */ }
   }
 
   async _termineLaden() {
@@ -1079,7 +1300,7 @@ class PlanerPanel extends HTMLElement {
       eingang: offen.length,
       woche: offen.filter((a) => a.datum && a.datum >= iso(montag(new Date())) && a.datum <= iso(plusTage(montag(new Date()), 6))).length,
       notizen: this._notizenSichtbar().length,
-      einkauf: (this._eArtikel?.liste === this._eListeId() ? this._eArtikel.items.filter((x) => !x.erledigt).length : 0),
+      einkauf: (this._eArtikel && this._eArtikel.liste === this._eListeId() ? this._eArtikel.items.filter((x) => !x.erledigt).length : 0),
     };
     const tabs = [["heute", "Heute"], ["woche", "Kalender"], ["demnaechst", "Demnächst"]];
     tabs.push(["notizen", "Notizen"]);
@@ -1087,30 +1308,12 @@ class PlanerPanel extends HTMLElement {
     if ((d.einkauf_listen || []).length) tabs.push(["einkauf", "Einkauf"]);
     if (this._ansicht === "einkauf" && !(d.einkauf_listen || []).length) this._ansicht = "heute";
     const heuteD = new Date();
-    const filterKnoepfe = d.andere_sehen
-      ? `<div class="seg" role="group" aria-label="Wessen Aufgaben">
-          ${[["ich", "Ich"], ...d.personen.filter((p) => p.id !== d.ich).map((p) => [p.id, p.name.split(" ")[0]]), [GEMEINSAM, "Gemeinsam"], ["alle", "Alle"]]
-            .map(([k, t]) => `<button type="button" data-filter="${esc(k)}" data-fokus="f-${esc(k)}" aria-pressed="${this._filter === k}">${esc(t)}</button>`).join("")}
-        </div>` : "";
-
-    const tabName = (tabs.find(([k]) => k === this._ansicht) || tabs[0])[1];
     const einkauf = this._ansicht === "einkauf";
     const notizen = this._ansicht === "notizen";
-    const bListe = [...new Set(d.aufgaben.filter((a) => a.status === "offen").flatMap((a) => [a.bereich, ...(a.tags || [])]).filter(Boolean))].sort();
-    if (this._bereich && !bListe.includes(this._bereich)) bListe.push(this._bereich);
-    const gross = (x) => x[0].toUpperCase() + x.slice(1);
-    const bereichChips = !schmal && bListe.length && !einkauf && !notizen
-      ? `<div class="bereiche" role="group" aria-label="Nach Bereich filtern">
-          <button type="button" data-bereich="" data-fokus="b-alle" aria-pressed="${!this._bereich}">Alle Bereiche</button>
-          ${bListe.map((x) => `<button type="button" data-bereich="${esc(x)}" data-fokus="b-${esc(x)}" aria-pressed="${this._bereich === x}" style="--b:${bereichFarbe(x, d.farben)}"><span class="punkt" aria-hidden="true"></span>${esc(gross(x))}</button>`).join("")}
-        </div>` : "";
-    const bereichWahl = schmal && bListe.length && !einkauf && !notizen
-      ? `<span class="rund ${this._bereich ? "aktiv" : ""}" title="Nach Bereich filtern">${ICON.filter}
-          <label class="sr" for="bwahl">Nach Bereich filtern</label>
-          <select id="bwahl" data-fokus="bwahl"><option value="">Alle Bereiche</option>${bListe.map((x) => `<option value="${esc(x)}" ${this._bereich === x ? "selected" : ""}>${esc(gross(x))}</option>`).join("")}</select>
-        </span>` : "";
-    const aktivFilter = schmal && this._bereich && !einkauf && !notizen
-      ? `<div class="aktivfilter"><span>Nur</span><button type="button" data-bereich="" data-fokus="b-weg" aria-label="Filter ${esc(gross(this._bereich))} aufheben"><span class="punkt" style="--b:${bereichFarbe(this._bereich, d.farben)}" aria-hidden="true"></span>${esc(gross(this._bereich))}${ICON.zu}</button></div>` : "";
+    const tabName = (tabs.find(([k]) => k === this._ansicht) || tabs[0])[1];
+    const pillen = this._pillenHtml();
+    const eListen = d.einkauf_listen || [];
+    const eName = einkauf && eListen.length > 1 ? (eListen.find((l) => l.id === this._eListeId()) || {}).name || "" : "";
     const eingabeSichtbar = !schmal || this._eingabeOffen;
     const kannTermin = (d.kalender || []).some((k) => k.schreiben);
 
@@ -1123,17 +1326,14 @@ class PlanerPanel extends HTMLElement {
         ${this._menuKnopf()}
         <div class="titel-block">
           <h1>${esc(tabName)}</h1>
-          <span class="datum">${schmal ? WT_KURZ[wt(heuteD)] + "." : WOCHENTAGE[wt(heuteD)]}, ${heuteD.getDate()}. ${MONATE[heuteD.getMonth()]}</span>
+          <span class="datum">${schmal ? WT_KURZ[wt(heuteD)] + "." : WOCHENTAGE[wt(heuteD)]}, ${heuteD.getDate()}. ${MONATE[heuteD.getMonth()]}${eName ? ` · ${esc(eName)}` : ""}</span>
         </div>
         <div class="rechts">
-          ${schmal ? "" : filterKnoepfe}
           <button type="button" class="rund" data-aktion="suche" data-fokus="suche" aria-label="Suchen" title="Suchen (Taste /)">${ICON.suche}</button>
-          ${bereichWahl}
-          ${d.admin ? `<button type="button" class="rund" data-aktion="einstellungen" data-fokus="einst" aria-label="Einstellungen" title="Einstellungen">${ICON.einstellungen}</button>` : ""}
+          ${this._kopfEintraege().length ? `<button type="button" class="rund" data-aktion="kopf-menue" data-fokus="kopf-menue" aria-haspopup="menu" aria-expanded="false" aria-label="Weitere Aktionen" title="Weitere Aktionen">${ICON.mehr}</button>` : ""}
         </div>
       </header>
-      ${schmal && filterKnoepfe ? `<div class="filterzeile">${filterKnoepfe}</div>` : ""}
-      ${aktivFilter}
+      ${pillen}
 
       <form class="schnell" id="schnellform" autocomplete="off" ${eingabeSichtbar ? "" : "hidden"}>
         <label class="sr" for="schnell">${einkauf ? "Neuer Artikel" : notizen ? "Neue Notiz" : "Neue Aufgabe"}</label>
@@ -1155,7 +1355,6 @@ class PlanerPanel extends HTMLElement {
       <nav class="tabs" aria-label="Ansichten">
         ${tabs.map(([k, t]) => `<button type="button" data-ansicht="${k}" data-fokus="t-${k}" ${this._ansicht === k ? 'aria-current="page"' : ""}>${(k === "eingang" ? ICON.aufgaben : ICON[k]) || ""}<span>${t}</span><span class="zahl ${!zaehler[k] ? "null" : ""}" aria-label="${zaehler[k]} ${k === "notizen" ? (zaehler[k] === 1 ? "Notiz" : "Notizen") : "offen"}">${zaehler[k]}</span></button>`).join("")}
       </nav>
-      ${bereichChips}
 
       <main id="inhalt">${this._ansichtHtml(alle, offen)}</main>
     </div>
@@ -1173,6 +1372,7 @@ class PlanerPanel extends HTMLElement {
     if (fokus && !root.querySelector("dialog[open]")) {
       const el = this._app.querySelector(`[data-fokus="${CSS_escape(fokus)}"]`);
       if (el) el.focus();
+      if (el?.id === "n-suche") { try { el.setSelectionRange(el.value.length, el.value.length); } catch (e) { /* egal */ } }
     }
   }
 
@@ -1228,6 +1428,371 @@ class PlanerPanel extends HTMLElement {
   _menuBinden() {
     const m = this.shadowRoot.getElementById("menu");
     if (m) m.onclick = () => this.dispatchEvent(new CustomEvent("hass-toggle-menu", { bubbles: true, composed: true }));
+  }
+
+  // ---------- Menüs: ⋯ oben, Filter-Pillen, Menü pro Eintrag ----------
+  // Wem ein Eintrag gehört: kleiner runder Kreis mit Anfangsbuchstabe (G = Gemeinsam)
+  _personFarbe(id) {
+    if (id === GEMEINSAM) return PERSON_GEMEINSAM;
+    const i = (this._daten?.personen || []).findIndex((p) => p.id === id);
+    return PERSON_FARBEN[(i < 0 ? 0 : i) % PERSON_FARBEN.length];
+  }
+  _avatar(id, klasse = "") {
+    const k = id === GEMEINSAM ? "G" : (this._name(id) || "?").charAt(0).toUpperCase();
+    return `<span class="wer-av ${klasse}" style="--pf:${this._personFarbe(id)}" title="${esc(this._name(id))}" aria-hidden="true">${esc(k)}</span>`;
+  }
+  // Bei „Ich“ nur Gemeinsames kennzeichnen, sonst jeden Eintrag
+  _werZeigen(person) {
+    const f = this._filter || "ich";
+    return f === "ich" ? person !== this._daten.ich : true;
+  }
+  _werText() {
+    const f = this._filter || "ich";
+    return f === "alle" ? "Alle" : f === GEMEINSAM ? "Gemeinsam" : f === "ich" ? "Ich" : this._name(f);
+  }
+  _bereichListe() {
+    const d = this._daten;
+    const l = [...new Set(d.aufgaben.filter((a) => a.status === "offen").flatMap((a) => [a.bereich, ...(a.tags || [])]).filter(Boolean))].sort();
+    if (this._bereich && !l.includes(this._bereich)) l.push(this._bereich);
+    return l;
+  }
+  _notizFilterListen() {
+    const sichtbar = this._notizenSichtbar();
+    const ordner = [...new Set(sichtbar.map((n) => n.ordner).filter(Boolean))].sort((a, b) => a.localeCompare(b, "de"));
+    const tags = [...new Set(sichtbar.flatMap((n) => this._notizTagsVon(n)))].sort((a, b) => a.localeCompare(b, "de"));
+    if (this._nOrdner && !ordner.includes(this._nOrdner)) this._nOrdner = "";
+    if (this._nTag && !tags.includes(this._nTag)) this._nTag = "";
+    return { ordner, tags };
+  }
+  _pille(art, inhalt, label, aktiv) {
+    return `<button type="button" class="pille${aktiv ? " aktiv" : ""}" data-menue="${art}" data-fokus="p-${art}" aria-haspopup="menu" aria-expanded="false" aria-label="${esc(label)}">${inhalt}${ICON.runter}</button>`;
+  }
+  // Eine Zeile Filter direkt unter dem Titel, überall gleich
+  _pillenHtml() {
+    const d = this._daten, v = this._ansicht;
+    if (v === "einkauf") return "";
+    const f = this._filter || "ich";
+    const teile = [];
+    const werId = f === "ich" ? d.ich : f === "alle" ? "" : f;
+    teile.push(this._pille("wer", `${werId ? this._avatar(werId) : `<span class="wer-av alle" aria-hidden="true">${ICON.personen}</span>`}<span class="pille-text">${esc(this._werText())}</span>`,
+      `Wessen Einträge: ${this._werText()}. Ändern`, false));
+    if (v === "heute" || v === "demnaechst") {
+      const b = this._bereich;
+      if (b || this._bereichListe().length) {
+        const name = b ? b[0].toUpperCase() + b.slice(1) : "Alle Bereiche";
+        teile.push(this._pille("bereich", `${b ? `<span class="punkt" style="--b:${bereichFarbe(b, d.farben)}" aria-hidden="true"></span>` : ""}<span class="pille-text">${esc(name)}</span>`, `Bereich: ${name}. Ändern`, !!b));
+      }
+    }
+    if (v === "notizen") {
+      const { ordner, tags } = this._notizFilterListen();
+      if (ordner.length || tags.length) {
+        const t = [this._nOrdner, this._nTag ? `#${this._nTag}` : ""].filter(Boolean).join(" · ") || "Alle Notizen";
+        teile.push(this._pille("notizen", `${this._nOrdner ? ICON.ordner : ""}<span class="pille-text">${esc(t)}</span>`, `Notizen filtern: ${t}. Ändern`, !!(this._nOrdner || this._nTag)));
+      }
+    }
+    return `<div class="pillen" role="group" aria-label="Filter">${teile.join("")}</div>`;
+  }
+
+  _filterSetzen(f) {
+    this._filter = f;
+    try { localStorage.setItem("planer.filter", f); } catch (e) { /* egal */ }
+    this._zeichnen();
+    this._sagen(`Zeigt: ${this._werText()}`);
+  }
+  _werMenue(anker, info) {
+    const d = this._daten, f = this._filter || "ich";
+    const punkt = (id, text) => ({ text, icon: this._avatar(id), radio: true, aktiv: f === (id === d.ich ? "ich" : id), aktion: () => this._filterSetzen(id === d.ich ? "ich" : id) });
+    this._menue(anker, [
+      punkt(d.ich, "Ich"),
+      ...(d.andere_sehen ? d.personen.filter((p) => p.id !== d.ich).map((p) => punkt(p.id, p.name.split(" ")[0])) : []),
+      punkt(GEMEINSAM, "Gemeinsam"),
+      d.andere_sehen ? "-" : null,
+      d.andere_sehen ? { text: "Alle", icon: ICON.personen, radio: true, aktiv: f === "alle", aktion: () => this._filterSetzen("alle") } : null,
+    ], { titel: "Wessen Einträge", tastatur: info?.tastatur });
+  }
+  _bereichMenue(anker, info) {
+    const d = this._daten;
+    const setzen = (b) => {
+      this._bereich = b;
+      try { localStorage.setItem("planer.bereich", b); } catch (e) { /* egal */ }
+      this._zeichnen();
+      this._sagen(b ? `Nur Bereich ${b}` : "Alle Bereiche");
+    };
+    this._menue(anker, [
+      { text: "Alle Bereiche", radio: true, aktiv: !this._bereich, aktion: () => setzen("") },
+      "-",
+      ...this._bereichListe().map((x) => ({ text: x[0].toUpperCase() + x.slice(1), icon: `<span class="nz-punkt" style="--nf:${bereichFarbe(x, d.farben)}"></span>`, radio: true, aktiv: this._bereich === x, aktion: () => setzen(x) })),
+    ], { titel: "Bereich", tastatur: info?.tastatur });
+  }
+  _notizFilterMenue(anker, info) {
+    const { ordner, tags } = this._notizFilterListen();
+    const setzen = (o, t) => {
+      this._nOrdner = o; this._nTag = t;
+      this._zeichnen();
+      this._sagen([o ? `Ordner ${o}` : "", t ? `#${t}` : ""].filter(Boolean).join(", ") || "Alle Notizen");
+    };
+    const zurueck = { text: "Zurück", icon: "‹", aktion: (i) => haupt(i) };
+    const haupt = (i) => this._menue(anker, [
+      { text: "Alle Notizen", radio: true, aktiv: !this._nOrdner && !this._nTag, aktion: () => setzen("", "") },
+      "-",
+      ordner.length ? { text: this._nOrdner ? `Ordner: ${this._nOrdner}` : "Ordner", icon: ICON.ordner, untermenue: true, aktion: ordnerM } : null,
+      tags.length ? { text: this._nTag ? `Tag: #${this._nTag}` : "Tags", icon: '<span class="g-t">#</span>', untermenue: true, aktion: tagM } : null,
+    ], { titel: "Notizen filtern", tastatur: i?.tastatur });
+    const ordnerM = (i) => this._menue(anker, [zurueck, "-",
+      { text: "Alle Ordner", radio: true, aktiv: !this._nOrdner, aktion: () => setzen("", this._nTag) },
+      ...ordner.map((o) => ({ text: o, icon: ICON.ordner, radio: true, aktiv: this._nOrdner === o, aktion: () => setzen(o, this._nTag) })),
+    ], { titel: "Ordner", tastatur: i?.tastatur });
+    const tagM = (i) => this._menue(anker, [zurueck, "-",
+      { text: "Alle Tags", radio: true, aktiv: !this._nTag, aktion: () => setzen(this._nOrdner, "") },
+      ...tags.map((t) => ({ text: `#${t}`, radio: true, aktiv: this._nTag === t, aktion: () => setzen(this._nOrdner, t) })),
+    ], { titel: "Tags", tastatur: i?.tastatur });
+    haupt(info);
+  }
+
+  // Selten gebrauchte Aktionen der Ansicht (⋯ oben rechts). Ohne anker nur zum Zählen.
+  _kopfEintraege(anker, zurueck) {
+    const d = this._daten, v = this._ansicht;
+    const termin = (d.kalender || []).some((k) => k.schreiben) ? { text: "Neuer Termin", icon: ICON.termin, aktion: () => this._terminNeu() } : null;
+    let e = [];
+    // Am PC stehen „Erweitert“ und „Termin“ schon neben der Eingabezeile, deshalb nur am Handy hier.
+    if ((v === "heute" || v === "demnaechst") && this._narrow) e = [{ text: "Neue Aufgabe mit allen Optionen", icon: ICON.regler, aktion: () => this._erweitert() }, termin];
+    else if (v === "woche" && this._kalAnsicht === "schichten") {
+      const aus = !this._schichtPerson();
+      e = [
+        { text: "Wiederholen …", icon: ICON.wdh, aus, aktion: () => this._schichtRhythmus() },
+        { text: "Schichten bearbeiten …", icon: ICON.regler, aus, aktion: () => this._schichtArten() },
+        { text: "Kalender & Erinnerung …", icon: ICON.woche, aus, aktion: () => this._schichtEinstellung() },
+      ];
+    } else if (v === "woche") {
+      const kal = d.kalender || [];
+      e = [kal.length ? { text: `Kalender auswählen (${kal.filter((k) => k.angezeigt !== false).length}/${kal.length})`, icon: ICON.woche, aktion: () => this._kalenderWahl() } : null, termin];
+    } else if (v === "notizen") e = [{ text: "Neue Notiz", icon: ICON.plus, aktion: () => this._aktion("neu") }];
+    else if (v === "einkauf") {
+      const listen = d.einkauf_listen || [];
+      if (listen.length > 1) {
+        const jetzt = this._eListeId();
+        e = [{ text: `Liste: ${(listen.find((l) => l.id === jetzt) || {}).name || ""}`, icon: ICON.einkauf, untermenue: true, aktion: (i) => this._menue(anker, [
+          { text: "Zurück", icon: "‹", aktion: zurueck }, "-",
+          ...listen.map((l) => ({ text: l.name, radio: true, aktiv: l.id === jetzt, aktion: () => {
+            this._eListe = l.id;
+            try { localStorage.setItem("planer.eliste", l.id); } catch (err) { /* egal */ }
+            this._zeichnen();
+            this._sagen(`Liste ${l.name}`);
+          } })),
+        ], { titel: "Liste", tastatur: i?.tastatur }) }];
+      }
+    }
+    e = e.filter(Boolean);
+    if (d.admin) e.push("-", { text: "Einstellungen", icon: ICON.einstellungen, aktion: () => this._einstellungen() });
+    if (e[0] === "-") e.shift();
+    return e;
+  }
+  _kopfMenue(anker, info) {
+    const auf = (i) => this._menue(anker, this._kopfEintraege(anker, auf), { titel: "Weitere Aktionen", tastatur: i?.tastatur });
+    auf(info);
+  }
+
+  // Menü pro Aufgabe (⋯, Rechtsklick, langes Drücken, Umschalt+F10)
+  _aufgabeKopie(a) {
+    return { titel: a.titel, datum: a.datum || null, uhrzeit: a.uhrzeit || null, dauer: a.dauer || null, person: a.person, top: a.top || null,
+      bereich: a.bereich || "", tags: a.tags || [], notiz: a.notiz || "", wiederholung: a.wiederholung || null, erinnerungen: a.erinnerungen ?? null,
+      teilaufgaben: (a.teilaufgaben || []).map((t) => ({ id: "", text: t.text, erledigt: t.erledigt })) };
+  }
+  async _aufgabeAendern(a, felder, text) {
+    const vorher = {};
+    for (const k of Object.keys(felder)) vorher[k] = a[k] ?? (k === "bereich" ? "" : null);
+    try { await this._ws({ type: "planer/speichern", aufgabe: { id: a.id, ...felder } }); } catch (e) { return; }
+    this._sagen(text);
+    this._hinweis(text, () => this._ws({ type: "planer/speichern", aufgabe: { id: a.id, ...vorher } }));
+    await this._lesen();
+  }
+  async _aufgabeDuplizieren(a) {
+    let neu;
+    try { neu = await this._ws({ type: "planer/speichern", aufgabe: this._aufgabeKopie(a) }); } catch (e) { return; }
+    const text = `Dupliziert: ${a.titel}`;
+    this._sagen(text);
+    if (neu?.id) this._hinweis(text, () => this._ws({ type: "planer/loeschen", aufgabe_id: neu.id }));
+    await this._lesen();
+  }
+  async _aufgabeLoeschen(a) {
+    const kopie = this._aufgabeKopie(a);
+    try { await this._ws({ type: "planer/loeschen", aufgabe_id: a.id }); } catch (e) { return; }
+    this._sagen(`Gelöscht: ${a.titel}`);
+    this._hinweis(`Gelöscht: ${a.titel}`, () => this._ws({ type: "planer/speichern", aufgabe: kopie }));
+    await this._lesen();
+  }
+  _aufgabeMenue(a, anker, opt = {}) {
+    const d = this._daten;
+    const fertig = a.status === "erledigt";
+    const o = (i, titel) => ({ titel, tastatur: i?.tastatur, punkt: opt.punkt });
+    const gross = (x) => x[0].toUpperCase() + x.slice(1);
+    const punktIcon = (f) => `<span class="nz-punkt" style="--nf:${f}"></span>`;
+    const zurueck = { text: "Zurück", icon: "‹", aktion: (i) => haupt(i) };
+    const verschiebenM = (i) => {
+      const basis = new Date();
+      const mo = plusTage(basis, 1);
+      while (wt(mo) !== 0) mo.setDate(mo.getDate() + 1);
+      const wahl = [["Heute", heute()], ["Morgen", iso(plusTage(basis, 1))], ["Übermorgen", iso(plusTage(basis, 2))],
+        [`Nächsten Montag (${mo.getDate()}.${mo.getMonth() + 1}.)`, iso(mo)], ["In einer Woche", iso(plusTage(basis, 7))], ["Ohne Datum", ""]];
+      this._menue(anker, [zurueck, "-",
+        ...wahl.map(([t, dt]) => ({ text: t, radio: true, aktiv: (a.datum || "") === dt, aktion: () => this._verschieben(a, dt || null) })),
+        "-",
+        { text: "Datum wählen …", icon: ICON.woche, aktion: () => this._verschiebenWahl(a) },
+      ], o(i, "Verschieben"));
+    };
+    const bereichM = (i) => {
+      const liste = [...new Set([...Object.keys(BEREICH_STANDARD), ...d.aufgaben.map((x) => x.bereich).filter(Boolean)])].sort((x, y) => x.localeCompare(y, "de"));
+      const setzen = (b) => this._aufgabeAendern(a, { bereich: b }, b ? `${a.titel}: Bereich ${gross(b)}` : `${a.titel}: kein Bereich`);
+      this._menue(anker, [zurueck, "-",
+        ...liste.map((b) => ({ text: gross(b), icon: punktIcon(bereichFarbe(b, d.farben)), radio: true, aktiv: a.bereich === b, aktion: () => setzen(b) })),
+        { text: "Kein Bereich", radio: true, aktiv: !a.bereich, aktion: () => setzen("") },
+        "-",
+        { eingabe: true, text: "Neuer Bereich", knopf: "OK", max: 40, aktion: (w) => setzen(w.replace(/^#/, "").toLowerCase()) },
+      ], o(i, "Bereich"));
+    };
+    const fuerM = (i) => this._menue(anker, [zurueck, "-",
+      ...[...d.personen.map((p) => p.id), GEMEINSAM].map((id) => ({ text: this._name(id), icon: this._avatar(id), radio: true, aktiv: a.person === id,
+        aktion: () => this._aufgabeAendern(a, { person: id }, `${a.titel}: für ${this._name(id)}`) })),
+    ], o(i, "Für"));
+    const topM = (i) => this._menue(anker, [zurueck, "-",
+      ...[1, 2, 3].map((r) => ({ text: `Rang ${r}`, icon: `<span class="rang klein">${r}</span>`, radio: true, aktiv: a.top === r,
+        aktion: () => this._aufgabeAendern(a, { top: r }, `${a.titel}: Top ${r}`) })),
+      { text: "Keiner", radio: true, aktiv: !a.top, aktion: () => this._aufgabeAendern(a, { top: null }, `${a.titel}: nicht mehr in den Top 3`) },
+    ], o(i, "Top 3"));
+    const haupt = (i) => this._menue(anker, [
+      fertig ? null : { text: "Verschieben", icon: ICON.pfeil, untermenue: true, aktion: verschiebenM },
+      { text: a.bereich ? `Bereich: ${gross(a.bereich)}` : "Bereich", icon: a.bereich ? punktIcon(bereichFarbe(a.bereich, d.farben)) : ICON.filter, untermenue: true, aktion: bereichM },
+      { text: `Für: ${this._name(a.person)}`, icon: this._avatar(a.person), untermenue: true, aktion: fuerM },
+      fertig ? null : { text: a.top ? `Top 3: Rang ${a.top}` : "Top 3", icon: `<span class="rang klein">${a.top || "3"}</span>`, untermenue: true, aktion: topM },
+      "-",
+      { text: "Duplizieren", icon: ICON.kopie, aktion: () => this._aufgabeDuplizieren(a) },
+      { text: "Bearbeiten …", icon: ICON.stift, aktion: () => this._oeffnen(a) },
+      "-",
+      { text: "Löschen", icon: ICON.muell, gefahr: true, aktion: () => this._aufgabeLoeschen(a) },
+    ], o(i, a.titel));
+    haupt(opt);
+  }
+
+  // Menü pro Notiz
+  async _notizAendern(n, felder, text) {
+    const vorher = {};
+    for (const k of Object.keys(felder)) vorher[k] = n[k] ?? (k === "angeheftet" ? false : "");
+    try { await this._ws({ type: "planer/notiz_speichern", notiz: { id: n.id, ...felder } }); } catch (e) { return; }
+    this._sagen(text);
+    this._hinweis(text, () => this._ws({ type: "planer/notiz_speichern", notiz: { id: n.id, ...vorher } }));
+    await this._lesen();
+  }
+  async _notizLoeschen(n) {
+    const kopie = { titel: n.titel, text: n.text, person: n.person, angeheftet: !!n.angeheftet, ordner: n.ordner || "", farbe: n.farbe || "", erledigte_unten: n.erledigte_unten !== false };
+    const titel = this._notizTitel(n);
+    try { await this._ws({ type: "planer/notiz_loeschen", notiz_id: n.id }); } catch (err) { return; }
+    this._sagen(`Gelöscht: ${titel}`);
+    this._hinweis(`Gelöscht: ${titel}`, () => this._ws({ type: "planer/notiz_speichern", notiz: kopie }));
+    await this._lesen();
+  }
+  _notizMenue(n, anker, opt = {}) {
+    const d = this._daten;
+    const o = (i, titel) => ({ titel, tastatur: i?.tastatur, punkt: opt.punkt });
+    const zurueck = { text: "Zurück", icon: "‹", aktion: (i) => haupt(i) };
+    const titel = this._notizTitel(n);
+    const ordnerM = (i) => {
+      const alle = [...new Set((d.notizen || []).map((x) => x.ordner).filter(Boolean))].sort((x, y) => x.localeCompare(y, "de"));
+      const setzen = (w) => this._notizAendern(n, { ordner: w }, w ? `${titel}: Ordner ${w}` : `${titel}: kein Ordner`);
+      this._menue(anker, [zurueck, "-",
+        ...alle.map((x) => ({ text: x, icon: ICON.ordner, radio: true, aktiv: n.ordner === x, aktion: () => setzen(x) })),
+        { text: "Kein Ordner", radio: true, aktiv: !n.ordner, aktion: () => setzen("") },
+        "-",
+        { eingabe: true, text: "Neuer Ordner", knopf: "Anlegen", max: 40, aktion: (w) => setzen(w) },
+      ], o(i, "Ordner"));
+    };
+    const farbM = (i) => this._menue(anker, [zurueck, "-",
+      ...NOTIZ_FARBEN.map(([name, f]) => ({ text: name, icon: `<span class="nz-punkt" style="--nf:${f}"></span>`, radio: true, aktiv: (n.farbe || "").toLowerCase() === f,
+        aktion: () => this._notizAendern(n, { farbe: f }, `${titel}: ${name}`) })),
+      "-",
+      { text: "Keine Farbe", radio: true, aktiv: !n.farbe, aktion: () => this._notizAendern(n, { farbe: "" }, `${titel}: keine Farbe`) },
+    ], o(i, "Farbe"));
+    const fuerM = (i) => this._menue(anker, [zurueck, "-",
+      ...[...d.personen.map((p) => p.id), GEMEINSAM].map((id) => ({ text: this._name(id), icon: this._avatar(id), radio: true, aktiv: n.person === id,
+        aktion: () => this._notizAendern(n, { person: id }, `${titel}: für ${this._name(id)}`) })),
+    ], o(i, "Teilen"));
+    const haupt = (i) => this._menue(anker, [
+      { text: n.angeheftet ? "Loslösen" : "Anheften", icon: ICON.pin, aktion: () => this._notizAendern(n, { angeheftet: !n.angeheftet }, n.angeheftet ? "Anheften aufgehoben" : "Notiz angeheftet") },
+      "-",
+      { text: n.ordner ? `Ordner: ${n.ordner}` : "Ordner", icon: ICON.ordner, untermenue: true, aktion: ordnerM },
+      { text: "Farbe", icon: `<span class="nz-punkt" style="--nf:${n.farbe || "transparent"}"></span>`, untermenue: true, aktion: farbM },
+      { text: `Teilen: ${this._name(n.person)}`, icon: this._avatar(n.person), untermenue: true, aktion: fuerM },
+      "-",
+      { text: "Löschen", icon: ICON.muell, gefahr: true, aktion: () => this._notizLoeschen(n) },
+    ], o(i, titel));
+    haupt(opt);
+  }
+
+  // Rechtsklick, Kontextmenü-Taste/Umschalt+F10 und langes Drücken (450 ms) öffnen das Menü einer Zeile
+  _kontextBinden(li, oeffnen) {
+    let uhr = null, x0 = 0, y0 = 0, schlucken = false;
+    const auf = (opt) => {
+      if (Date.now() - (this._kontextZeit || 0) < 700) return;
+      this._kontextZeit = Date.now();
+      oeffnen(opt);
+    };
+    const stopp = () => { clearTimeout(uhr); uhr = null; };
+    li.addEventListener("contextmenu", (e) => {
+      if (e.target.closest("input,textarea")) return;
+      e.preventDefault();
+      const tastatur = e.button !== 2 && !e.clientX && !e.clientY;
+      auf(tastatur ? { tastatur: true } : { punkt: { x: e.clientX, y: e.clientY } });
+    });
+    li.addEventListener("keydown", (e) => {
+      if (e.key !== "ContextMenu" && !(e.shiftKey && e.key === "F10")) return;
+      e.preventDefault();
+      auf({ tastatur: true, anker: e.target.closest("button") });
+    });
+    li.addEventListener("pointerdown", (e) => {
+      li._lang = false; schlucken = false;
+      if (e.pointerType === "mouse" || e.button > 0 || e.target.closest(".nrow-aktionen,.mehr-knopf,.haken")) return;
+      x0 = e.clientX; y0 = e.clientY;
+      stopp();
+      uhr = setTimeout(() => {
+        uhr = null;
+        li._lang = true; schlucken = true;
+        try { navigator.vibrate?.(10); } catch (err) { /* egal */ }
+        auf({});
+      }, 450);
+    });
+    li.addEventListener("pointermove", (e) => { if (uhr && Math.hypot(e.clientX - x0, e.clientY - y0) > 8) stopp(); });
+    ["pointerup", "pointercancel", "pointerleave"].forEach((t) => li.addEventListener(t, stopp));
+    // Nach dem langen Drücken nicht auch noch öffnen
+    li.addEventListener("click", (e) => { if (schlucken) { schlucken = false; e.stopPropagation(); e.preventDefault(); } }, true);
+  }
+  _menueBinden() {
+    const app = this._app;
+    app.querySelectorAll("[data-menue]").forEach((b) => b.addEventListener("click", (e) => {
+      const info = { tastatur: e.detail === 0 };
+      const art = b.dataset.menue;
+      if (art === "wer") this._werMenue(b, info);
+      else if (art === "bereich") this._bereichMenue(b, info);
+      else if (art === "notizen") this._notizFilterMenue(b, info);
+    }));
+    app.querySelectorAll('[data-aktion="kopf-menue"]').forEach((b) => b.addEventListener("click", (e) => this._kopfMenue(b, { tastatur: e.detail === 0 })));
+    app.querySelectorAll("[data-zmenue]").forEach((b) => b.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const a = this._finde(b.dataset.zmenue);
+      if (a) this._aufgabeMenue(a, b, { tastatur: e.detail === 0 });
+    }));
+    app.querySelectorAll("li.aufgabe[data-id]").forEach((li) => this._kontextBinden(li, (opt) => {
+      const a = this._finde(li.dataset.id);
+      if (a) this._aufgabeMenue(a, opt.anker || li.querySelector(".mehr-knopf") || li.querySelector(".inhalt"), opt);
+    }));
+  }
+  _notizKontextBinden(wurzel) {
+    wurzel.querySelectorAll("li.nrow").forEach((li) => this._kontextBinden(li, (opt) => {
+      const n = this._notiz(li.dataset.nid);
+      if (n) this._notizMenue(n, opt.anker || li.querySelector(".nrow-mehr") || li.querySelector(".nrow-zeile"), opt);
+    }));
+    wurzel.querySelectorAll("[data-nmenue]").forEach((b) => b.addEventListener("click", (e) => {
+      const n = this._notiz(b.dataset.nmenue);
+      if (n) this._notizMenue(n, b, { tastatur: e.detail === 0 });
+    }));
   }
 
   _ansichtHtml(alle, offen) {
@@ -1319,9 +1884,7 @@ class PlanerPanel extends HTMLElement {
         <div class="inhalt" style="cursor:default"><span class="titel">${esc(x.text)}</span>${x.beschreibung ? `<span class="unter">${esc(x.beschreibung)}</span>` : ""}</div>
         <button type="button" class="weg-knopf" data-eweg="${esc(x.uid)}" data-fokus="ew-${esc(x.uid)}" aria-label="${esc(x.text)} löschen">${ICON.zu}</button>
       </div></li>`;
-    return `${listen.length > 1 ? `<div class="seg filterzeile" style="display:flex" role="group" aria-label="Einkaufsliste wählen">${listen.map((l) => `<button type="button" data-eliste="${esc(l.id)}" aria-pressed="${l.id === liste}">${esc(l.name)}</button>`).join("")}</div>` : ""}
-
-      <section class="gruppe" aria-labelledby="e-titel">
+    return `<section class="gruppe" aria-labelledby="e-titel">
         <h2 id="e-titel" class="sr">${esc(name)}, ${offen.length} offen</h2>
         ${geladen?.fehler ? `<p class="leer" role="alert">${esc(geladen.fehler)}</p>` : ""}
         ${!geladen ? `<p class="hinweis" role="status">Liste wird geladen …</p>` : offen.length ? `<ul class="liste gruppiert">${offen.map(zeile).join("")}</ul>` : `<p class="leer">Alles eingekauft.</p>`}
@@ -1331,11 +1894,6 @@ class PlanerPanel extends HTMLElement {
 
   _einkaufBinden(root) {
     const liste = this._eListeId();
-    root.querySelectorAll("[data-eliste]").forEach((b) => b.addEventListener("click", () => {
-      this._eListe = b.dataset.eliste;
-      try { localStorage.setItem("planer.eliste", this._eListe); } catch (e) { /* egal */ }
-      this._zeichnen();
-    }));
     const tun = async (art, uid, text, rueck) => {
       try { await this._ws({ type: "planer/einkauf_aktion", liste, art, uid }); this._sagen(text); }
       catch (err) { this._sagen(err.message || "Das hat nicht geklappt"); return; }
@@ -1408,22 +1966,10 @@ class PlanerPanel extends HTMLElement {
       anzahl[a.id] = (anzahl[a.id] || 0) + 1;
     }
     const stempel = this._stempel;
-    const wer = ` · ${esc(person === d.ich ? "Meine Schichten" : this._name(person).split(" ")[0])}`;
-    const se = (d.schicht_einst || {})[person] || {};
-    const kalName = se.kalender ? ((d.schicht_kalender_wahl || []).find((k) => k.id === se.kalender)?.name || se.kalender) : "";
-    const pushText = !se.push ? "" : se.push === "vorabend" ? `Erinnerung am Vorabend ${se.push_uhr || "20:00"}` : `Erinnerung ${minText(+se.push)}`;
+    const wer = this._narrow ? "" : ` · ${esc(person === d.ich ? "Meine Schichten" : this._name(person).split(" ")[0])}`;
     return `<section class="gruppe" aria-labelledby="s-titel">
       ${this._kalenderUmschalter()}
       <div class="wkopf"><h2 id="s-titel">${MONATE[monat]} ${jahr}${wer}</h2>${this._kalNavi("schicht", "Heute", monat === jetzt.getMonth() && jahr === jetzt.getFullYear(), "Monat wechseln")}</div>
-      ${!plan.arten.length ? `<div class="schicht-start"><p><b>Noch keine Schichten angelegt.</b><br>Lege deine Schichten einmal an, zum Beispiel Frühdienst 06:00–14:15. Sie bleiben gespeichert und stehen dann hier zum Eintragen bereit.</p>
-        <button type="button" class="knopf primaer" data-aktion="schicht-arten">${ICON.plus}Schicht anlegen</button></div>` : `
-      <div class="stempelleiste" role="group" aria-label="Schicht zum Eintragen wählen">
-        ${plan.arten.map((a) => `<button type="button" class="stempel" data-stempel="${esc(a.id)}" aria-pressed="${stempel === a.id}" style="--k:${a.farbe}" title="${esc(a.name)} ${esc(this._schichtZeit(a))}">
-          <span class="skurz">${esc(a.kurz)}</span><span class="sname">${esc(a.name)}</span></button>`).join("")}
-        <button type="button" class="stempel radierer" data-stempel="leer" aria-pressed="${stempel === "leer"}" title="Schicht entfernen"><span class="skurz">${ICON.zu}</span><span class="sname">Entfernen</span></button>
-        <button type="button" class="stempel neu" data-aktion="schicht-arten" title="Schichten anlegen oder ändern"><span class="skurz">${ICON.plus}</span><span class="sname">Neue Schicht</span></button>
-      </div>
-      <p class="hinweis" role="status">${stempel ? `${stempel === "leer" ? "Entfernen" : esc(plan.arten.find((a) => a.id === stempel)?.name || "")} aktiv: Tage antippen. Nochmal auf den Knopf tippen beendet das Eintragen.` : "Schicht oben wählen und dann Tage antippen. Ohne Auswahl öffnet ein Tag die Auswahl."}</p>`}
       <div class="woche-wrap"><div class="monat schichtmonat" role="grid" aria-labelledby="s-titel">
         ${["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((n) => `<div class="mkopf" role="columnheader">${n}</div>`).join("")}
         ${tage.slice(0, zeilen).map((t) => {
@@ -1434,15 +1980,17 @@ class PlanerPanel extends HTMLElement {
             <span class="mnr">${dd.getDate()}</span>${a ? `<span class="skurz">${esc(a.kurz)}</span><span class="szeit">${esc(a.von || "")}</span>` : ""}</button>`;
         }).join("")}
       </div></div>
+      ${!plan.arten.length ? `<div class="schicht-start"><p><b>Noch keine Schichten angelegt.</b><br>Lege deine Schichten einmal an, zum Beispiel Frühdienst 06:00–14:15. Sie bleiben gespeichert und stehen dann hier zum Eintragen bereit.</p>
+        <button type="button" class="knopf primaer" data-aktion="schicht-neu">${ICON.plus}Schicht anlegen</button></div>` : `
+      <div class="stempelleiste unten" role="group" aria-label="Schicht zum Eintragen wählen">
+        ${plan.arten.map((a) => `<button type="button" class="stempel" data-stempel="${esc(a.id)}" aria-pressed="${stempel === a.id}" style="--k:${a.farbe}" title="${esc(a.name)} ${esc(this._schichtZeit(a))}">
+          <span class="skurz">${esc(a.kurz)}</span><span class="sname">${esc(a.name)}</span></button>`).join("")}
+        <button type="button" class="stempel radierer" data-stempel="leer" aria-pressed="${stempel === "leer"}" title="Schicht entfernen"><span class="skurz">${ICON.zu}</span><span class="sname">Entfernen</span></button>
+      </div>
+      <p class="hinweis stempel-hinweis" role="status">${stempel ? `${stempel === "leer" ? "Entfernen" : esc(plan.arten.find((a) => a.id === stempel)?.name || "")}: Tage antippen` : ""}</p>`}
       <div class="schicht-fuss">
         <div class="schicht-summe"><b>${Math.floor(minuten / 60)} Std.${minuten % 60 ? ` ${minuten % 60} Min.` : ""}</b> im ${MONATE[monat]}
           ${plan.arten.filter((a) => anzahl[a.id]).map((a) => `<span class="chip" style="--b:${a.farbe}"><span class="punkt" aria-hidden="true"></span> ${anzahl[a.id]}× ${esc(a.name)}</span>`).join("")}</div>
-        <div class="schicht-knoepfe">
-          <button type="button" class="knopf" data-aktion="schicht-rhythmus">${ICON.wdh}Wiederholen</button>
-          <button type="button" class="knopf" data-aktion="schicht-arten">${ICON.regler}Schichten bearbeiten</button>
-          <button type="button" class="knopf" data-aktion="schicht-einst">${ICON.woche}Kalender &amp; Erinnerung</button>
-        </div>
-        <p class="hinweis">${kalName ? `Wird automatisch in „${esc(kalName)}“ eingetragen.` : "Wird in keinen Kalender übertragen."}${pushText ? ` ${esc(pushText)}.` : ""}</p>
       </div>
     </section>`;
   }
@@ -1466,8 +2014,7 @@ class PlanerPanel extends HTMLElement {
     }).join("");
     return `<section class="gruppe" aria-labelledby="s-titel">
       ${this._kalenderUmschalter()}
-      <div class="wkopf"><h2 id="s-titel">${MONATE[monat]} ${jahr} · Beide</h2>${this._kalNavi("schicht", "Heute", monat === jetzt.getMonth() && jahr === jetzt.getFullYear(), "Monat wechseln")}</div>
-      <p class="hinweis">Zum Eintragen oben eine Person wählen. Tippe auf einen Namen, um direkt zu ihrem Plan zu wechseln.</p>
+      <div class="wkopf"><h2 id="s-titel">${MONATE[monat]} ${jahr}${this._narrow ? "" : " · Beide"}</h2>${this._kalNavi("schicht", "Heute", monat === jetzt.getMonth() && jahr === jetzt.getFullYear(), "Monat wechseln")}</div>
       <div class="schicht-wer">${pers.map((p) => `<button type="button" class="knopf klein" data-filter="${esc(p === d.ich ? "ich" : p)}">${esc(vorname(p))} bearbeiten</button>`).join("")}</div>
       <div class="woche-wrap"><div class="monat schichtmonat beide" role="grid" aria-labelledby="s-titel">
         ${["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((n) => `<div class="mkopf" role="columnheader">${n}</div>`).join("")}
@@ -1588,48 +2135,105 @@ class PlanerPanel extends HTMLElement {
     dlg.showModal();
   }
 
+  // Liste der eigenen Schichten; Tippen öffnet das Formular für genau eine Schicht
   _schichtArten() {
-    const person = this._schichtPerson();
+    const person = this._schichtPerson() || this._daten.ich;
+    const arten = this._plan(person).arten;
+    if (!arten.length) return this._schichtForm(null);
     const dlg = this.shadowRoot.getElementById("blatt");
     dlg.onclose = null; dlg._vorZu = null;
-    const zeile = (a) => `<li class="sart" data-id="${esc(a.id || "")}">
-      <input type="color" value="${esc(a.farbe || "#8e8e93")}" aria-label="Farbe">
-      <input class="sa-name" value="${esc(a.name || "")}" placeholder="Name, z. B. Frühschicht" aria-label="Name">
-      <input class="sa-kurz" value="${esc(a.kurz || "")}" maxlength="3" placeholder="F" aria-label="Kürzel">
-      <input class="sa-von" type="time" value="${esc(a.von || "")}" aria-label="Beginn">
-      <input class="sa-bis" type="time" value="${esc(a.bis || "")}" aria-label="Ende">
-      <input class="sa-pause" type="number" min="0" max="240" step="5" inputmode="numeric" value="${esc(a.pause || 0)}" aria-label="Pause in Minuten">
-      <label class="sa-kal" title="In den Arbeitskalender übertragen"><input type="checkbox" class="sa-kal-box" ${(a.kalender ?? !!(a.von && a.bis)) || !a.name ? "checked" : ""}><span>Kalender</span></label>
-      <button type="button" class="rund weg" aria-label="Schichtart entfernen">${ICON.zu}</button></li>`;
-    dlg.innerHTML = `<form method="dialog" id="saform" novalidate>
+    dlg.innerHTML = `<form method="dialog" id="slform" novalidate>
       <div class="blatt-kopf">${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
-        <button type="button" class="knopf text l" id="sa-abbrechen">Abbrechen</button><h2 id="blatt-titel">Schichten</h2><button type="submit" class="knopf text fett r">Sichern</button></div>
-      <p class="hinweis">Farbe, Name, Kürzel (1–3 Zeichen), Beginn, Ende und Pause in Minuten. Ohne Uhrzeit (z. B. Frei, Urlaub) zählt die Schicht nicht als Arbeitszeit.</p>
-      <div class="sart-kopf" aria-hidden="true"><span></span><span>Name</span><span>Kürzel</span><span>Beginn</span><span>Ende</span><span>Pause</span><span>Kalender</span><span></span></div>
-      <ul class="sarten" id="sa-liste">${this._plan(person).arten.map(zeile).join("")}</ul>
-      <button type="button" class="knopf" id="sa-neu">${ICON.plus}Schicht hinzufügen</button>
-      <p class="fehler" id="sa-fehler" role="alert"></p>
+        <span class="l"></span><h2 id="blatt-titel">Schichten</h2><button type="submit" class="knopf text fett r">Fertig</button></div>
+      <ul class="sliste" role="list">${arten.map((a) => `<li><button type="button" class="szeile" data-sart="${esc(a.id)}" style="--k:${a.farbe}">
+          <span class="skurz">${esc(a.kurz)}</span><span class="sz-text"><b>${esc(a.name)}</b><small>${a.von && a.bis ? `${esc(a.von)}–${esc(a.bis)}${a.pause ? ` · ${a.pause} Min. Pause` : ""}` : "ohne Uhrzeit"}</small></span>${ICON.vor}</button></li>`).join("")}
+        <li><button type="button" class="szeile neu" data-sart=""><span class="skurz">${ICON.plus}</span><span class="sz-text"><b>Neue Schicht</b></span></button></li>
+      </ul>
+    </form>`;
+    dlg.querySelectorAll("[data-sart]").forEach((b) => b.addEventListener("click", () => this._schichtForm(arten.find((a) => a.id === b.dataset.sart) || null, true)));
+    this._wischZu(dlg);
+    if (!dlg.open) dlg.showModal();
+  }
+
+  _schichtForm(art, ausListe = false) {
+    const person = this._schichtPerson() || this._daten.ich;
+    const arten = this._plan(person).arten;
+    const dlg = this.shadowRoot.getElementById("blatt");
+    dlg.onclose = null; dlg._vorZu = null;
+    const FARBEN = ["#ff9f0a", "#ff453a", "#ff375f", "#bf5af2", "#5e5ce6", "#0a84ff", "#30b0c7", "#34c759", "#a2845e", "#8e8e93"];
+    const a = art || { name: "", kurz: "", farbe: FARBEN[arten.length % FARBEN.length], von: "", bis: "", pause: 0 };
+    const mitZeit = art ? !!(a.von && a.bis) : true;
+    const imKal = a.kalender ?? mitZeit;
+    dlg.innerHTML = `<form method="dialog" id="sfform" novalidate>
+      <div class="blatt-kopf">${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
+        <button type="button" class="knopf text l" id="sf-zurueck">${ausListe ? "Zurück" : "Abbrechen"}</button><h2 id="blatt-titel">${art ? "Schicht bearbeiten" : "Neue Schicht"}</h2><button type="submit" class="knopf text fett r">Sichern</button></div>
+      <div class="sform">
+        <div class="svorschau" id="sf-vorschau" style="--k:${a.farbe}"><span class="skurz" id="sf-vk">${esc(a.kurz || "?")}</span><span id="sf-vn">${esc(a.name || "Neue Schicht")}</span></div>
+        <div class="sgruppe">
+          <label class="szeile-feld"><span>Name</span><input id="sf-name" value="${esc(a.name)}" placeholder="z. B. Frühdienst" autocomplete="off" maxlength="40"></label>
+          <label class="szeile-feld"><span>Kürzel</span><input id="sf-kurz" value="${esc(a.kurz)}" placeholder="F" maxlength="3" autocomplete="off" autocapitalize="characters"></label>
+        </div>
+        <div class="sgruppe">
+          <div class="szeile-feld"><span>Farbe</span><div class="sfarben" role="radiogroup" aria-label="Farbe">${FARBEN.map((f) => `<button type="button" role="radio" class="sfarbe" data-farbe="${f}" style="--k:${f}" aria-checked="${f.toLowerCase() === (a.farbe || "").toLowerCase()}" aria-label="Farbe ${f}"></button>`).join("")}</div></div>
+        </div>
+        <div class="sgruppe">
+          <label class="szeile-feld schalter-zeile"><span>Mit Uhrzeit</span><input type="checkbox" role="switch" id="sf-zeit" ${mitZeit ? "checked" : ""}></label>
+          <div id="sf-zeiten" ${mitZeit ? "" : "hidden"}>
+            <label class="szeile-feld"><span>Beginn</span><input id="sf-von" type="time" value="${esc(a.von || "06:00")}"></label>
+            <label class="szeile-feld"><span>Ende</span><input id="sf-bis" type="time" value="${esc(a.bis || "14:00")}"></label>
+            <label class="szeile-feld"><span>Pause</span><select id="sf-pause">${[0, 15, 30, 45, 60, 90].map((m) => `<option value="${m}" ${(+a.pause || 0) === m ? "selected" : ""}>${m ? `${m} Min.` : "keine"}</option>`).join("")}</select></label>
+          </div>
+        </div>
+        <div class="sgruppe">
+          <label class="szeile-feld schalter-zeile"><span>In Arbeitskalender eintragen</span><input type="checkbox" role="switch" id="sf-kal" ${imKal ? "checked" : ""}></label>
+        </div>
+        ${art ? `<button type="button" class="knopf gefahr breit" id="sf-weg">Schicht löschen</button>` : ""}
+        <p class="fehler" id="sf-fehler" role="alert"></p>
+      </div>
     </form>`;
     const $ = (id) => dlg.querySelector(`#${id}`);
-    $("sa-neu").addEventListener("click", () => { $("sa-liste").insertAdjacentHTML("beforeend", zeile({ farbe: KAL_FARBEN[$("sa-liste").children.length % KAL_FARBEN.length] })); $("sa-liste").lastElementChild.querySelector(".sa-name").focus(); });
-    $("sa-liste").addEventListener("click", (e) => { const w = e.target.closest(".weg"); if (w) w.closest("li").remove(); });
-    $("sa-abbrechen").addEventListener("click", () => this._zu(dlg));
-    $("saform").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const arten = [...$("sa-liste").children].map((li) => ({
-        id: li.dataset.id, farbe: li.querySelector('input[type="color"]').value, name: li.querySelector(".sa-name").value.trim(),
-        kurz: li.querySelector(".sa-kurz").value.trim(), von: li.querySelector(".sa-von").value || null, bis: li.querySelector(".sa-bis").value || null,
-        pause: +li.querySelector(".sa-pause").value || 0, kalender: li.querySelector(".sa-kal-box").checked,
-      })).filter((a) => a.name);
-      if (!arten.length && this._plan(person).arten.length === 0) { this._zu(dlg); return; }
-      try { await this._ws({ type: "planer/schicht_arten", person, arten }); }
-      catch (err) { $("sa-fehler").textContent = err.message || "Speichern hat nicht geklappt."; return; }
-      this._zu(dlg);
-      this._stempel = null;
+    let farbe = a.farbe;
+    const vorschau = () => {
+      $("sf-vorschau").style.setProperty("--k", farbe);
+      $("sf-vk").textContent = $("sf-kurz").value.trim() || ($("sf-name").value.trim()[0] || "?").toUpperCase();
+      $("sf-vn").textContent = $("sf-name").value.trim() || "Neue Schicht";
+    };
+    $("sf-name").addEventListener("input", vorschau);
+    $("sf-kurz").addEventListener("input", vorschau);
+    dlg.querySelectorAll("[data-farbe]").forEach((b) => b.addEventListener("click", () => {
+      farbe = b.dataset.farbe;
+      dlg.querySelectorAll("[data-farbe]").forEach((x) => x.setAttribute("aria-checked", String(x === b)));
+      vorschau();
+    }));
+    $("sf-zeit").addEventListener("change", () => { $("sf-zeiten").hidden = !$("sf-zeit").checked; if (!$("sf-zeit").checked) $("sf-kal").checked = false; });
+    const zurueck = () => (ausListe ? this._schichtArten() : this._zu(dlg));
+    $("sf-zurueck").addEventListener("click", zurueck);
+    const senden = async (liste, text) => {
+      try { await this._ws({ type: "planer/schicht_arten", person, arten: liste }); }
+      catch (err) { $("sf-fehler").textContent = err.message || "Speichern hat nicht geklappt."; return false; }
       await this._lesen();
+      this._sagen(text);
+      return true;
+    };
+    $("sf-weg")?.addEventListener("click", async () => {
+      const tage = Object.values(this._plan(person).tage).filter((x) => x === art.id).length;
+      if (tage && !$("sf-weg").dataset.sicher) { $("sf-weg").dataset.sicher = "1"; $("sf-weg").textContent = `Wirklich löschen? ${tage} eingetragene Tage gehen mit weg`; return; }
+      if (await senden(arten.filter((x) => x.id !== art.id), `${art.name} gelöscht`)) { if (this._stempel === art.id) this._stempel = null; zurueck(); }
+    });
+    $("sfform").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = $("sf-name").value.trim();
+      if (!name) { $("sf-fehler").textContent = "Bitte einen Namen eingeben."; $("sf-name").focus(); return; }
+      const mz = $("sf-zeit").checked;
+      const neu = { id: art?.id, name, kurz: $("sf-kurz").value.trim() || name[0].toUpperCase(), farbe,
+        von: mz ? $("sf-von").value || null : null, bis: mz ? $("sf-bis").value || null : null,
+        pause: mz ? +$("sf-pause").value || 0 : 0, kalender: $("sf-kal").checked };
+      const liste = art ? arten.map((x) => (x.id === art.id ? neu : x)) : [...arten, neu];
+      if (await senden(liste, `${name} gespeichert`)) zurueck();
     });
     this._wischZu(dlg);
-    dlg.showModal();
+    if (!dlg.open) dlg.showModal();
+    if (!art && !this._narrow) $("sf-name").focus();
   }
 
   // Rhythmus wie in Supershift: Folge von Kürzeln wiederholen (z. B. F F S S N N X X)
@@ -1756,14 +2360,11 @@ class PlanerPanel extends HTMLElement {
 
   _kalenderUmschalter() {
     const v = this._kalAnsicht;
-    const kal = this._daten.kalender || [];
-    const an = kal.filter((k) => k.angezeigt !== false).length;
     return `<div class="kalleiste"><div class="seg kalumschalter" role="group" aria-label="Kalenderansicht">
       <button type="button" data-kal-ansicht="monat" data-fokus="ka-m" aria-pressed="${v === "monat"}">Monat</button>
       <button type="button" data-kal-ansicht="woche" data-fokus="ka-w" aria-pressed="${v === "woche"}">Woche</button>
       <button type="button" data-kal-ansicht="schichten" data-fokus="ka-s" aria-pressed="${v === "schichten"}">Schichten</button>
-    </div>
-    ${kal.length && v !== "schichten" ? `<button type="button" class="knopf kalwahl" data-aktion="kal-wahl" data-fokus="kal-wahl" aria-haspopup="dialog">${ICON.woche}<span>Kalender</span><span class="zahl">${an}/${kal.length}</span></button>` : ""}</div>`;
+    </div></div>`;
   }
   _kalNavi(art, heuteText, istJetzt, label) {
     return `<div class="navi" role="group" aria-label="${label}">
@@ -1808,7 +2409,6 @@ class PlanerPanel extends HTMLElement {
         }).join("")}
       </div></div>
       ${termine === null ? `<p class="hinweis" role="status">Termine werden geladen …</p>` : ""}
-      <p class="hinweis">Tippe auf einen Tag, um ihn mit allen Uhrzeiten zu öffnen.</p>
     </section>`;
   }
 
@@ -1868,7 +2468,6 @@ class PlanerPanel extends HTMLElement {
     ${termine === null ? `<p class="hinweis" role="status">Termine werden geladen …</p>` : ""}
     ${eingang.length ? `<section class="gruppe" aria-labelledby="ab-titel">
       <h2 id="ab-titel">Aus dem Eingang einplanen</h2>
-      <p class="hinweis">${this._narrow ? "Aufgabe antippen und ein Datum wählen." : "Auf einen Tag ziehen oder öffnen und ein Datum wählen."}</p>
       <div class="ablage">${eingang.map((a) => `<button type="button" class="wpunkt a" style="--k:${bereichFarbe(a.bereich, this._daten.farben) || "var(--accent)"}" draggable="true" data-ziehen="${a.id}" data-aktion="oeffnen" data-id="${a.id}">${esc(a.titel)}</button>`).join("")}</div>
     </section>` : ""}`;
   }
@@ -2241,7 +2840,6 @@ class PlanerPanel extends HTMLElement {
     if (a.datum && (this._ansicht !== "heute" || a.datum < this._tag)) meta.push(`<span class="chip ${a.datum < this._tag ? "warn" : ""}">${esc(datumText(a.datum))}</span>`);
     if (wiederErledigt) meta.push(`<span class="chip mint">nächstes Mal ${esc(datumText(a.datum))}</span>`);
     if (a.uhrzeit) meta.push(`<span class="chip">${esc(a.uhrzeit)} Uhr</span>`);
-    if (this._filter !== "ich" || a.person !== this._daten.ich) meta.push(`<span class="chip">${esc(this._name(a.person))}</span>`);
     const farbe = bereichFarbe(a.bereich, this._daten.farben);
     if (!fertig && this._ansicht === "heute" && this._naechste === a.id) meta.unshift(`<span class="chip naechstes">Als Nächstes</span>`);
     if (a.bereich) meta.push(`<span class="chip" style="--b:${farbe}"><span class="punkt" aria-hidden="true"></span> ${esc(a.bereich)}</span>`);
@@ -2255,18 +2853,20 @@ class PlanerPanel extends HTMLElement {
     }
     if (a.wiederholung) meta.push(`<span class="chip mint">${ICON.wdh}${esc(regelText(a.wiederholung))}</span>`);
     if (a.verschoben > 0) meta.push(`<span class="chip warn">${a.verschoben}× verschoben</span>`);
-    const morgen = fertig ? "" : !this._narrow ? `<button type="button" class="knopf klein" data-aktion="morgen" data-id="${a.id}" data-fokus="m-${a.id}" aria-label="${esc(a.titel)} auf morgen verschieben">Morgen</button>`
-      : `<button type="button" class="mehr-knopf" data-aktion="verschieben" data-id="${a.id}" aria-label="${esc(a.titel)} verschieben">${ICON.woche}</button>`;
+    const morgen = fertig || this._narrow ? "" : `<button type="button" class="knopf klein" data-aktion="morgen" data-id="${a.id}" data-fokus="m-${a.id}" aria-label="${esc(a.titel)} auf morgen verschieben">Morgen</button>`;
+    const mehr = `<button type="button" class="mehr-knopf" data-zmenue="${a.id}" data-fokus="zm-${a.id}" aria-haspopup="menu" aria-expanded="false" aria-label="Aktionen für ${esc(a.titel)}" title="Aktionen (Rechtsklick, lange drücken)">${ICON.mehr}</button>`;
+    const wer = this._werZeigen(a.person);
     return `<li class="aufgabe ${a.top && !fertig ? "top" : ""} ${fertig ? "erledigt" : ""} ${a.bereich ? "farbig" : ""}" data-id="${a.id}" ${a.bereich ? `style="--b:${farbe}"` : ""}>
       <div class="wisch rechts" aria-hidden="true">${ICON.haken}Erledigt</div><div class="wisch links" aria-hidden="true">Verschieben${ICON.pfeil}</div>
       <div class="zeile">
         <button type="button" class="haken" role="checkbox" aria-checked="${fertig}" data-aktion="haken" data-id="${a.id}" data-fokus="h-${a.id}" aria-label="${esc(a.titel)} erledigt">${fertig ? HAKEN : ""}</button>
         ${a.top && !fertig ? `<span class="rang" aria-label="Top ${a.top}">${a.top}</span>` : ""}
         <button type="button" class="inhalt" data-aktion="oeffnen" data-id="${a.id}" data-fokus="o-${a.id}">
-          <span class="titel">${esc(a.titel)}<span class="sr">, bearbeiten</span></span>
+          <span class="titel">${esc(a.titel)}<span class="sr">${wer ? `, für ${esc(this._name(a.person))}` : ""}, bearbeiten</span></span>
           ${meta.length ? `<span class="meta">${meta.join("")}</span>` : ""}
         </button>
-        <div class="aktionen">${morgen}</div>
+        ${wer ? this._avatar(a.person, "zeile-av") : ""}
+        <div class="aktionen">${morgen}${mehr}</div>
       </div>
     </li>`;
   }
@@ -2300,28 +2900,16 @@ class PlanerPanel extends HTMLElement {
       try { localStorage.setItem("planer.ansicht", this._ansicht); } catch (e) { /* egal */ }
       this._zeichnen();
     }));
-    this._app.querySelectorAll("[data-bereich]").forEach((b) => b.addEventListener("click", () => {
-      this._bereich = b.dataset.bereich;
-      try { localStorage.setItem("planer.bereich", this._bereich); } catch (e) { /* egal */ }
-      this._zeichnen();
-      this._sagen(this._bereich ? `Nur Bereich ${this._bereich}` : "Alle Bereiche");
-    }));
-    root.getElementById("bwahl")?.addEventListener("change", (e) => {
-      this._bereich = e.target.value;
-      try { localStorage.setItem("planer.bereich", this._bereich); } catch (err) { /* egal */ }
-      this._zeichnen();
-      this._sagen(this._bereich ? `Nur Bereich ${this._bereich}` : "Alle Bereiche");
-    });
     this._app.querySelectorAll("[data-filter]").forEach((b) => b.addEventListener("click", () => {
       this._filter = b.dataset.filter;
       try { localStorage.setItem("planer.filter", this._filter); } catch (e) { /* egal */ }
       this._zeichnen();
     }));
     this._app.querySelectorAll("[data-aktion]").forEach((b) => b.addEventListener("click", () => this._aktion(b.dataset.aktion, b.dataset.id)));
-    this._app.querySelectorAll("[data-notiz]").forEach((b) => b.addEventListener("click", () => { const n = this._notiz(b.dataset.notiz); if (n) this._notizOeffnen(n); }));
     this._app.querySelectorAll("li.aufgabe").forEach((li) => this._wischen(li));
-    this._nOffen = null;
-    this._app.querySelectorAll("li.nrow").forEach((li) => this._notizWischen(li));
+    this._menueBinden();
+    this._notizListeBinden(this._app);
+    this._notizFilterBinden();
     this._einkaufBinden(root);
     this._app.querySelectorAll("[data-kal-ansicht]").forEach((b) => b.addEventListener("click", () => {
       this._kalAnsicht = b.dataset.kalAnsicht;
@@ -2466,6 +3054,7 @@ class PlanerPanel extends HTMLElement {
     if (art === "schicht-arten") return this._schichtArten();
     if (art === "schicht-rhythmus") return this._schichtRhythmus();
     if (art === "schicht-einst") return this._schichtEinstellung();
+    if (art === "schicht-neu") return this._schichtForm(null);
     if (art === "erweitert") return this._erweitert();
     if (art === "neu" && this._ansicht === "notizen") {
       const person = this._filter !== "ich" && this._filter !== "alle" ? this._filter : this._daten.ich;
@@ -2587,10 +3176,10 @@ class PlanerPanel extends HTMLElement {
         .filter((t) => { const k = `${t.kalender}|${t.uid}|${t.start}`; if (gesehen.has(k)) return false; gesehen.add(k); return true; })
         .sort((a, b) => a.start.localeCompare(b.start)).slice(0, 30);
       const einkauf = (this._eArtikel?.items || []).filter((x) => passt(x.text, x.beschreibung)).slice(0, 20);
-      const notizenTreffer = this._notizenSichtbar().filter((n) => passt(n.titel, n.text)).sort((a, b) => (b.geaendert || "").localeCompare(a.geaendert || "")).slice(0, 20);
+      const notizenTreffer = this._notizenSichtbar().filter((n) => passt(n.titel, n.text, n.ordner, ...this._notizTagsVon(n).map((t) => `#${t}`))).sort((a, b) => (b.geaendert || "").localeCompare(a.geaendert || "")).slice(0, 20);
       const teil = (titel, inhalt) => inhalt ? `<section class="gruppe"><h3>${titel}</h3><ul class="liste gruppiert">${inhalt}</ul></section>` : "";
       const html = teil("Aufgaben", aufg.map((a) => `<li><button type="button" class="treffer" data-sa="${a.id}"><span class="titel">${esc(a.titel)}</span><span class="unter">${a.status === "erledigt" ? "Erledigt" : a.datum ? esc(datumText(a.datum)) : "Ohne Datum"}${a.uhrzeit ? `, ${a.uhrzeit} Uhr` : ""}${a.bereich ? ` · ${esc(a.bereich)}` : ""}</span></button></li>`).join(""))
-        + teil("Notizen", notizenTreffer.map((n) => `<li><button type="button" class="treffer" data-sn="${esc(n.id)}"><span class="titel">${esc(this._notizTitel(n))}</span><span class="unter">${esc(this._notizZeit(n.geaendert))}${n.text && n.titel ? ` · ${esc(n.text.replace(/\s+/g, " ").slice(0, 60))}` : ""}</span></button></li>`).join(""))
+        + teil("Notizen", notizenTreffer.map((n) => `<li><button type="button" class="treffer" data-sn="${esc(n.id)}"><span class="titel">${esc(this._notizTitel(n))}</span><span class="unter">${esc(this._notizZeit(n.geaendert))}${n.ordner ? ` · ${esc(n.ordner)}` : ""}${n.text && n.titel ? ` · ${esc(n.text.split("\n").map(notizKlartext).filter(Boolean).join(" ").slice(0, 60))}` : ""}</span></button></li>`).join(""))
         + teil("Termine", termine.map((t) => `<li><button type="button" class="treffer" data-st="${esc(`${t.kalender}|${t.uid}|${t.start}`)}"><span class="titel">${esc(t.titel)}</span><span class="unter">${esc(datumText(t.start.slice(0, 10)))}${t.ganztag ? "" : `, ${uhr(t.start)} Uhr`} · ${esc(this._kal(t.kalender).name)}</span></button></li>`).join(""))
         + teil("Einkauf", einkauf.map((x) => `<li><button type="button" class="treffer" data-se="1"><span class="titel">${esc(x.text)}</span><span class="unter">${x.erledigt ? "Gekauft" : "Auf der Liste"}${x.beschreibung ? ` · ${esc(x.beschreibung)}` : ""}</span></button></li>`).join(""));
       erg.innerHTML = html || `<p class="leer">Nichts gefunden für „${esc(q.value.trim())}“.</p>`;
@@ -2652,6 +3241,7 @@ class PlanerPanel extends HTMLElement {
     });
     li.addEventListener("pointermove", (e) => {
       if (x0 === null) return;
+      if (li._lang) { x0 = null; return; }
       dx = e.clientX - x0;
       if (!aktiv && Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(e.clientY - y0)) { aktiv = true; li.setPointerCapture(e.pointerId); }
       if (!aktiv) return;
@@ -2851,9 +3441,7 @@ class PlanerPanel extends HTMLElement {
       await this._ws({ type: "planer/loeschen", aufgabe_id: a.id });
       this._zu(dlg);
       this._sagen(`Gelöscht: ${a.titel}`);
-      const kopie = { titel: a.titel, datum: a.datum || null, uhrzeit: a.uhrzeit || null, dauer: a.dauer || null, person: a.person, top: a.top || null,
-        bereich: a.bereich || "", tags: a.tags || [], notiz: a.notiz || "", wiederholung: a.wiederholung || null, erinnerungen: a.erinnerungen ?? null,
-        teilaufgaben: (a.teilaufgaben || []).map((t) => ({ id: "", text: t.text, erledigt: t.erledigt })) };
+      const kopie = this._aufgabeKopie(a);
       this._hinweis(`Gelöscht: ${a.titel}`, () => this._ws({ type: "planer/speichern", aufgabe: kopie }));
       await this._lesen();
     });
@@ -2884,6 +3472,141 @@ class PlanerPanel extends HTMLElement {
     else if (!$("b-titel").value.trim()) $("b-titel").focus();
   }
 
+  // ---------- Kontextmenü (iOS-Stil) ----------
+  // Kleines Menü an einem Knopf. eintraege: { text, icon?, aktion(info), gefahr?, aktiv?, radio?, untermenue?, aus? },
+  // { eingabe: true, text, knopf, max, wert?, aktion(wert) } für ein Textfeld, "-" als Trenner.
+  // Schließt bei Tipp daneben, Escape oder Auswahl. Pfeiltasten, Pos1/Ende und Tab funktionieren.
+  // punkt {x, y}: an dieser Stelle öffnen (Rechtsklick) statt unter dem Knopf.
+  _menue(anker, eintraege, { titel = "", tastatur = false, punkt = null } = {}) {
+    const st = this._menueStatus;
+    // Tipp auf denselben Knopf bei offenem Menü schließt nur (nicht gleich wieder öffnen)
+    if (st && st.anker === anker && Date.now() - st.zeit < 400) { this._menueStatus = null; return; }
+    this._menueZu?.(false);
+    const root = this.shadowRoot;
+    const wirt = anker.closest("dialog") || root.getElementById("rahmen");
+    const m = document.createElement("div");
+    m.className = "menue";
+    m.setAttribute("role", "menu");
+    m.tabIndex = -1;
+    if (titel) m.setAttribute("aria-label", titel);
+    const punkte = [];
+    const zu = (fokusZurueck) => {
+      if (!m.isConnected) return;
+      const drin = m.contains(root.activeElement);
+      m.remove();
+      document.removeEventListener("pointerdown", aussen, true);
+      document.removeEventListener("keydown", taste, true);
+      window.removeEventListener("resize", groesse);
+      window.visualViewport?.removeEventListener("resize", platz);
+      wirt.removeEventListener("scroll", rollen, true);
+      wirt.removeEventListener("cancel", abbruch);
+      if (anker.hasAttribute("aria-haspopup")) anker.setAttribute("aria-expanded", "false");
+      if (this._menueZu === zu) this._menueZu = null;
+      if (fokusZurueck !== false && drin) anker.focus({ preventScroll: true });
+    };
+    const waehlen = (e, ev) => {
+      const info = { tastatur: ev?.detail === 0 };
+      zu(!e.untermenue && info.tastatur);
+      try { e.aktion?.(info); } catch (err) { console.error(err); }
+    };
+    for (const e of eintraege) {
+      if (!e) continue;
+      if (e === "-") {
+        if (m.lastElementChild && !m.lastElementChild.classList.contains("menue-trenner")) {
+          const t = document.createElement("div"); t.className = "menue-trenner"; t.setAttribute("role", "separator"); m.append(t);
+        }
+        continue;
+      }
+      if (e.eingabe) {
+        const f = document.createElement("div");
+        f.className = "menue-eingabe";
+        f.innerHTML = `<input type="text" maxlength="${e.max || 40}" placeholder="${esc(e.text)}" aria-label="${esc(e.text)}" enterkeyhint="done" autocomplete="off" value="${esc(e.wert || "")}"><button type="button" class="knopf text fett">${esc(e.knopf || "OK")}</button>`;
+        const inp = f.querySelector("input"), b = f.querySelector("button");
+        const los = () => { const w = inp.value.trim(); if (!w) { inp.focus(); return; } zu(false); e.aktion(w); };
+        inp.addEventListener("keydown", (ev) => { if (ev.key === "Enter") { ev.preventDefault(); los(); } });
+        b.addEventListener("click", los);
+        m.append(f);
+        punkte.push(inp, b);
+        continue;
+      }
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = `menue-punkt${e.gefahr ? " gefahr" : ""}`;
+      b.tabIndex = -1;
+      b.setAttribute("role", e.aktiv === undefined ? "menuitem" : e.radio ? "menuitemradio" : "menuitemcheckbox");
+      if (e.aktiv !== undefined) b.setAttribute("aria-checked", String(!!e.aktiv));
+      if (e.untermenue) b.setAttribute("aria-haspopup", "menu");
+      if (e.aus) b.disabled = true;
+      b.innerHTML = `<span class="menue-haken" aria-hidden="true">${e.aktiv ? ICON.haken : ""}</span><span class="menue-text">${esc(e.text)}</span>${e.untermenue ? '<span class="menue-pfeil" aria-hidden="true">›</span>' : ""}${e.icon ? `<span class="menue-icon" aria-hidden="true">${e.icon}</span>` : ""}`;
+      // Fokus (und damit die Bildschirmtastatur) bleibt im Textfeld
+      b.addEventListener("pointerdown", (ev) => ev.preventDefault());
+      b.addEventListener("click", (ev) => waehlen(e, ev));
+      m.append(b);
+      punkte.push(b);
+    }
+    if (m.lastElementChild?.classList.contains("menue-trenner")) m.lastElementChild.remove();
+    const aktive = () => punkte.filter((x) => !x.disabled);
+    const aussen = (ev) => {
+      const ziel = ev.composedPath()[0];
+      if (m.contains(ziel)) return;
+      if (anker.contains(ziel)) this._menueStatus = { anker, zeit: Date.now() };
+      zu(false);
+    };
+    const taste = (ev) => {
+      if (ev.key === "Escape") { ev.preventDefault(); ev.stopPropagation(); zu(true); return; }
+      if (!m.contains(root.activeElement)) {
+        // Fokus noch im Textfeld: Pfeil nach unten holt das Menü in den Fokus
+        if (ev.key === "ArrowDown" && root.activeElement === anker) { ev.preventDefault(); aktive()[0]?.focus(); }
+        return;
+      }
+      const liste = aktive(), i = liste.indexOf(root.activeElement);
+      const imFeld = root.activeElement?.tagName === "INPUT";
+      let ziel = null;
+      if (ev.key === "ArrowDown") ziel = liste[(i + 1) % liste.length];
+      else if (ev.key === "ArrowUp") ziel = liste[(i - 1 + liste.length) % liste.length];
+      else if (ev.key === "Home" && !imFeld) ziel = liste[0];
+      else if (ev.key === "End" && !imFeld) ziel = liste[liste.length - 1];
+      else if (ev.key === "Tab") { ev.preventDefault(); zu(true); return; }
+      if (ziel) { ev.preventDefault(); ziel.focus(); }
+    };
+    const platz = () => {
+      if (!m.isConnected) return;
+      const r = punkt ? { left: punkt.x, right: punkt.x, top: punkt.y, bottom: punkt.y } : anker.getBoundingClientRect();
+      const vv = window.visualViewport;
+      const oben0 = vv ? vv.offsetTop : 0, hoehe = vv ? vv.height : innerHeight, breite = vv ? vv.width : innerWidth;
+      m.style.maxHeight = "";
+      const w = Math.min(m.offsetWidth, breite - 16);
+      let x = r.left;
+      if (x + w > breite - 8) x = r.right - w;
+      x = Math.max(8, Math.min(x, breite - w - 8));
+      const unten = oben0 + hoehe - r.bottom - 12, darueber = r.top - oben0 - 12;
+      const h = m.offsetHeight;
+      let y;
+      if (h <= unten || unten >= darueber) { y = r.bottom + 6; m.style.maxHeight = `${Math.max(120, unten)}px`; m.dataset.seite = "unten"; }
+      else { y = Math.max(oben0 + 8, r.top - 6 - Math.min(h, darueber)); m.style.maxHeight = `${Math.max(120, darueber)}px`; m.dataset.seite = "oben"; }
+      m.style.left = `${Math.round(x)}px`;
+      m.style.top = `${Math.round(y)}px`;
+    };
+    // Bildschirmtastatur, Drehen oder Scrollen: Menü bleibt am Knopf
+    const groesse = () => platz();
+    const rollen = (ev) => { if (m.contains(ev.target)) return; if (punkt) zu(false); else platz(); };
+    const abbruch = (ev) => { ev.preventDefault(); zu(true); };
+    m.addEventListener("keydown", (ev) => { if (ev.key === " " && ev.target.tagName === "INPUT") ev.stopPropagation(); });
+    wirt.append(m);
+    platz();
+    if (anker.hasAttribute("aria-haspopup")) anker.setAttribute("aria-expanded", "true");
+    document.addEventListener("pointerdown", aussen, true);
+    document.addEventListener("keydown", taste, true);
+    window.addEventListener("resize", groesse);
+    window.visualViewport?.addEventListener("resize", platz);
+    wirt.addEventListener("scroll", rollen, true);
+    wirt.addEventListener("cancel", abbruch);
+    this._menueZu = zu;
+    this._menueStatus = null;
+    if (tastatur) (aktive().find((x) => x.getAttribute("aria-checked") === "true") || aktive()[0])?.focus();
+    return zu;
+  }
+
   // ---------- Notizen ----------
   _notiz(id) { return (this._daten?.notizen || []).find((n) => n.id === id); }
   _notizenSichtbar() {
@@ -2893,7 +3616,7 @@ class PlanerPanel extends HTMLElement {
     return (d.notizen || []).filter((n) => f === "alle" || (f === "ich" ? n.person === d.ich || n.person === GEMEINSAM : n.person === f));
   }
   _notizTitel(n) {
-    return (n.titel || "").trim() || (n.text || "").trim().split("\n")[0].slice(0, 80) || "Ohne Titel";
+    return notizOhneFett((n.titel || "").trim()) || notizKlartext((n.text || "").trim().split("\n")[0]).slice(0, 80) || "Ohne Titel";
   }
   // „Heute 14:05“, „Gestern 09:30“, „12. Nov“ (mit Jahr, wenn nicht aktuell)
   _notizZeit(s) {
@@ -2934,28 +3657,53 @@ class PlanerPanel extends HTMLElement {
     }
     return { n: gesamt, ok };
   }
+  _notizTagsVon(n) { return notizTags(`${n.titel || ""}\n${n.text || ""}`); }
+  // Notizen nach Ordner, #Tag und Suchwort
+  _notizenGefiltert() {
+    const w = (this._nSuche || "").trim().toLowerCase();
+    return this._notizenSichtbar().filter((n) => {
+      if (this._nOrdner && (n.ordner || "") !== this._nOrdner) return false;
+      const tags = this._notizTagsVon(n);
+      if (this._nTag && !tags.includes(this._nTag)) return false;
+      if (!w) return true;
+      return [n.titel, n.text, n.ordner, ...tags.map((t) => `#${t}`)].some((x) => String(x || "").toLowerCase().includes(w));
+    });
+  }
   _notizZeile(n) {
     const d = this._daten;
     const fort = this._notizFortschritt(n);
     const zeilen = (n.titel ? (n.text || "") : (n.text || "").split("\n").slice(1).join("\n")).split("\n").map((z) => z.trim()).filter(Boolean);
-    const erste = zeilen.find((z) => !/^[☐☑]/.test(z)) || (zeilen[0] || "").replace(/^[☐☑]\s*/, "");
+    const ersteRoh = zeilen.find((z) => notizZeileLesen(z).art !== "check");
+    const erste = ersteRoh ? notizKlartext(ersteRoh) : "";
     const vor = [];
     if (fort.n) vor.push(`<span class="fort">${fort.ok}/${fort.n} erledigt</span>`);
-    if (erste && !/^[☐☑]/.test(erste)) vor.push(esc(erste));
-    const person = this._filter !== "ich" || (n.person !== d.ich && n.person !== GEMEINSAM) ? this._name(n.person) : n.person === GEMEINSAM ? "Gemeinsam" : "";
+    if (erste) vor.push(esc(erste));
+    const wer = this._werZeigen(n.person);
+    const tags = this._notizTagsVon(n);
     const id = esc(n.id);
-    return `<li class="nrow" data-nid="${id}">
+    const farbe = /^#[0-9a-f]{6}$/i.test(n.farbe || "") ? n.farbe : "";
+    const farbName = farbe ? (NOTIZ_FARBEN.find(([, f]) => f === farbe.toLowerCase())?.[0] || "Farbe") : "";
+    return `<li class="nrow${farbe ? " nrow-farbe" : ""}" data-nid="${id}"${farbe ? ` style="--nf:${farbe}"` : ""}>
       <div class="nrow-aktionen" aria-hidden="true"><button type="button" class="nrow-an" data-nanheften="${id}" tabindex="-1">${n.angeheftet ? "Lösen" : "Anheften"}</button><button type="button" class="nrow-weg" data-nloeschen="${id}" tabindex="-1">Löschen</button></div>
       <button type="button" class="nrow-zeile" data-notiz="${id}" data-fokus="n-${id}">
-        <span class="nrow-titel"><span>${esc(this._notizTitel(n))}</span>${n.angeheftet ? `<span class="notiz-pin" title="Angeheftet">${ICON.pin}<span class="sr">Angeheftet</span></span>` : ""}</span>
-        <span class="nrow-unter"><span class="nrow-zeit">${esc(this._notizKurz(n.geaendert))}</span><span class="nrow-vor">${vor.join(" · ") || "Kein weiterer Text"}${person ? ` · ${esc(person)}` : ""}</span></span>
+        <span class="nrow-titel"><span>${esc(notizOhneFett(this._notizTitel(n)))}</span>${farbe ? `<span class="sr">, ${esc(farbName)}</span>` : ""}${n.angeheftet ? `<span class="notiz-pin" title="Angeheftet">${ICON.pin}<span class="sr">Angeheftet</span></span>` : ""}${wer ? `<span class="sr">, für ${esc(this._name(n.person))}</span>${this._avatar(n.person, "nrow-av")}` : ""}</span>
+        <span class="nrow-unter"><span class="nrow-zeit">${esc(this._notizKurz(n.geaendert))}</span><span class="nrow-vor">${vor.join(" · ") || "Kein weiterer Text"}</span></span>
+        ${n.ordner || tags.length ? `<span class="nrow-meta">${n.ordner ? `<span class="nrow-ordner">${ICON.ordner}<span class="sr">Ordner </span>${esc(n.ordner)}</span>` : ""}${tags.slice(0, 4).map((t) => `<span class="nrow-tag">#${esc(t)}</span>`).join("")}${tags.length > 4 ? `<span class="nrow-tag">+${tags.length - 4}</span>` : ""}</span>` : ""}
       </button>
+      ${this._narrow ? "" : `<button type="button" class="mehr-knopf nrow-mehr" data-nmenue="${id}" data-fokus="nm-${id}" aria-haspopup="menu" aria-expanded="false" aria-label="Aktionen für ${esc(this._notizTitel(n))}" title="Aktionen (Rechtsklick)">${ICON.mehr}</button>`}
     </li>`;
   }
   _notizenHtml() {
-    const alle = [...this._notizenSichtbar()].sort((a, b) => (b.geaendert || "").localeCompare(a.geaendert || ""));
-    const hinweis = `<p class="hinweis notiz-hinweis">Ideen, Listen und Gedanken. Änderungen werden automatisch gespeichert.${this._narrow ? " Nach links wischen für Anheften und Löschen." : ""}</p>`;
-    if (!alle.length) return `${hinweis}<p class="leer">Noch keine Notizen. Schreib oben einen Titel oder tippe auf Plus.</p>`;
+    const sichtbar = this._notizenSichtbar();
+    const hinweis = `<p class="hinweis notiz-hinweis">Ideen, Listen und Gedanken. Änderungen werden automatisch gespeichert.${this._narrow ? " Lange drücken für mehr." : " Rechtsklick für mehr."}</p>`;
+    if (!sichtbar.length) return `${hinweis}<p class="leer">Noch keine Notizen. Schreib oben einen Titel oder tippe auf Plus.</p>`;
+    this._notizFilterListen();
+    const suche = `<div class="suchfeld nsuche">${ICON.suche}<label class="sr" for="n-suche">Notizen durchsuchen</label><input id="n-suche" type="search" data-fokus="n-suche" placeholder="Notizen durchsuchen" value="${esc(this._nSuche || "")}" enterkeyhint="search" autocomplete="off"></div>`;
+    return `${suche}<div id="n-listen">${this._notizenListeHtml()}</div>`;
+  }
+  _notizenListeHtml() {
+    const alle = [...this._notizenGefiltert()].sort((a, b) => (b.geaendert || "").localeCompare(a.geaendert || ""));
+    if (!alle.length) return `<p class="leer">Keine passenden Notizen.</p>`;
     const jahr = new Date().getFullYear();
     const gruppen = new Map();
     const dazu = (name, n) => { if (!gruppen.has(name)) gruppen.set(name, []); gruppen.get(name).push(n); };
@@ -2970,10 +3718,28 @@ class PlanerPanel extends HTMLElement {
       else { const m = new Date(n.geaendert); dazu(m.getFullYear() === jahr ? MONATE[m.getMonth()] : `${MONATE[m.getMonth()]} ${m.getFullYear()}`, n); }
     }
     let i = 0;
-    return hinweis + [...gruppen].map(([name, liste]) => { const id = `n-g${i++}`; return `<section class="ngruppe" aria-labelledby="${id}">
+    return [...gruppen].map(([name, liste]) => { const id = `n-g${i++}`; return `<section class="ngruppe" aria-labelledby="${id}">
       <h2 id="${id}">${esc(name)}</h2>
       <ul class="nliste">${liste.map((n) => this._notizZeile(n)).join("")}</ul>
     </section>`; }).join("");
+  }
+  _notizListeBinden(wurzel) {
+    wurzel.querySelectorAll("[data-notiz]").forEach((b) => b.addEventListener("click", () => { const n = this._notiz(b.dataset.notiz); if (n) this._notizOeffnen(n); }));
+    this._nOffen = null;
+    wurzel.querySelectorAll("li.nrow").forEach((li) => this._notizWischen(li));
+    this._notizKontextBinden(wurzel);
+  }
+  _notizFilterBinden() {
+    const app = this._app;
+    const q = app.querySelector("#n-suche");
+    q?.addEventListener("input", () => {
+      this._nSuche = q.value;
+      const ziel = app.querySelector("#n-listen");
+      if (!ziel) return;
+      ziel.innerHTML = this._notizenListeHtml();
+      this._notizListeBinden(ziel);
+    });
+    q?.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); q.blur(); } });
   }
 
   // Wischen nach links zeigt „Anheften“ und „Löschen“ (nur Touch)
@@ -2994,6 +3760,7 @@ class PlanerPanel extends HTMLElement {
     });
     li.addEventListener("pointermove", (e) => {
       if (x0 === null) return;
+      if (li._lang) { x0 = null; return; }
       dx = e.clientX - x0;
       if (!aktiv && Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(e.clientY - y0)) { aktiv = true; li.classList.add("zieht"); try { li.setPointerCapture(e.pointerId); } catch (err) { /* egal */ } }
       if (!aktiv) return;
@@ -3012,23 +3779,8 @@ class PlanerPanel extends HTMLElement {
     };
     li.addEventListener("pointerup", ende);
     li.addEventListener("pointercancel", ende);
-    li.querySelector("[data-nanheften]").addEventListener("click", async () => {
-      const n = this._notiz(id);
-      if (!n) return;
-      try { await this._ws({ type: "planer/notiz_speichern", notiz: { id, angeheftet: !n.angeheftet } }); } catch (err) { return; }
-      this._sagen(n.angeheftet ? "Anheften aufgehoben" : "Notiz angeheftet");
-      await this._lesen();
-    });
-    li.querySelector("[data-nloeschen]").addEventListener("click", async () => {
-      const n = this._notiz(id);
-      if (!n) return;
-      const kopie = { titel: n.titel, text: n.text, person: n.person, angeheftet: !!n.angeheftet };
-      const titel = this._notizTitel(n);
-      try { await this._ws({ type: "planer/notiz_loeschen", notiz_id: id }); } catch (err) { return; }
-      this._sagen(`Gelöscht: ${titel}`);
-      this._hinweis(`Gelöscht: ${titel}`, () => this._ws({ type: "planer/notiz_speichern", notiz: kopie }));
-      await this._lesen();
-    });
+    li.querySelector("[data-nanheften]").addEventListener("click", () => { const n = this._notiz(id); if (n) this._notizAendern(n, { angeheftet: !n.angeheftet }, n.angeheftet ? "Anheften aufgehoben" : "Notiz angeheftet"); });
+    li.querySelector("[data-nloeschen]").addEventListener("click", () => { const n = this._notiz(id); if (n) this._notizLoeschen(n); });
   }
 
   _notizOeffnen(n, fokusText = false) {
@@ -3037,14 +3789,26 @@ class PlanerPanel extends HTMLElement {
     const personen = [...d.personen.map((p) => [p.id, p.name]), [GEMEINSAM, "Gemeinsam"]];
     let id = n.id || null;
     let angeheftet = !!n.angeheftet;
+    let ordner = n.ordner || "", farbe = n.farbe || "", erledigteUnten = n.erledigte_unten !== false;
+    const ruhig = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const CHECK_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="7" r="2.5"/><path d="M5 7l.8.8L7.3 6.3"/><circle cx="6" cy="17" r="2.5"/><path d="M11 7h9M11 17h9"/></svg>`;
     dlg.innerHTML = `<form method="dialog" id="nform" novalidate>
       <div class="blatt-kopf">${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
         <span class="l stand" id="n-stand" aria-live="polite"></span>
         <h2 id="blatt-titel">Notiz</h2>
         <button type="submit" class="knopf text fett r">Fertig</button>
       </div>
-      <div class="nz-leiste" role="toolbar" aria-label="Formatierung"><button type="button" class="knopf klein" id="n-check">☑ Checkliste</button></div>
+      <div class="nz-leiste" id="n-leiste" role="toolbar" aria-label="Notiz bearbeiten">
+        <button type="button" class="knopf klein" id="n-format" aria-haspopup="menu" aria-expanded="false"><span class="nz-aa" aria-hidden="true">Aa</span>Format</button>
+        <button type="button" class="knopf klein" id="n-check" tabindex="-1">${CHECK_SVG}Checkliste</button>
+        <span class="nz-leiste-luecke"></span>
+        <span class="nz-geteilt" id="n-geteilt" hidden>${ICON.personen}Gemeinsam</span>
+        <button type="button" class="knopf klein nz-mehr" id="n-mehr" tabindex="-1" aria-haspopup="menu" aria-expanded="false" aria-label="Mehr Optionen">${ICON.mehr}</button>
+      </div>
+      <div class="nz-meta" id="n-meta" hidden></div>
       <div class="nz-liste" id="n-zeilen" role="group" aria-label="Notiztext. Die erste Zeile ist der Titel."></div>
+      <div class="nz-links" id="n-links" hidden></div>
+      <div class="nz-toast" id="n-toast" role="status" hidden></div>
       <div class="reihe">
         <div class="feld"><label for="n-person">Für</label><select id="n-person">${personen.map(([pid, name]) => `<option value="${esc(pid)}" ${n.person === pid ? "selected" : ""}>${esc(name)}</option>`).join("")}</select></div>
         <div class="feld"><span class="lbl" id="n-pin-l">Anheften</span><button type="button" class="knopf notiz-pinknopf" id="n-pin" aria-pressed="${angeheftet}" aria-labelledby="n-pin-l">${ICON.pin}<span id="n-pin-t">${angeheftet ? "Angeheftet" : "Nicht angeheftet"}</span></button></div>
@@ -3054,95 +3818,476 @@ class PlanerPanel extends HTMLElement {
     </form>`;
     const $ = (x) => dlg.querySelector(`#${x}`);
     const liste = $("n-zeilen");
-    // Zeilenmodell: Zeile 1 ist der Titel; „☐ “ / „☑ “ am Zeilenanfang macht eine Zeile zum Checklistenpunkt
+    const ARIA = { h1: "Überschrift", h2: "Zwischenüberschrift", bullet: "Aufzählungspunkt", num: "Listenpunkt", check: "Checklistenpunkt", text: "Zeile" };
+    const LISTEN = ["check", "bullet", "num"];
+
+    // ---- Zeilenmodell: Zeile 1 ist der Titel, jede weitere Zeile ein eigenes Feld; Tabellen sind ein Block ----
     const wachsen = (ta) => { ta.style.height = "auto"; ta.style.height = `${ta.scrollHeight}px`; };
     const alleWachsen = () => liste.querySelectorAll("textarea").forEach(wachsen);
+    const istTitel = (el) => el === liste.firstElementChild;
+    const feldVon = (el) => (el.dataset.art === "table" ? (el._zelle && el.querySelector(`tr:nth-child(${el._zelle[0] + 1}) td:nth-child(${el._zelle[1] + 1}) input`)) || el.querySelector("input") : el.querySelector("textarea"));
     const artSetzen = (el, art, ok = false) => {
       const ta = el.querySelector("textarea");
       el.querySelector(".nz-box")?.remove();
+      el.querySelector(".nz-mark")?.remove();
+      el.classList.remove("nz-h1", "nz-h2");
       if (art === "check") {
         const b = document.createElement("button");
         b.type = "button"; b.className = "nz-box"; b.setAttribute("role", "checkbox");
         b.addEventListener("pointerdown", (e) => e.preventDefault());
-        b.addEventListener("click", () => { const neu = el.dataset.ok !== "1"; el.dataset.ok = neu ? "1" : "0"; b.setAttribute("aria-checked", String(neu)); b.setAttribute("aria-label", `${ta.value || "Punkt"} erledigt`); merken(true); });
+        b.addEventListener("click", () => haken(el, el.dataset.ok !== "1"));
         el.prepend(b);
         el.dataset.ok = ok ? "1" : "0";
         b.setAttribute("aria-checked", String(ok)); b.setAttribute("aria-label", `${ta.value || "Punkt"} erledigt`);
       } else delete el.dataset.ok;
+      if (art === "bullet" || art === "num") {
+        const s = document.createElement("span");
+        s.className = "nz-mark"; s.setAttribute("aria-hidden", "true"); s.textContent = art === "bullet" ? "•" : "1.";
+        el.prepend(s);
+      }
+      if (art === "h1" || art === "h2") el.classList.add(`nz-${art}`);
       el.dataset.art = art;
+      ta.setAttribute("aria-label", ARIA[art] || "Zeile");
     };
-    const neueZeile = (z, titel = false) => {
+    const textZeile = (wert, art = "text", ok = false, titel = false) => {
       const el = document.createElement("div");
       el.className = titel ? "nz nz-titel" : "nz";
       const ta = document.createElement("textarea");
       ta.rows = 1; ta.autocomplete = "off"; ta.setAttribute("enterkeyhint", "enter");
       ta.autocapitalize = "sentences";
-      if (titel) { ta.maxLength = 200; ta.placeholder = "Titel"; ta.setAttribute("aria-label", "Titel"); }
-      else ta.setAttribute("aria-label", "Zeile");
-      const m = titel ? null : /^([☐☑]) ?/.exec(z);
-      ta.value = m ? z.slice(m[0].length) : z;
+      ta.value = wert;
       el.append(ta);
-      artSetzen(el, m ? "check" : "text", m?.[1] === "☑");
+      if (titel) { ta.maxLength = 200; ta.placeholder = "Titel"; el.dataset.art = "text"; ta.setAttribute("aria-label", "Titel"); }
+      else artSetzen(el, art, ok);
       return el;
     };
-    const fokus = (el, pos) => { const ta = el.querySelector("textarea"); ta.focus({ preventScroll: false }); const p = pos === undefined ? ta.value.length : pos; try { ta.setSelectionRange(p, p); } catch (err) { /* egal */ } };
-    const zeilenLesen = () => [...liste.children].map((el, i) => (el.dataset.art === "check" && i > 0 ? (el.dataset.ok === "1" ? "☑ " : "☐ ") : "") + el.querySelector("textarea").value.replace(/\n/g, " "));
-    const start = n.titel ? [n.titel, ...(n.text || "").split("\n")] : (n.text || "").split("\n");
-    if (start.length < 2) start.push("");
-    start.forEach((z, i) => liste.append(neueZeile(z, i === 0)));
-    let aktuell = null;
-    liste.addEventListener("focusin", (e) => { aktuell = e.target.closest(".nz") || aktuell; });
+    const neueZeile = (z) => { const p = notizZeileLesen(z); return p.art === "table" ? tabelle([notizZellen(z)]) : textZeile(p.wert, p.art, p.ok); };
+    // Zeilen zu Elementen; aufeinanderfolgende Tabellenzeilen werden eine Tabelle
+    const bauen = (zeilen, ersteIstTitel) => {
+      const raus = [];
+      let tab = null;
+      zeilen.forEach((z, i) => {
+        if (ersteIstTitel && i === 0) { raus.push(textZeile(z, "text", false, true)); return; }
+        if (notizZeileLesen(z).art === "table") { if (tab) tab.push(notizZellen(z)); else { tab = [notizZellen(z)]; raus.push(tab); } return; }
+        tab = null;
+        raus.push(neueZeile(z));
+      });
+      return raus.map((x) => (Array.isArray(x) ? tabelle(x) : x));
+    };
+
+    // ---- Tabellen ----
+    const tabLesen = (el) => [...el.querySelectorAll("tr")].map((tr) => [...tr.querySelectorAll("input")].map((i) => i.value));
+    const tabZeichnen = (el, zeilen, fokusRC) => {
+      const sp = Math.max(1, ...zeilen.map((r) => r.length));
+      zeilen = zeilen.map((r) => [...r, ...Array(sp - r.length).fill("")]);
+      el.innerHTML = `<div class="nz-tab-scroll"><table class="nz-tabelle"><caption class="sr">Tabelle mit ${zeilen.length} Zeilen und ${sp} Spalten</caption><tbody>${zeilen.map((r, ri) => `<tr>${r.map((c, ci) => `<td><input type="text" class="nz-zelle" value="${esc(c)}" data-r="${ri}" data-c="${ci}" aria-label="Zeile ${ri + 1}, Spalte ${ci + 1}" autocomplete="off" enterkeyhint="next"></td>`).join("")}</tr>`).join("")}</tbody></table></div>
+        <div class="nz-tab-knoepfe"><button type="button" class="knopf klein" data-tab="zeile">${ICON.plus}Zeile</button><button type="button" class="knopf klein" data-tab="spalte">${ICON.plus}Spalte</button><button type="button" class="knopf klein nz-tab-mehr" data-tab="menue" aria-haspopup="menu" aria-expanded="false" aria-label="Tabelle bearbeiten">${ICON.mehr}</button></div>`;
+      el._zelle = fokusRC || el._zelle || [0, 0];
+      el._zelle = [Math.min(el._zelle[0], zeilen.length - 1), Math.min(el._zelle[1], sp - 1)];
+      if (fokusRC) { const i = feldVon(el); i?.focus(); try { i.setSelectionRange(i.value.length, i.value.length); } catch (err) { /* egal */ } }
+    };
+    const tabelle = (zeilen) => {
+      const el = document.createElement("div");
+      el.className = "nz nz-tab"; el.dataset.art = "table";
+      tabZeichnen(el, zeilen.length ? zeilen : [["", ""], ["", ""]]);
+      return el;
+    };
+    const tabAktion = (el, art, info = {}) => {
+      const z = tabLesen(el);
+      const [r, c] = el._zelle || [z.length - 1, 0];
+      const sp = z[0]?.length || 1;
+      if (art === "zeile") { z.splice(r + 1, 0, Array(sp).fill("")); tabZeichnen(el, z, [r + 1, c]); }
+      else if (art === "zeile-oben") { z.splice(r, 0, Array(sp).fill("")); tabZeichnen(el, z, [r, c]); }
+      else if (art === "spalte") { z.forEach((x) => x.splice(c + 1, 0, "")); tabZeichnen(el, z, [r, c + 1]); }
+      else if (art === "zeile-weg" || art === "spalte-weg" || art === "weg") {
+        if (art === "zeile-weg") z.splice(r, 1);
+        if (art === "spalte-weg") z.forEach((x) => x.splice(c, 1));
+        if (art === "weg" || !z.length || !z[0].length) {
+          const vorher = el.previousElementSibling;
+          let nach = el.nextElementSibling;
+          el.remove();
+          if (!nach || nach.dataset.art === "table") { nach = textZeile(""); vorher.after(nach); }
+          aktuell = nach;
+          fokus(nach, 0);
+          this._sagen("Tabelle gelöscht");
+        } else tabZeichnen(el, z, [Math.min(r, z.length - 1), Math.min(c, z[0].length - 1)]);
+      }
+      merken(true);
+      if (info.tastatur) feldVon(el)?.focus();
+    };
+    const tabMenue = (el, knopf, info) => this._menue(knopf, [
+      { text: "Zeile darunter", icon: ICON.plus, aktion: (i) => tabAktion(el, "zeile", i) },
+      { text: "Zeile darüber", icon: ICON.plus, aktion: (i) => tabAktion(el, "zeile-oben", i) },
+      { text: "Spalte rechts", icon: ICON.plus, aktion: (i) => tabAktion(el, "spalte", i) },
+      "-",
+      { text: "Zeile löschen", gefahr: true, aktion: (i) => tabAktion(el, "zeile-weg", i) },
+      { text: "Spalte löschen", gefahr: true, aktion: (i) => tabAktion(el, "spalte-weg", i) },
+      { text: "Tabelle löschen", gefahr: true, icon: ICON.muell, aktion: (i) => tabAktion(el, "weg", i) },
+    ], { titel: "Tabelle", tastatur: info.tastatur });
+
+    const fokus = (el, pos) => {
+      if (!el) return;
+      if (el.dataset.art === "table") {
+        const z = el.querySelectorAll("tr");
+        el._zelle = pos === 0 ? [0, 0] : [z.length - 1, (z[z.length - 1]?.querySelectorAll("input").length || 1) - 1];
+        const i = feldVon(el); i?.focus(); return;
+      }
+      const ta = el.querySelector("textarea"); ta.focus({ preventScroll: false });
+      const p = pos === undefined ? ta.value.length : Math.min(pos, ta.value.length);
+      try { ta.setSelectionRange(p, p); } catch (err) { /* egal */ }
+    };
+    // Nummern neu zählen (jede zusammenhängende Liste beginnt bei 1)
+    const nummern = () => {
+      let k = 0;
+      for (const el of liste.children) {
+        if (el.dataset.art !== "num") { k = 0; continue; }
+        k++;
+        const m = el.querySelector(".nz-mark");
+        if (m) m.textContent = `${k}.`;
+        el.querySelector("textarea").setAttribute("aria-label", `Punkt ${k}`);
+      }
+    };
+    const PRAEFIX = { h1: "# ", h2: "## ", bullet: "• " };
+    const zeilenLesen = () => {
+      const raus = [];
+      let k = 0;
+      [...liste.children].forEach((el, i) => {
+        const art = el.dataset.art;
+        if (art === "table") {
+          k = 0;
+          for (const r of tabLesen(el)) raus.push(`| ${r.map((c) => c.replace(/\|/g, "/").replace(/\s+/g, " ")).join(" | ")} |`);
+          return;
+        }
+        const w = el.querySelector("textarea").value.replace(/\r?\n/g, " ");
+        if (i === 0) { raus.push(w); return; }
+        k = art === "num" ? k + 1 : 0;
+        raus.push((art === "check" ? (el.dataset.ok === "1" ? "☑ " : "☐ ") : art === "num" ? `${k}. ` : PRAEFIX[art] || "") + w);
+      });
+      return raus;
+    };
+    const startZeilen = (x) => { const z = x.titel ? [x.titel, ...(x.text || "").split("\n")] : (x.text || "").split("\n"); if (z.length < 2) z.push(""); return z; };
+    liste.append(...bauen(startZeilen(n), true));
+    nummern();
+
+    // ---- Checkliste: abhaken, Erledigte nach unten ----
+    const blockVon = (el) => {
+      const ist = (x) => x && x.dataset.art === "check" && !istTitel(x);
+      let a = el; while (ist(a.previousElementSibling)) a = a.previousElementSibling;
+      const block = [];
+      for (let x = a; ist(x); x = x.nextElementSibling) block.push(x);
+      return block;
+    };
+    const flip = (els, tun) => {
+      const vor = new Map(els.map((x) => [x, x.getBoundingClientRect().top]));
+      const akt = this.shadowRoot.activeElement, a = akt?.selectionStart, b = akt?.selectionEnd;
+      tun();
+      if (akt && liste.contains(akt) && this.shadowRoot.activeElement !== akt) { akt.focus({ preventScroll: true }); try { akt.setSelectionRange(a, b); } catch (err) { /* egal */ } }
+      if (ruhig) return;
+      for (const x of els) {
+        const dy = vor.get(x) - x.getBoundingClientRect().top;
+        if (Math.abs(dy) > 1) x.animate?.([{ transform: `translateY(${dy}px)` }, { transform: "none" }], { duration: 300, easing: "cubic-bezier(.2,.8,.2,1)" });
+      }
+    };
+    // Abgehakter Punkt ans Ende seiner Liste, wieder geöffneter vor den ersten erledigten
+    const einsortieren = (el) => {
+      if (!erledigteUnten || !el.isConnected || el.dataset.art !== "check") return false;
+      const block = blockVon(el);
+      const ok = el.dataset.ok === "1";
+      const andere = block.filter((x) => x !== el);
+      const ziel = ok ? null : andere.find((x) => x.dataset.ok === "1");
+      if (ok ? block[block.length - 1] === el : (ziel ? el.nextElementSibling === ziel || block.indexOf(el) < block.indexOf(ziel) : true)) return false;
+      flip(block, () => { if (ok) block[block.length - 1].after(el); else ziel.before(el); });
+      return true;
+    };
+    const allesSortieren = () => {
+      const bloecke = [];
+      for (const el of liste.children) if (el.dataset.art === "check" && !istTitel(el) && el.previousElementSibling?.dataset.art !== "check") bloecke.push(blockVon(el));
+      for (const block of bloecke) {
+        const neu = [...block.filter((x) => x.dataset.ok !== "1"), ...block.filter((x) => x.dataset.ok === "1")];
+        if (neu.every((x, i) => x === block[i])) continue;
+        flip(block, () => { const vor = block[0].previousElementSibling; vor.after(...neu); });
+      }
+    };
+    let sortierTimer = null;
+    const haken = (el, ok, still = false) => {
+      el.dataset.ok = ok ? "1" : "0";
+      const b = el.querySelector(".nz-box"), ta = el.querySelector("textarea");
+      b?.setAttribute("aria-checked", String(ok)); b?.setAttribute("aria-label", `${ta.value || "Punkt"} erledigt`);
+      merken(true);
+      if (!still) this._sagen(ok ? `${ta.value || "Punkt"} erledigt` : `${ta.value || "Punkt"} offen`);
+      if (erledigteUnten) {
+        clearTimeout(sortierTimer);
+        sortierTimer = setTimeout(() => { if (einsortieren(el)) merken(true); }, ruhig ? 0 : 450);
+      }
+    };
+
+    // ---- Links, Telefonnummern, E-Mail ----
+    const linksZeigen = () => {
+      const l = notizLinks(zeilenLesen().join("\n"));
+      const box = $("n-links");
+      box.hidden = !l.length;
+      box.innerHTML = l.length ? `<span class="nz-links-t" id="n-links-t">Links</span><ul aria-labelledby="n-links-t">${l.slice(0, 12).map((x) => `<li><a class="nz-link" href="${esc(x.href)}" ${x.art === "web" ? 'target="_blank" rel="noopener noreferrer"' : ""}>${x.art === "tel" ? ICON.telefon : x.art === "mail" ? ICON.mail : ICON.link}<span>${esc(x.art === "web" ? x.text.replace(/^https?:\/\//i, "").replace(/\/$/, "") : x.text)}</span>${x.art === "tel" ? '<span class="sr"> anrufen</span>' : x.art === "mail" ? '<span class="sr"> E-Mail schreiben</span>' : '<span class="sr"> öffnen, neues Fenster</span>'}</a></li>`).join("")}</ul>` : "";
+    };
+    // ---- Kopfzeilen-Infos: Ordner, Farbe, Gemeinsam ----
+    const metaZeigen = () => {
+      const m = $("n-meta");
+      const fName = NOTIZ_FARBEN.find(([, f]) => f === farbe)?.[0];
+      m.hidden = !ordner && !farbe;
+      m.innerHTML = `${ordner ? `<button type="button" class="nz-chip" id="n-meta-ordner" aria-haspopup="menu" aria-expanded="false" aria-label="Ordner ${esc(ordner)} ändern">${ICON.ordner}${esc(ordner)}</button>` : ""}${farbe ? `<button type="button" class="nz-chip" id="n-meta-farbe" aria-haspopup="menu" aria-expanded="false" aria-label="Farbe ${esc(fName || "")} ändern"><span class="nz-punkt" style="--nf:${esc(farbe)}" aria-hidden="true"></span>${esc(fName || "Farbe")}</button>` : ""}`;
+      m.querySelector("#n-meta-ordner")?.addEventListener("click", (e) => ordnerMenue(e.currentTarget, { tastatur: e.detail === 0 }));
+      m.querySelector("#n-meta-farbe")?.addEventListener("click", (e) => farbMenue(e.currentTarget, { tastatur: e.detail === 0 }));
+      dlg.style.setProperty("--nf", farbe || "transparent");
+      dlg.classList.toggle("nz-farbig", !!farbe);
+      $("n-geteilt").hidden = $("n-person").value !== GEMEINSAM;
+    };
+
+    // ---- Bearbeiten ----
+    let aktuell = null, letztesFeld = null;
+    liste.addEventListener("focusin", (e) => {
+      aktuell = e.target.closest(".nz") || aktuell;
+      if (e.target.matches("textarea, input")) letztesFeld = e.target;
+      if (e.target.classList.contains("nz-zelle")) aktuell._zelle = [+e.target.dataset.r, +e.target.dataset.c];
+    });
+    liste.addEventListener("click", (e) => {
+      const k = e.target.closest("[data-tab]");
+      if (!k) return;
+      const el = k.closest(".nz");
+      aktuell = el;
+      if (k.dataset.tab === "menue") tabMenue(el, k, { tastatur: e.detail === 0 });
+      else tabAktion(el, k.dataset.tab, { tastatur: e.detail === 0 });
+    });
+    liste.addEventListener("pointerdown", (e) => { if (e.target.closest("[data-tab]:not([data-tab=menue])")) e.preventDefault(); });
     liste.addEventListener("input", (e) => {
       const ta = e.target, el = ta.closest(".nz");
-      if (!el) return;
+      if (!el || ta.tagName !== "TEXTAREA") return;
       if (ta.value.includes("\n")) {
-        // Einfügen mehrerer Zeilen: auf Zeilen verteilen
+        // Einfügen mehrerer Zeilen: auf Zeilen verteilen; in Listen bekommen neue Zeilen dieselbe Art
         const teile = ta.value.split(/\r?\n/);
-        const istTitel = el === liste.firstElementChild;
         ta.value = teile[0];
-        let vor = el;
-        for (const t of teile.slice(1)) { const z = neueZeile(/^[☐☑] /.test(t) || el.dataset.art !== "check" ? t : `☐ ${t}`); vor.after(z); vor = z; }
-        if (istTitel && el.dataset.art === "check") artSetzen(el, "text");
-        fokus(vor);
-        alleWachsen();
-      } else wachsen(ta);
+        const art = el.dataset.art;
+        const fort = LISTEN.includes(art) && !istTitel(el);
+        const neu = bauen(teile.slice(1).map((t) => (fort && notizZeileLesen(t).art === "text" ? (art === "check" ? "☐ " : art === "num" ? "1. " : "• ") + t : t)), false);
+        el.after(...neu);
+        if (neu.length) fokus(neu[neu.length - 1]);
+        nummern(); alleWachsen();
+        return;
+      }
+      // Kurzbefehle am Zeilenanfang wie in Apple Notizen: „- “ Aufzählung, „1. “ Nummerierung, „[] “ Checkliste
+      if (!istTitel(el) && el.dataset.art === "text") {
+        const m = /^(?:([-*•]) |(1)\. |(\[ ?\]) )/.exec(ta.value);
+        if (m && ta.selectionStart === m[0].length) {
+          ta.value = ta.value.slice(m[0].length);
+          artSetzen(el, m[1] ? "bullet" : m[2] ? "num" : "check");
+          nummern(); fokus(el, 0);
+        }
+      }
+      wachsen(ta);
     });
     liste.addEventListener("keydown", (e) => {
       const ta = e.target, el = ta.closest(".nz");
       if (!el || e.isComposing) return;
-      const titel = el === liste.firstElementChild;
+      if (ta.classList.contains("nz-zelle")) {
+        const tr = ta.closest("tr"), td = ta.closest("td");
+        const ri = [...tr.parentElement.children].indexOf(tr), ci = [...tr.children].indexOf(td);
+        const zeilen = tr.parentElement.children;
+        if (e.key === "Enter") {
+          e.preventDefault();
+          if (ri === zeilen.length - 1) { el._zelle = [ri, ci]; tabAktion(el, "zeile"); }
+          else zeilen[ri + 1].children[ci]?.querySelector("input")?.focus();
+        } else if (e.key === "ArrowDown") {
+          e.preventDefault();
+          if (ri < zeilen.length - 1) zeilen[ri + 1].children[ci]?.querySelector("input")?.focus();
+          else { let nach = el.nextElementSibling; if (!nach) { nach = textZeile(""); el.after(nach); } fokus(nach, 0); }
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          if (ri > 0) zeilen[ri - 1].children[ci]?.querySelector("input")?.focus();
+          else fokus(el.previousElementSibling);
+        }
+        return;
+      }
+      if (ta.tagName !== "TEXTAREA") return;
+      const titel = istTitel(el);
+      const art = el.dataset.art;
       if (e.key === "Enter") {
         e.preventDefault();
-        if (el.dataset.art === "check" && !ta.value.trim()) { artSetzen(el, "text"); ta.value = ""; merken(true); fokus(el); return; }
+        if (LISTEN.includes(art) && !ta.value.trim()) { artSetzen(el, "text"); ta.value = ""; nummern(); merken(true); fokus(el); return; }
         const vor = ta.value.slice(0, ta.selectionStart), nach = ta.value.slice(ta.selectionEnd);
         ta.value = vor;
-        const z = neueZeile(el.dataset.art === "check" && !titel ? `☐ ${nach}` : nach);
+        const z = textZeile(nach, !titel && LISTEN.includes(art) ? art : "text");
         el.after(z);
-        alleWachsen(); fokus(z, 0); merken(true);
+        nummern(); alleWachsen(); fokus(z, 0); merken(true);
       } else if (e.key === "Backspace" && ta.selectionStart === 0 && ta.selectionEnd === 0) {
-        if (el.dataset.art === "check") { e.preventDefault(); artSetzen(el, "text"); merken(true); fokus(el, 0); }
+        if (!titel && art !== "text") { e.preventDefault(); artSetzen(el, "text"); nummern(); merken(true); fokus(el, 0); }
         else if (!titel) {
           e.preventDefault();
-          const vorher = el.previousElementSibling, pt = vorher.querySelector("textarea"), l = pt.value.length;
+          const vorher = el.previousElementSibling;
+          if (vorher.dataset.art === "table") {
+            if (!ta.value) { el.remove(); if (!vorher.nextElementSibling) vorher.after(textZeile("")); merken(true); }
+            fokus(vorher);
+            return;
+          }
+          const pt = vorher.querySelector("textarea"), l = pt.value.length;
           pt.value += ta.value;
-          el.remove(); alleWachsen(); fokus(vorher, l); merken(true);
+          el.remove(); nummern(); alleWachsen(); fokus(vorher, l); merken(true);
         }
       } else if (e.key === "ArrowUp" && ta.selectionStart === 0 && el.previousElementSibling) { e.preventDefault(); fokus(el.previousElementSibling); }
       else if (e.key === "ArrowDown" && ta.selectionStart === ta.value.length && el.nextElementSibling) { e.preventDefault(); fokus(el.nextElementSibling, 0); }
+      else if ((e.key === "b" || e.key === "B") && (e.ctrlKey || e.metaKey) && !e.altKey) { e.preventDefault(); fett(); }
     });
-    const checkKnopf = $("n-check");
-    checkKnopf.addEventListener("pointerdown", (e) => e.preventDefault());
-    checkKnopf.addEventListener("click", () => {
+
+    // Zeile, auf die eine Formatierung wirkt (nie der Titel, nie eine Tabelle: dann eine neue Zeile dahinter)
+    const zielZeile = () => {
       let el = aktuell && liste.contains(aktuell) ? aktuell : liste.lastElementChild;
-      if (el === liste.firstElementChild) { el = el.nextElementSibling || (liste.append(neueZeile("")), liste.lastElementChild); }
+      if (istTitel(el)) {
+        const nach = el.nextElementSibling;
+        if (nach && nach.dataset.art !== "table") el = nach;
+        else { const z = textZeile(""); el.after(z); el = z; }
+      } else if (el.dataset.art === "table") { const z = textZeile(""); el.after(z); el = z; }
+      return el;
+    };
+    const formatSetzen = (art) => {
+      const el = zielZeile();
       const ta = el.querySelector("textarea");
-      if (el.dataset.art === "check") artSetzen(el, "text"); else artSetzen(el, "check");
-      aktuell = el; alleWachsen(); merken(true); fokus(el, ta.selectionStart ?? undefined);
+      const pos = ta.selectionStart ?? ta.value.length;
+      const neu = el.dataset.art === art && art !== "text" ? "text" : art;
+      artSetzen(el, neu, false);
+      aktuell = el;
+      nummern(); alleWachsen(); merken(true); fokus(el, pos);
+      this._sagen(neu === "text" ? "Normaler Text" : `${ARIA[neu]}`);
+    };
+    const fett = () => {
+      const f = letztesFeld && liste.contains(letztesFeld) ? letztesFeld : null;
+      if (!f) { this._sagen("Erst Text auswählen."); return; }
+      const v = f.value;
+      let a = f.selectionStart ?? v.length, b = f.selectionEnd ?? a;
+      let neu, na, nb;
+      if (b - a >= 4 && v.slice(a, a + 2) === "**" && v.slice(b - 2, b) === "**") { neu = v.slice(0, a) + v.slice(a + 2, b - 2) + v.slice(b); na = a; nb = b - 4; }
+      else if (v.slice(a - 2, a) === "**" && v.slice(b, b + 2) === "**") { neu = v.slice(0, a - 2) + v.slice(a, b) + v.slice(b + 2); na = a - 2; nb = b - 2; }
+      else { neu = `${v.slice(0, a)}**${v.slice(a, b)}**${v.slice(b)}`; na = a + 2; nb = b + 2; }
+      f.value = neu;
+      f.focus();
+      try { f.setSelectionRange(na, nb); } catch (err) { /* egal */ }
+      if (f.tagName === "TEXTAREA") wachsen(f);
+      merken(true);
+    };
+    const tabelleEinfuegen = () => {
+      let el = aktuell && liste.contains(aktuell) ? aktuell : liste.lastElementChild;
+      const t = tabelle([["", ""], ["", ""]]);
+      if (!istTitel(el) && el.dataset.art !== "table" && !el.querySelector("textarea").value.trim()) el.replaceWith(t);
+      else el.after(t);
+      const nach = t.nextElementSibling;
+      if (!nach || nach.dataset.art === "table") t.after(textZeile(""));
+      aktuell = t;
+      nummern(); fokus(t, 0); merken(true);
+      this._sagen("Tabelle mit 2 Spalten und 2 Zeilen eingefügt");
+    };
+    const aktuelleArt = () => { const el = aktuell && liste.contains(aktuell) ? aktuell : null; return !el || istTitel(el) ? "" : el.dataset.art; };
+    const formatMenue = (knopf, info) => {
+      const art = aktuelleArt();
+      this._menue(knopf, [
+        { text: "Überschrift", icon: '<span class="g-h1">T</span>', radio: true, aktiv: art === "h1", aktion: () => formatSetzen("h1") },
+        { text: "Zwischenüberschrift", icon: '<span class="g-h2">T</span>', radio: true, aktiv: art === "h2", aktion: () => formatSetzen("h2") },
+        { text: "Normaler Text", icon: '<span class="g-t">T</span>', radio: true, aktiv: art === "text", aktion: () => formatSetzen("text") },
+        "-",
+        { text: "Aufzählung", icon: '<span class="g-t">•</span>', radio: true, aktiv: art === "bullet", aktion: () => formatSetzen("bullet") },
+        { text: "Nummerierte Liste", icon: '<span class="g-t">1.</span>', radio: true, aktiv: art === "num", aktion: () => formatSetzen("num") },
+        { text: "Checkliste", icon: CHECK_SVG, radio: true, aktiv: art === "check", aktion: () => formatSetzen("check") },
+        "-",
+        { text: "Fett", icon: '<b class="g-t">B</b>', aktion: fett },
+        { text: "Tabelle einfügen", icon: ICON.tabelle, aktion: tabelleEinfuegen },
+      ], { titel: "Format", tastatur: info.tastatur });
+    };
+
+    // ---- Punkt als Aufgabe übernehmen ----
+    const toast = (text, rueck) => {
+      const t = $("n-toast");
+      clearTimeout(t._zeit);
+      t.innerHTML = `<span>${esc(text)}</span>${rueck ? '<button type="button" class="knopf text fett">Rückgängig</button>' : ""}`;
+      t.hidden = false;
+      t.querySelector("button")?.addEventListener("click", async () => { t.hidden = true; try { await rueck(); this._sagen("Rückgängig gemacht"); } catch (err) { /* angesagt */ } });
+      t._zeit = setTimeout(() => { t.hidden = true; }, 6000);
+    };
+    const alsAufgabe = async () => {
+      const el = aktuell && liste.contains(aktuell) ? aktuell : null;
+      const f = el ? feldVon(el) : null;
+      const titel = notizOhneFett(f?.value || "").replace(/\s+/g, " ").trim().slice(0, 200);
+      if (!titel) { toast("Tippe zuerst in die Zeile, die eine Aufgabe werden soll."); this._sagen("Keine Zeile ausgewählt"); return; }
+      let neu;
+      try { neu = await this._ws({ type: "planer/speichern", aufgabe: { titel, person: $("n-person").value, datum: null } }); } catch (err) { return; }
+      const warOffen = el.dataset.art === "check" && el.dataset.ok !== "1";
+      if (warOffen) haken(el, true, true);
+      this._sagen(`Aufgabe angelegt: ${titel}, im Eingang`);
+      toast(`Aufgabe „${titel}“ im Eingang`, async () => {
+        if (neu?.id) await this._ws({ type: "planer/loeschen", aufgabe_id: neu.id });
+        if (warOffen && el.isConnected) haken(el, false, true);
+      });
+    };
+
+    // ---- Ordner und Farbe ----
+    const ordnerSetzen = (o) => { ordner = String(o || "").trim().slice(0, 40); metaZeigen(); merken(true); this._sagen(ordner ? `In Ordner ${ordner}` : "Kein Ordner"); };
+    const farbeSetzen = (f) => { farbe = f; metaZeigen(); merken(true); this._sagen(f ? `Farbe ${NOTIZ_FARBEN.find(([, x]) => x === f)?.[0] || ""}` : "Keine Farbe"); };
+    const ordnerMenue = (knopf, info, zurueck) => {
+      const alle = [...new Set((this._daten?.notizen || []).map((x) => x.ordner).filter(Boolean).concat(ordner ? [ordner] : []))].sort((a, b) => a.localeCompare(b, "de"));
+      this._menue(knopf, [
+        zurueck ? { text: "Zurück", icon: "‹", aktion: zurueck } : null,
+        zurueck ? "-" : null,
+        ...alle.map((o) => ({ text: o, icon: ICON.ordner, radio: true, aktiv: o === ordner, aktion: () => ordnerSetzen(o) })),
+        { text: "Kein Ordner", radio: true, aktiv: !ordner, aktion: () => ordnerSetzen("") },
+        "-",
+        { eingabe: true, text: "Neuer Ordner", knopf: "Anlegen", max: 40, aktion: (w) => ordnerSetzen(w) },
+      ], { titel: "Ordner", tastatur: info?.tastatur });
+    };
+    const farbMenue = (knopf, info, zurueck) => this._menue(knopf, [
+      zurueck ? { text: "Zurück", icon: "‹", aktion: zurueck } : null,
+      zurueck ? "-" : null,
+      ...NOTIZ_FARBEN.map(([name, f]) => ({ text: name, icon: `<span class="nz-punkt" style="--nf:${f}"></span>`, radio: true, aktiv: farbe === f, aktion: () => farbeSetzen(f) })),
+      "-",
+      { text: "Keine Farbe", radio: true, aktiv: !farbe, aktion: () => farbeSetzen("") },
+    ], { titel: "Farbe", tastatur: info?.tastatur });
+    const mehrKnopf = $("n-mehr");
+    const mehrMenue = (info) => this._menue(mehrKnopf, [
+      { text: angeheftet ? "Loslösen" : "Anheften", icon: ICON.pin, aktion: pinUmschalten },
+      { text: "Als Aufgabe übernehmen", icon: ICON.aufgaben, aktion: alsAufgabe },
+      "-",
+      { text: ordner ? `Ordner: ${ordner}` : "Ordner …", icon: ICON.ordner, untermenue: true, aktion: (i) => ordnerMenue(mehrKnopf, i, mehrMenue) },
+      { text: "Farbe", icon: `<span class="nz-punkt" style="--nf:${farbe || "transparent"}"></span>`, untermenue: true, aktion: (i) => farbMenue(mehrKnopf, i, mehrMenue) },
+      { text: "Erledigte nach unten", aktiv: erledigteUnten, aktion: () => {
+        erledigteUnten = !erledigteUnten;
+        if (erledigteUnten) allesSortieren();
+        merken(true);
+        this._sagen(erledigteUnten ? "Erledigte wandern nach unten" : "Erledigte bleiben an ihrem Platz");
+      } },
+      "-",
+      { text: "Notiz löschen", icon: ICON.muell, gefahr: true, aktion: () => loeschen() },
+    ], { titel: "Mehr", tastatur: info?.tastatur });
+
+    // ---- Werkzeugleiste ----
+    const leiste = $("n-leiste");
+    const formatKnopf = $("n-format"), checkKnopf = $("n-check");
+    [formatKnopf, checkKnopf, mehrKnopf].forEach((k) => k.addEventListener("pointerdown", (e) => e.preventDefault()));
+    formatKnopf.addEventListener("click", (e) => formatMenue(formatKnopf, { tastatur: e.detail === 0 }));
+    checkKnopf.addEventListener("click", () => formatSetzen("check"));
+    mehrKnopf.addEventListener("click", (e) => mehrMenue({ tastatur: e.detail === 0 }));
+    // Pfeiltasten wandern durch die Werkzeugleiste (ein Tab-Stopp)
+    leiste.addEventListener("keydown", (e) => {
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight" && e.key !== "Home" && e.key !== "End") return;
+      const k = [formatKnopf, checkKnopf, mehrKnopf];
+      let i = k.indexOf(this.shadowRoot.activeElement);
+      if (i < 0) return;
+      e.preventDefault();
+      i = e.key === "Home" ? 0 : e.key === "End" ? k.length - 1 : (i + (e.key === "ArrowRight" ? 1 : -1) + k.length) % k.length;
+      k.forEach((x, j) => { x.tabIndex = j === i ? 0 : -1; });
+      k[i].focus();
     });
+
+    // ---- Speichern ----
     let sicher = false;
-    let zeitgeber = null, aenderung = false, geaendert = false, weg = false, laeuft = Promise.resolve();
+    let zeitgeber = null, aenderung = false, geaendert = false, weg = false, laeuft = Promise.resolve(), inFlug = 0, letzteEingabe = 0, liveTimer = null;
     const stand = (t) => { $("n-stand").textContent = t; };
-    const sammeln = () => { const z = zeilenLesen(); return { titel: z[0], text: z.slice(1).join("\n"), person: $("n-person").value, angeheftet }; };
+    const sammeln = () => { const z = zeilenLesen(); return { titel: z[0], text: z.slice(1).join("\n"), person: $("n-person").value, angeheftet, ordner, farbe, erledigte_unten: erledigteUnten }; };
+    const sig = (x) => JSON.stringify([x.titel || "", x.text || "", !!x.angeheftet, x.ordner || "", x.farbe || "", x.erledigte_unten !== false, x.person || ""]);
+    // Stände, die schon im Editor waren: kommen sie (verspätet) vom Server zurück, ist das keine fremde Änderung
+    const gesehen = new Set([sig(n)]);
     // Speichern läuft nacheinander. Eine neue Notiz bekommt ihre ID von der ersten Antwort; spätere Speicherungen nutzen sie.
     const autoSpeichern = () => {
       clearTimeout(zeitgeber); zeitgeber = null;
@@ -3151,47 +4296,97 @@ class PlanerPanel extends HTMLElement {
       if (!id && !notiz.titel.trim() && !notiz.text.trim()) { aenderung = false; stand(""); return laeuft; }
       aenderung = false;
       stand("Speichert …");
+      inFlug++;
       laeuft = laeuft.then(async () => {
         if (weg) return;
         try {
           const neu = await this._hass.callWS({ type: "planer/notiz_speichern", notiz: id ? { ...notiz, id } : notiz });
           id = neu.id; geaendert = true;
+          gesehen.add(sig(neu));
           $("n-loeschen").hidden = false;
           stand(aenderung ? "" : "Gespeichert");
         } catch (err) { aenderung = true; stand(""); $("n-fehler").textContent = err.message || "Speichern hat nicht geklappt."; }
-      });
+      }).finally(() => { inFlug--; });
       return laeuft;
     };
     const merken = (sofort = false) => {
       aenderung = true; stand(""); $("n-fehler").textContent = "";
       clearTimeout(zeitgeber);
+      linksZeigen();
       if (sofort) autoSpeichern(); else zeitgeber = setTimeout(autoSpeichern, 300);
     };
     const form = $("nform");
-    form.addEventListener("input", (e) => merken(e.target.tagName === "SELECT"));
-    form.addEventListener("change", () => merken(true));
+    form.addEventListener("input", (e) => {
+      if (e.target.closest(".menue")) return;
+      letzteEingabe = Date.now();
+      merken(e.target.tagName === "SELECT");
+    });
+    form.addEventListener("change", (e) => {
+      if (e.target.closest(".menue")) return;
+      if (e.target.id === "n-person") metaZeigen();
+      merken(true);
+    });
     form.addEventListener("focusout", () => { if (aenderung) autoSpeichern(); });
-    $("n-pin").addEventListener("click", () => {
+    const pinUmschalten = () => {
       angeheftet = !angeheftet;
       $("n-pin").setAttribute("aria-pressed", String(angeheftet));
       $("n-pin-t").textContent = angeheftet ? "Angeheftet" : "Nicht angeheftet";
       this._sagen(angeheftet ? "Notiz angeheftet" : "Anheften aufgehoben");
       merken(true);
-    });
+    };
+    $("n-pin").addEventListener("click", pinUmschalten);
+
+    // ---- Live: Änderungen von anderen (z. B. gemeinsame Notiz) übernehmen, wenn hier gerade nicht getippt wird ----
+    const uebernehmen = (s) => {
+      angeheftet = !!s.angeheftet; ordner = s.ordner || ""; farbe = s.farbe || ""; erledigteUnten = s.erledigte_unten !== false;
+      $("n-pin").setAttribute("aria-pressed", String(angeheftet));
+      $("n-pin-t").textContent = angeheftet ? "Angeheftet" : "Nicht angeheftet";
+      if ([...$("n-person").options].some((o) => o.value === s.person)) $("n-person").value = s.person;
+      metaZeigen();
+      const jetzt = sammeln();
+      if (jetzt.titel === (s.titel || "") && jetzt.text.replace(/\s+$/, "") === (s.text || "")) return;
+      const akt = this.shadowRoot.activeElement;
+      const hatteFokus = akt && liste.contains(akt);
+      const idx = hatteFokus ? [...liste.children].indexOf(akt.closest(".nz")) : -1;
+      const pos = hatteFokus ? akt.selectionStart : 0;
+      liste.replaceChildren(...bauen(startZeilen(s), true));
+      nummern(); alleWachsen(); linksZeigen();
+      aktuell = null;
+      if (idx >= 0) { const el = liste.children[Math.min(idx, liste.children.length - 1)]; fokus(el, el.dataset.art === "table" ? 0 : pos); }
+      stand("Aktualisiert");
+      this._sagen("Die Notiz wurde gerade woanders geändert und ist jetzt aktuell.");
+    };
+    const live = () => {
+      clearTimeout(liveTimer);
+      if (!dlg.open || weg || !id) return;
+      const s = this._notiz(id);
+      if (!s) return;
+      const k = sig(s);
+      if (gesehen.has(k)) return;
+      const ruhe = Date.now() - letzteEingabe;
+      if (aenderung || zeitgeber || inFlug || ruhe < 3000) { liveTimer = setTimeout(live, Math.max(400, 3000 - ruhe)); return; }
+      gesehen.add(k);
+      uebernehmen(s);
+    };
+    this._notizLive = live;
+
     // Beim Wegklicken/Schließen sofort sichern, nicht erst nach der Animation; ebenso wenn die App verlassen wird
-    dlg._vorZu = () => autoSpeichern();
+    dlg._vorZu = () => { this._menueZu?.(false); return autoSpeichern(); };
     const weglegen = () => { if (document.visibilityState === "hidden" && dlg.open) dlg._vorZu?.(); };
     document.addEventListener("visibilitychange", weglegen);
     window.addEventListener("pagehide", weglegen);
     dlg.addEventListener("close", () => { document.removeEventListener("visibilitychange", weglegen); window.removeEventListener("pagehide", weglegen); }, { once: true });
     dlg.onclose = async () => {
       dlg._vorZu = null;
+      this._menueZu?.(false);
+      clearTimeout(liveTimer);
+      if (this._notizLive === live) this._notizLive = null;
+      dlg.classList.remove("nz-farbig");
       if (weg) return;
       await autoSpeichern();
       if (geaendert) { geaendert = false; await this._lesen(); }
     };
-    $("n-loeschen").addEventListener("click", async () => {
-      if (!sicher) { sicher = true; $("n-loeschen").textContent = "Wirklich löschen?"; $("n-loeschen").focus(); return; }
+    const loeschen = async () => {
       weg = true; clearTimeout(zeitgeber);
       await laeuft;
       const kopie = sammeln();
@@ -3203,6 +4398,10 @@ class PlanerPanel extends HTMLElement {
       this._sagen(`Gelöscht: ${titel}`);
       if (id) this._hinweis(`Gelöscht: ${titel}`, () => this._ws({ type: "planer/notiz_speichern", notiz: kopie }));
       await this._lesen();
+    };
+    $("n-loeschen").addEventListener("click", async () => {
+      if (!sicher) { sicher = true; $("n-loeschen").textContent = "Wirklich löschen?"; $("n-loeschen").focus(); return; }
+      await loeschen();
     });
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -3212,8 +4411,12 @@ class PlanerPanel extends HTMLElement {
       this._zu(dlg);
     });
     this._wischZu(dlg);
+    metaZeigen();
+    linksZeigen();
     dlg.showModal();
     alleWachsen();
+    // Werkzeugleiste klebt unter der Kopfzeile
+    leiste.style.top = `${dlg.querySelector(".blatt-kopf").offsetHeight}px`;
     // Nur bei neuen Notizen direkt ins Textfeld (öffnet die Tastatur); bestehende öffnen ohne Tastatur.
     if (fokusText || !id) fokus(n.titel ? liste.children[1] : liste.firstElementChild, 0);
     else { $("blatt-titel").setAttribute("tabindex", "-1"); $("blatt-titel").focus({ preventScroll: true }); }
