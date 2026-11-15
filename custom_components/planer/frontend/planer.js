@@ -2047,6 +2047,7 @@ class PlanerPanel extends HTMLElement {
   // Dialog mit Ausblend-Animation schließen
   _zu(dlg) {
     if (!dlg.open) return;
+    try { dlg._vorZu?.(); } catch (e) { /* Speichern meldet Fehler selbst */ }
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) { dlg.close(); return; }
     dlg.classList.add("schliesst");
     setTimeout(() => { dlg.close(); dlg.classList.remove("schliesst"); }, 200);
@@ -2233,16 +2234,28 @@ class PlanerPanel extends HTMLElement {
       return laeuft;
     };
     if (a.id) {
-      const merken = (e) => {
+      // Schnell speichern: beim Tippen nach 300 ms, bei Auswahl/Verlassen eines Feldes sofort
+      const merken = (e, sofort = false) => {
         if (e.target.id === "b-teil-neu") return;
         aenderung = true; stand(""); $("b-fehler").textContent = "";
-        clearTimeout(uhr); uhr = setTimeout(autoSpeichern, 700);
+        clearTimeout(uhr);
+        if (sofort) autoSpeichern(); else uhr = setTimeout(autoSpeichern, 300);
       };
-      $("bform").addEventListener("input", merken);
-      $("bform").addEventListener("change", merken);
-      $("bform").addEventListener("click", (e) => { if (e.target.closest(".weg, [data-tag], #b-teil-plus")) merken(e); });
+      $("bform").addEventListener("input", (e) => merken(e, e.target.type === "checkbox" || e.target.type === "radio" || e.target.tagName === "SELECT"));
+      $("bform").addEventListener("change", (e) => merken(e, true));
+      $("bform").addEventListener("focusout", () => { if (aenderung) autoSpeichern(); });
+      $("bform").addEventListener("click", (e) => { if (e.target.closest(".weg, [data-tag], #b-teil-plus")) merken(e, true); });
+      $("b-teil-neu").addEventListener("keydown", (e) => { if (e.key === "Enter") setTimeout(() => merken({ target: $("bform") }, true)); });
+      // Beim Wegklicken/Schließen sofort sichern, nicht erst nach der Animation
+      dlg._vorZu = () => { hashtagsAusTitel(); return autoSpeichern(); };
+      // App/Tab wird verlassen: sofort sichern
+      const weglegen = () => { if (document.visibilityState === "hidden" && dlg.open) dlg._vorZu?.(); };
+      document.addEventListener("visibilitychange", weglegen);
+      window.addEventListener("pagehide", weglegen);
+      dlg.addEventListener("close", () => { document.removeEventListener("visibilitychange", weglegen); window.removeEventListener("pagehide", weglegen); }, { once: true });
     }
     dlg.onclose = async () => {
+      dlg._vorZu = null;
       if (!a.id || weg) return;
       hashtagsAusTitel();
       await autoSpeichern();
