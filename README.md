@@ -10,7 +10,7 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
 3. Einstellungen › Geräte & Dienste › Integration hinzufügen › **Planer**.
 4. In der Seitenleiste erscheint „Planer“.
 
-## Was es gibt (v0.8)
+## Was es gibt (v0.8.1)
 
 - **Heute** mit Top 3 (je Rang 1–3, nie mehr als drei), weiteren Aufgaben, Überfälligem und „Heute erledigt“.
 - **Demnächst** (nach Tagen gruppiert) und **Eingang** (alles ohne Datum).
@@ -80,6 +80,9 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
 - **Kalender auswählen** (v0.8): Im Kalender oben über „Kalender“ wählt jede Person selbst, welche Kalender sie sieht.
 - **Hashtags beim Bearbeiten** (v0.8): `#tag` im Titel wird auch nachträglich zu Bereich bzw. Hashtag.
 - **Pop-ups** (v0.8): blitzen beim Schließen nicht mehr auf.
+- **Zeitleiste** (v0.8.1): Datumsköpfe blenden die Einträge beim Scrollen weich aus. Unter Einstellungen pro Person
+  in der Spalte „Zeitleiste“ wählen, welche Kalender dort erscheinen.
+- **Aufgaben farbig** (v0.8.1): Aufgaben im Kalender sind in der Farbe ihres Bereichs hinterlegt (sonst blau) und haben einen kleinen Kreis.
 
 ## Daten
 
