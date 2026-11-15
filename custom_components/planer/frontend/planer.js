@@ -920,6 +920,8 @@ input[role=switch]:focus-visible{outline:2px solid var(--accent);outline-offset:
 .schmal .schicht-knoepfe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
 .schmal .schicht-knoepfe .knopf{flex-direction:column;gap:2px;min-height:56px;padding:var(--s1);font-size:var(--t-klein)}
 .schmal .schicht-summe{font-size:var(--t-klein)}
+.stempelleiste.unten{margin-top:var(--s3)}
+.schmal .stempelleiste.unten{position:sticky;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:3;padding:var(--s2);margin:var(--s3) calc(-1 * var(--s2)) 0;border-radius:var(--r-voll);background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media (forced-colors:active){.haken[aria-checked="true"]::before{forced-color-adjust:none;background:Highlight}.seg button[aria-pressed="true"],nav.tabs button[aria-current="page"]{outline:2px solid Highlight}}
 `;
@@ -1466,14 +1468,6 @@ class PlanerPanel extends HTMLElement {
     return `<section class="gruppe" aria-labelledby="s-titel">
       ${this._kalenderUmschalter()}
       <div class="wkopf"><h2 id="s-titel">${MONATE[monat]} ${jahr}${wer}</h2>${this._kalNavi("schicht", "Heute", monat === jetzt.getMonth() && jahr === jetzt.getFullYear(), "Monat wechseln")}</div>
-      ${!plan.arten.length ? `<div class="schicht-start"><p><b>Noch keine Schichten angelegt.</b><br>Lege deine Schichten einmal an, zum Beispiel Frühdienst 06:00–14:15. Sie bleiben gespeichert und stehen dann hier zum Eintragen bereit.</p>
-        <button type="button" class="knopf primaer" data-aktion="schicht-neu">${ICON.plus}Schicht anlegen</button></div>` : `
-      <div class="stempelleiste" role="group" aria-label="Schicht zum Eintragen wählen">
-        ${plan.arten.map((a) => `<button type="button" class="stempel" data-stempel="${esc(a.id)}" aria-pressed="${stempel === a.id}" style="--k:${a.farbe}" title="${esc(a.name)} ${esc(this._schichtZeit(a))}">
-          <span class="skurz">${esc(a.kurz)}</span><span class="sname">${esc(a.name)}</span></button>`).join("")}
-        <button type="button" class="stempel radierer" data-stempel="leer" aria-pressed="${stempel === "leer"}" title="Schicht entfernen"><span class="skurz">${ICON.zu}</span><span class="sname">Entfernen</span></button>
-      </div>
-      <p class="hinweis stempel-hinweis" role="status">${stempel ? `${stempel === "leer" ? "Entfernen" : esc(plan.arten.find((a) => a.id === stempel)?.name || "")}: Tage antippen` : ""}</p>`}
       <div class="woche-wrap"><div class="monat schichtmonat" role="grid" aria-labelledby="s-titel">
         ${["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((n) => `<div class="mkopf" role="columnheader">${n}</div>`).join("")}
         ${tage.slice(0, zeilen).map((t) => {
@@ -1484,6 +1478,14 @@ class PlanerPanel extends HTMLElement {
             <span class="mnr">${dd.getDate()}</span>${a ? `<span class="skurz">${esc(a.kurz)}</span><span class="szeit">${esc(a.von || "")}</span>` : ""}</button>`;
         }).join("")}
       </div></div>
+      ${!plan.arten.length ? `<div class="schicht-start"><p><b>Noch keine Schichten angelegt.</b><br>Lege deine Schichten einmal an, zum Beispiel Frühdienst 06:00–14:15. Sie bleiben gespeichert und stehen dann hier zum Eintragen bereit.</p>
+        <button type="button" class="knopf primaer" data-aktion="schicht-neu">${ICON.plus}Schicht anlegen</button></div>` : `
+      <div class="stempelleiste unten" role="group" aria-label="Schicht zum Eintragen wählen">
+        ${plan.arten.map((a) => `<button type="button" class="stempel" data-stempel="${esc(a.id)}" aria-pressed="${stempel === a.id}" style="--k:${a.farbe}" title="${esc(a.name)} ${esc(this._schichtZeit(a))}">
+          <span class="skurz">${esc(a.kurz)}</span><span class="sname">${esc(a.name)}</span></button>`).join("")}
+        <button type="button" class="stempel radierer" data-stempel="leer" aria-pressed="${stempel === "leer"}" title="Schicht entfernen"><span class="skurz">${ICON.zu}</span><span class="sname">Entfernen</span></button>
+      </div>
+      <p class="hinweis stempel-hinweis" role="status">${stempel ? `${stempel === "leer" ? "Entfernen" : esc(plan.arten.find((a) => a.id === stempel)?.name || "")}: Tage antippen` : ""}</p>`}
       <div class="schicht-fuss">
         <div class="schicht-summe"><b>${Math.floor(minuten / 60)} Std.${minuten % 60 ? ` ${minuten % 60} Min.` : ""}</b> im ${MONATE[monat]}
           ${plan.arten.filter((a) => anzahl[a.id]).map((a) => `<span class="chip" style="--b:${a.farbe}"><span class="punkt" aria-hidden="true"></span> ${anzahl[a.id]}× ${esc(a.name)}</span>`).join("")}</div>
