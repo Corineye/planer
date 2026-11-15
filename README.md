@@ -10,7 +10,7 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
 3. Einstellungen › Geräte & Dienste › Integration hinzufügen › **Planer**.
 4. In der Seitenleiste erscheint „Planer“.
 
-## Was es gibt (v0.7)
+## Was es gibt (v0.8)
 
 - **Heute** mit Top 3 (je Rang 1–3, nie mehr als drei), weiteren Aufgaben, Überfälligem und „Heute erledigt“.
 - **Demnächst** (nach Tagen gruppiert) und **Eingang** (alles ohne Datum).
@@ -74,6 +74,12 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
 - **Pop-ups** (v0.7): schließen beim Klick außerhalb.
 - **Erinnerungen** (v0.7): Zeitpunkte direkt antippen (30 Min., 3 Std., 1 Tag …); neue Aufgaben haben keine Erinnerung, bis du eine wählst.
 - **Kleinigkeiten** (v0.7): Eingabeleiste auch in Einkauf, gewählte „Wann“-Option farbig, Top 3 nur sichtbar, wenn es Top-Aufgaben gibt.
+
+- **Heute neu** (v0.8): Der Reiter „Aufgaben“ ist in Heute aufgegangen. Links stehen Überfällig, Top 3, alle Aufgaben von heute
+  (auch mit Uhrzeit und ohne Datum) und Demnächst. Rechts ist die Zeitleiste, die sich scrollen lässt und 14 Tage vorausreicht.
+- **Kalender auswählen** (v0.8): Im Kalender oben über „Kalender“ wählt jede Person selbst, welche Kalender sie sieht.
+- **Hashtags beim Bearbeiten** (v0.8): `#tag` im Titel wird auch nachträglich zu Bereich bzw. Hashtag.
+- **Pop-ups** (v0.8): blitzen beim Schließen nicht mehr auf.
 
 ## Daten
 

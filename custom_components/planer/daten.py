@@ -109,6 +109,7 @@ class Planer:
             "kalender_sehen": e.get("kalender_sehen"),  # None = alle
             "kalender_schreiben": e.get("kalender_schreiben"),  # None = alle, in die man schreiben kann
             "kalender_erinnern": e.get("kalender_erinnern", []),
+            "kalender_aus": e.get("kalender_aus", []),  # von der Person selbst ausgeblendet
             "handy": e.get("handy"),
             "standard_kalender": e.get("standard_kalender"),
             "erinnerungen": e.get("erinnerungen", STANDARD_ERINNERUNGEN),
@@ -328,7 +329,7 @@ class Planer:
         e = self.einstellungen.setdefault(person, {})
         if "andere_sehen" in werte:
             e["andere_sehen"] = bool(werte["andere_sehen"])
-        for feld in ("kalender_sehen", "kalender_schreiben", "kalender_erinnern"):
+        for feld in ("kalender_sehen", "kalender_schreiben", "kalender_erinnern", "kalender_aus"):
             if feld in werte:
                 v = werte[feld]
                 e[feld] = None if v is None else [str(x) for x in v if str(x).startswith("calendar.")]
