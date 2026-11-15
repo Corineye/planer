@@ -17,7 +17,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
 
-from .const import GEMEINSAM, MAX_AUFGABEN, SPEICHER_SCHLUESSEL, SPEICHER_VERSION
+from .const import GEMEINSAM, MAX_AUFGABEN, MAX_NOTIZEN, SPEICHER_SCHLUESSEL, SPEICHER_VERSION
 from .wiederholung import fortschreiben, gueltig
 
 STANDARD_ERINNERUNGEN = [30, 180, 1440]
@@ -52,6 +52,7 @@ class Planer:
         self.hass = hass
         self._store: Store = Store(hass, SPEICHER_VERSION, SPEICHER_SCHLUESSEL)
         self.aufgaben: dict[str, dict[str, Any]] = {}
+        self.notizen: dict[str, dict[str, Any]] = {}
         self.einstellungen: dict[str, dict[str, Any]] = {}
         self.wochen: dict[str, dict[str, dict[str, Any]]] = {}  # Person → Kalenderwoche (2026-W47) → Ziele, Notiz
         self.allgemein: dict[str, Any] = {}
@@ -63,6 +64,7 @@ class Planer:
     async def async_laden(self) -> None:
         daten = await self._store.async_load() or {}
         self.aufgaben = daten.get("aufgaben", {})
+        self.notizen = daten.get("notizen", {})
         self.einstellungen = daten.get("einstellungen", {})
         self.wochen = daten.get("wochen", {})
         self.allgemein = daten.get("allgemein", {})
@@ -136,6 +138,9 @@ class Planer:
     def fuer(self, benutzer_id: str | None) -> list[dict[str, Any]]:
         return [a for a in self.aufgaben.values() if self.sichtbar(a, benutzer_id)]
 
+    def notizen_fuer(self, benutzer_id: str | None) -> list[dict[str, Any]]:
+        return [n for n in self.notizen.values() if self.sichtbar(n, benutzer_id)]
+
     # --- Ändern -------------------------------------------------------------------------------
 
     @callback
@@ -145,7 +150,7 @@ class Planer:
 
     async def _sichern(self) -> None:
         await self._store.async_save(
-            {"aufgaben": self.aufgaben, "einstellungen": self.einstellungen, "wochen": self.wochen, "allgemein": self.allgemein,
+            {"aufgaben": self.aufgaben, "notizen": self.notizen, "einstellungen": self.einstellungen, "wochen": self.wochen, "allgemein": self.allgemein,
              "schichten": self.schichten}
         )
         for fn in list(self._zuhoerer):
@@ -303,6 +308,44 @@ class Planer:
         if not self.sichtbar(a, benutzer_id):
             raise PermissionError("Diese Aufgabe gehört einer anderen Person.")
         del self.aufgaben[aufgabe_id]
+        await self._sichern()
+
+    async def notiz_speichern(self, roh: dict[str, Any], benutzer_id: str | None) -> dict[str, Any]:
+        alt = self.notizen.get(str(roh.get("id") or ""))
+        if alt is None and len(self.notizen) >= MAX_NOTIZEN:
+            raise ValueError("Zu viele Notizen gespeichert. Bitte alte löschen.")
+        if alt is not None and not self.sichtbar(alt, benutzer_id):
+            raise PermissionError("Diese Notiz gehört einer anderen Person.")
+        n: dict[str, Any] = dict(alt or {})
+        jetzt = dt_util.now().isoformat(timespec="seconds")
+        if "titel" in roh:
+            n["titel"] = _text(roh["titel"], 200)
+        if "text" in roh:
+            # Zeilenumbrüche und Einrückung bleiben erhalten, nur Ränder werden gekürzt
+            n["text"] = str(roh["text"] or "").strip()[:20000]
+        if "person" in roh:
+            p = roh["person"]
+            n["person"] = p if p == GEMEINSAM or any(x["id"] == p for x in self.personen) else (benutzer_id or GEMEINSAM)
+        if "angeheftet" in roh:
+            n["angeheftet"] = bool(roh["angeheftet"])
+        if not alt:
+            n.setdefault("titel", "")
+            n.setdefault("text", "")
+            n.setdefault("person", benutzer_id or GEMEINSAM)
+            n.setdefault("angeheftet", False)
+            n.update(id=uuid.uuid4().hex[:12], erstellt=jetzt, erstellt_von=benutzer_id)
+        n["geaendert"] = jetzt
+        self.notizen[n["id"]] = n
+        await self._sichern()
+        return n
+
+    async def notiz_loeschen(self, notiz_id: str, benutzer_id: str | None) -> None:
+        n = self.notizen.get(notiz_id)
+        if n is None:
+            return
+        if not self.sichtbar(n, benutzer_id):
+            raise PermissionError("Diese Notiz gehört einer anderen Person.")
+        del self.notizen[notiz_id]
         await self._sichern()
 
     async def woche(self, person: str, kw: str, ziele: list[dict[str, Any]], notiz: str) -> dict[str, Any]:

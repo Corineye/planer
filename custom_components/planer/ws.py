@@ -43,7 +43,7 @@ def async_registrieren(hass: HomeAssistant) -> None:
     for befehl in (
         ws_lesen, ws_abonnieren, ws_speichern, ws_erledigen, ws_loeschen, ws_einstellung,
         ws_termine, ws_kalender_anzeige, ws_schicht_arten, ws_schicht_tage, ws_termin_anlegen, ws_termin_loeschen, ws_woche, ws_allgemein,
-        ws_einkauf, ws_einkauf_aktion,
+        ws_einkauf, ws_einkauf_aktion, ws_notiz_speichern, ws_notiz_loeschen,
     ):
         websocket_api.async_register_command(hass, befehl)
     daten["ws"] = True
@@ -75,6 +75,7 @@ async def ws_lesen(hass: HomeAssistant, connection: websocket_api.ActiveConnecti
             "handys": hass.data[DOMAIN]["erinnerungen"].handys() if user.is_admin else [],
             "kalender": _kalender_fuer(hass, user.id),
             "aufgaben": p.fuer(user.id),
+            "notizen": p.notizen_fuer(user.id),
             "wochen": p.wochen.get(user.id, {}),
             "gemeinsam_kalender": p.allgemein.get("gemeinsam_kalender"),
             "farben": p.allgemein.get("farben", {}),
@@ -305,3 +306,25 @@ async def ws_einkauf_aktion(hass: HomeAssistant, connection: websocket_api.Activ
         connection.send_result(msg["id"], {"ok": True})
     except (PermissionError, KeyError, ValueError, HomeAssistantError) as err:
         _fehler(connection, msg["id"], err)
+
+
+@websocket_api.websocket_command({vol.Required("type"): f"{DOMAIN}/notiz_speichern", vol.Required("notiz"): dict})
+@websocket_api.async_response
+async def ws_notiz_speichern(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    try:
+        n = await _planer(hass).notiz_speichern(msg["notiz"], connection.user.id)
+    except (ValueError, PermissionError) as err:
+        _fehler(connection, msg["id"], err)
+        return
+    connection.send_result(msg["id"], n)
+
+
+@websocket_api.websocket_command({vol.Required("type"): f"{DOMAIN}/notiz_loeschen", vol.Required("notiz_id"): ID})
+@websocket_api.async_response
+async def ws_notiz_loeschen(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    try:
+        await _planer(hass).notiz_loeschen(msg["notiz_id"], connection.user.id)
+    except PermissionError as err:
+        _fehler(connection, msg["id"], err)
+        return
+    connection.send_result(msg["id"], {"ok": True})
