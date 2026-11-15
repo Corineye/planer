@@ -42,7 +42,7 @@ def async_registrieren(hass: HomeAssistant) -> None:
         return
     for befehl in (
         ws_lesen, ws_abonnieren, ws_speichern, ws_erledigen, ws_loeschen, ws_einstellung,
-        ws_termine, ws_kalender_anzeige, ws_termin_anlegen, ws_termin_loeschen, ws_woche, ws_allgemein,
+        ws_termine, ws_kalender_anzeige, ws_schicht_arten, ws_schicht_tage, ws_termin_anlegen, ws_termin_loeschen, ws_woche, ws_allgemein,
         ws_einkauf, ws_einkauf_aktion,
     ):
         websocket_api.async_register_command(hass, befehl)
@@ -68,6 +68,7 @@ async def ws_lesen(hass: HomeAssistant, connection: websocket_api.ActiveConnecti
             "personen": personen,
             "andere_sehen": p.sieht_andere(user.id),
             "einst": p.einst(user.id),
+            "schichten": {x["id"]: p.schichtplan(x["id"]) for x in personen if x["id"] == user.id or p.sieht_andere(user.id)},
             "einstellungen": {x["id"]: p.einst(x["id"]) for x in personen} if user.is_admin else {},
             "alle_benutzer": p.alle_benutzer if user.is_admin else [],
             "alle_kalender": kalender.liste(hass) if user.is_admin else [],
@@ -160,6 +161,33 @@ async def ws_termine(hass: HomeAssistant, connection: websocket_api.ActiveConnec
         return
     ids = [k["id"] for k in _kalender_fuer(hass, connection.user.id) if k["angezeigt"]]
     connection.send_result(msg["id"], await kalender.termine(hass, ids, start, ende))
+
+
+def _darf_plan(hass: HomeAssistant, benutzer_id: str, person: str) -> bool:
+    return person == benutzer_id or _planer(hass).sieht_andere(benutzer_id)
+
+
+@websocket_api.websocket_command(
+    {vol.Required("type"): f"{DOMAIN}/schicht_arten", vol.Required("person"): ID, vol.Required("arten"): [dict]}
+)
+@websocket_api.async_response
+async def ws_schicht_arten(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    if not _darf_plan(hass, connection.user.id, msg["person"]):
+        connection.send_error(msg["id"], "unauthorized", "Kein Zugriff auf diesen Schichtplan")
+        return
+    connection.send_result(msg["id"], await _planer(hass).schicht_arten(msg["person"], msg["arten"]))
+
+
+@websocket_api.websocket_command(
+    {vol.Required("type"): f"{DOMAIN}/schicht_tage", vol.Required("person"): ID, vol.Required("tage"): dict}
+)
+@websocket_api.async_response
+async def ws_schicht_tage(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    """Tage setzen: {"2026-11-16": "frueh", "2026-11-17": null} (null = Schicht entfernen)."""
+    if not _darf_plan(hass, connection.user.id, msg["person"]):
+        connection.send_error(msg["id"], "unauthorized", "Kein Zugriff auf diesen Schichtplan")
+        return
+    connection.send_result(msg["id"], await _planer(hass).schicht_tage(msg["person"], msg["tage"]))
 
 
 @websocket_api.websocket_command(

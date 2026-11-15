@@ -21,6 +21,13 @@ from .const import GEMEINSAM, MAX_AUFGABEN, SPEICHER_SCHLUESSEL, SPEICHER_VERSIO
 from .wiederholung import fortschreiben, gueltig
 
 STANDARD_ERINNERUNGEN = [30, 180, 1440]
+STANDARD_SCHICHTEN = [
+    {"id": "frueh", "name": "Frühschicht", "kurz": "F", "farbe": "#ff9f0a", "von": "06:00", "bis": "14:00", "pause": 30},
+    {"id": "spaet", "name": "Spätschicht", "kurz": "S", "farbe": "#0a84ff", "von": "14:00", "bis": "22:00", "pause": 30},
+    {"id": "nacht", "name": "Nachtschicht", "kurz": "N", "farbe": "#5e5ce6", "von": "22:00", "bis": "06:00", "pause": 30},
+    {"id": "frei", "name": "Frei", "kurz": "X", "farbe": "#34c759", "von": None, "bis": None, "pause": 0},
+    {"id": "urlaub", "name": "Urlaub", "kurz": "U", "farbe": "#30b0c7", "von": None, "bis": None, "pause": 0},
+]
 UHRZEIT = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
 MAX_VERLAUF = 60
 
@@ -48,6 +55,7 @@ class Planer:
         self.einstellungen: dict[str, dict[str, Any]] = {}
         self.wochen: dict[str, dict[str, dict[str, Any]]] = {}  # Person → Kalenderwoche (2026-W47) → Ziele, Notiz
         self.allgemein: dict[str, Any] = {}
+        self.schichten: dict[str, dict[str, Any]] = {}  # Person → {"arten": [...], "tage": {Datum: Art-ID}}
         self._zuhoerer: list[Callable[[], None]] = []
         self.personen: list[dict[str, str]] = []
         self.alle_benutzer: list[dict[str, Any]] = []
@@ -58,6 +66,7 @@ class Planer:
         self.einstellungen = daten.get("einstellungen", {})
         self.wochen = daten.get("wochen", {})
         self.allgemein = daten.get("allgemein", {})
+        self.schichten = daten.get("schichten", {})
         await self.async_personen()
 
     async def async_personen(self) -> list[dict[str, str]]:
@@ -136,7 +145,8 @@ class Planer:
 
     async def _sichern(self) -> None:
         await self._store.async_save(
-            {"aufgaben": self.aufgaben, "einstellungen": self.einstellungen, "wochen": self.wochen, "allgemein": self.allgemein}
+            {"aufgaben": self.aufgaben, "einstellungen": self.einstellungen, "wochen": self.wochen, "allgemein": self.allgemein,
+             "schichten": self.schichten}
         )
         for fn in list(self._zuhoerer):
             fn()
@@ -307,6 +317,52 @@ class Planer:
         self.wochen.setdefault(person, {})[kw] = eintrag
         await self._sichern()
         return eintrag
+
+    # ---------- Schichtplan (wie Supershift) ----------
+    def schichtplan(self, person: str) -> dict[str, Any]:
+        e = self.schichten.get(person) or {}
+        return {"arten": e.get("arten") or [dict(x) for x in STANDARD_SCHICHTEN], "tage": e.get("tage", {})}
+
+    async def schicht_arten(self, person: str, arten: list[dict[str, Any]]) -> dict[str, Any]:
+        sauber, ids = [], set()
+        for x in arten[:20]:
+            if not isinstance(x, dict) or not _text(x.get("name"), 40):
+                continue
+            aid = _text(x.get("id"), 12) or uuid.uuid4().hex[:8]
+            if aid in ids:
+                continue
+            ids.add(aid)
+            zeit = lambda v: str(v) if v and re.match(r"^\d{2}:\d{2}$", str(v)) else None  # noqa: E731
+            sauber.append({
+                "id": aid,
+                "name": _text(x.get("name"), 40),
+                "kurz": _text(x.get("kurz"), 3) or _text(x.get("name"), 1).upper(),
+                "farbe": str(x.get("farbe")) if re.match(r"^#[0-9a-fA-F]{6}$", str(x.get("farbe"))) else "#8e8e93",
+                "von": zeit(x.get("von")),
+                "bis": zeit(x.get("bis")),
+                "pause": max(0, min(240, int(x.get("pause") or 0))) if str(x.get("pause") or 0).isdigit() else 0,
+            })
+        plan = self.schichten.setdefault(person, {})
+        plan["arten"] = sauber
+        # Tage mit gelöschten Arten aufräumen
+        plan["tage"] = {t: a for t, a in plan.get("tage", {}).items() if a in ids}
+        await self._sichern()
+        return self.schichtplan(person)
+
+    async def schicht_tage(self, person: str, tage: dict[str, Any]) -> dict[str, Any]:
+        plan = self.schichten.setdefault(person, {})
+        plan.setdefault("arten", [dict(x) for x in STANDARD_SCHICHTEN])
+        ids = {a["id"] for a in plan["arten"]}
+        ziel = plan.setdefault("tage", {})
+        for tag, art in list(tage.items())[:800]:
+            if not re.match(r"^\d{4}-\d{2}-\d{2}$", str(tag)):
+                continue
+            if art and art in ids:
+                ziel[tag] = art
+            else:
+                ziel.pop(tag, None)
+        await self._sichern()
+        return self.schichtplan(person)
 
     async def allgemein_setzen(self, werte: dict[str, Any]) -> None:
         if "farben" in werte and isinstance(werte["farben"], dict):
