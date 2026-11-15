@@ -513,7 +513,10 @@ aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);positio
 .wpunkt{display:block;width:100%;text-align:left;font-size:var(--t-fuss);line-height:1.35;padding:6px var(--s2);border-radius:var(--s2);border:0;background:var(--fill);cursor:pointer;overflow-wrap:anywhere;color:var(--fg);min-height:32px}
 .schmal .wpunkt{font-size:var(--t-sub);min-height:44px;padding:var(--s2) var(--s3)}
 .wpunkt.t{background:color-mix(in srgb,var(--k,var(--accent)) 14%,transparent);box-shadow:inset 3px 0 0 var(--k,var(--accent))}
-.wpunkt.a.top{background:var(--mint-dim)}
+.wpunkt.a{background:color-mix(in srgb,var(--k,var(--accent)) 13%,var(--card));box-shadow:inset 3px 0 0 var(--k,var(--accent))}
+.wpunkt.a::before{content:"";flex:none;display:inline-block;width:11px;height:11px;border-radius:50%;border:1.5px solid var(--k,var(--accent));margin-right:6px;vertical-align:-1px}
+.wpunkt.a.fertig::before{background:var(--k,var(--accent))}
+.wpunkt.a.top{background:color-mix(in srgb,var(--k,var(--accent)) 20%,var(--card))}
 .wpunkt.a.fertig{opacity:.55;text-decoration:line-through}
 .wpunkt .z{color:var(--muted);margin-right:6px;font-variant-numeric:tabular-nums}
 .wpunkt[draggable=true]{cursor:grab}
@@ -639,7 +642,7 @@ ul.zeitleiste>li.jetzt span{position:absolute;right:0;top:-10px;font-size:var(--
 .block{position:absolute;display:flex;flex-direction:column;gap:1px;overflow:hidden;text-align:left;border:0;border-radius:6px;padding:2px 6px;cursor:pointer;color:var(--fg);font-size:var(--t-fuss);line-height:1.25;background:color-mix(in srgb,var(--k,var(--accent)) 18%,var(--card));box-shadow:inset 3px 0 0 var(--k,var(--accent))}
 .block b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .block span{color:var(--muted);font-size:var(--t-klein);white-space:nowrap}
-.block.a{background:var(--card);box-shadow:inset 0 0 0 1.5px var(--k,var(--accent))}
+.block.a{background:color-mix(in srgb,var(--k,var(--accent)) 13%,var(--card));box-shadow:inset 0 0 0 1.5px var(--k,var(--accent))}
 .block.fertig{opacity:.5;text-decoration:line-through}
 .block:focus-visible{z-index:3}
 .wpunkt.block-aussen{display:inline-flex;gap:6px;position:static}
@@ -709,7 +712,7 @@ dialog .schnellwahl .knopf:not(.primaer):not(.text)[aria-pressed="true"]{backgro
 .wtag .chips{display:flex;flex-wrap:wrap;gap:6px}
 .wtag .chips .wpunkt{display:inline-flex;align-items:center;gap:6px;width:auto;max-width:100%;min-height:32px;cursor:inherit}
 .schmal .wtag .chips .wpunkt{min-height:36px;font-size:var(--t-fuss);padding:6px var(--s3)}
-.wtag .chips .wpunkt.a{box-shadow:inset 3px 0 0 var(--k,transparent)}
+
 .wpunkt .zt{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:600}
 .raster.waehlbar{cursor:crosshair;touch-action:pan-y;user-select:none;-webkit-user-select:none}
 .raster .auswahl{position:absolute;left:var(--rand);right:2px;border-radius:8px;background:color-mix(in srgb,var(--accent-fill) 22%,transparent);box-shadow:inset 0 0 0 2px var(--accent-fill);font-size:var(--t-klein);font-weight:700;color:var(--accent);padding:2px 8px;pointer-events:none;z-index:3;font-variant-numeric:tabular-nums}
@@ -729,7 +732,10 @@ dialog.pop form{display:grid;gap:var(--s3);padding:var(--s3) var(--s5) var(--s5)
 .tl-scroll{max-height:calc(100dvh - 300px);min-height:240px;overflow-y:auto;overscroll-behavior:contain;padding-right:var(--s1);display:grid;gap:var(--s4);align-content:start}
 .schmal .tl-scroll{max-height:380px;min-height:0}
 .tl-tag{display:grid;gap:var(--s2)}
-.tl-kopf{margin:0;font-size:var(--t-fuss);font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0;background:var(--card);padding:var(--s1) 0;z-index:1}
+.tl-kopf{margin:0;font-size:var(--t-fuss);font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0;z-index:2;padding:var(--s1) 0 var(--s3);margin-bottom:calc(-1 * var(--s2));
+  background:linear-gradient(to bottom,color-mix(in srgb,var(--bg) 82%,transparent) 0,color-mix(in srgb,var(--bg) 82%,transparent) 55%,transparent 100%);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);-webkit-mask-image:linear-gradient(to bottom,#000 60%,transparent);mask-image:linear-gradient(to bottom,#000 60%,transparent)}
+.tl-scroll{-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 24px),transparent);padding-bottom:var(--s5)}
 .tl-scroll:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:var(--s2)}
 .kalleiste{display:flex;align-items:center;gap:var(--s2);flex-wrap:wrap}
 .kalwahl .zahl{font-size:var(--t-klein);color:var(--muted);font-variant-numeric:tabular-nums}
@@ -1315,7 +1321,7 @@ class PlanerPanel extends HTMLElement {
     ${eingang.length ? `<section class="gruppe" aria-labelledby="ab-titel">
       <h2 id="ab-titel">Aus dem Eingang einplanen</h2>
       <p class="hinweis">${this._narrow ? "Aufgabe antippen und ein Datum wählen." : "Auf einen Tag ziehen oder öffnen und ein Datum wählen."}</p>
-      <div class="ablage">${eingang.map((a) => `<button type="button" class="wpunkt a" draggable="true" data-ziehen="${a.id}" data-aktion="oeffnen" data-id="${a.id}">${esc(a.titel)}</button>`).join("")}</div>
+      <div class="ablage">${eingang.map((a) => `<button type="button" class="wpunkt a" style="--k:${bereichFarbe(a.bereich, this._daten.farben) || "var(--accent)"}" draggable="true" data-ziehen="${a.id}" data-aktion="oeffnen" data-id="${a.id}">${esc(a.titel)}</button>`).join("")}</div>
     </section>` : ""}`;
   }
 
@@ -1333,14 +1339,14 @@ class PlanerPanel extends HTMLElement {
       ...ts.filter((t) => !t.ganztag).map((t) => ({ s: t.start.slice(0, 10) < tag ? "00:00" : uhr(t.start),
         html: `<span class="wpunkt t" style="--k:${this._farbe(t.kalender)}"><span class="zt">${t.start.slice(0, 10) < tag ? "" : uhr(t.start)}</span>${esc(t.titel)}</span>` })),
       ...as.filter((a) => a.uhrzeit).map((a) => ({ s: a.uhrzeit,
-        html: `<span class="wpunkt a ${a.status === "erledigt" ? "fertig" : ""}" draggable="${a.status === "offen"}" data-ziehen="${a.id}" style="--k:${bereichFarbe(a.bereich, this._daten.farben)}"><span class="zt">${a.uhrzeit}</span>${esc(a.titel)}</span>` })),
+        html: `<span class="wpunkt a ${a.status === "erledigt" ? "fertig" : ""}" draggable="${a.status === "offen"}" data-ziehen="${a.id}" style="--k:${bereichFarbe(a.bereich, this._daten.farben) || "var(--accent)"}"><span class="zt">${a.uhrzeit}</span>${esc(a.titel)}</span>` })),
     ].sort((x, y) => x.s.localeCompare(y.s));
     const ohne = as.filter((a) => !a.uhrzeit);
     if (!ganz.length && !zeitlich.length && !ohne.length) return `<p class="wleer">Nichts geplant.</p>`;
     return `<div class="chips">
       ${ganz.map((t) => `<span class="wpunkt t" style="--k:${this._farbe(t.kalender)}">${esc(t.titel)}</span>`).join("")}
       ${zeitlich.map((x) => x.html).join("")}
-      ${ohne.map((a) => `<span class="wpunkt a ${a.top ? "top" : ""} ${a.status === "erledigt" ? "fertig" : ""}" draggable="${a.status === "offen"}" data-ziehen="${a.id}">${a.top ? `<span class="z">${a.top}</span>` : ""}${esc(a.titel)}</span>`).join("")}
+      ${ohne.map((a) => `<span class="wpunkt a ${a.top ? "top" : ""} ${a.status === "erledigt" ? "fertig" : ""}" style="--k:${bereichFarbe(a.bereich, this._daten.farben) || "var(--accent)"}" draggable="${a.status === "offen"}" data-ziehen="${a.id}">${a.top ? `<span class="z">${a.top}</span>` : ""}${esc(a.titel)}</span>`).join("")}
     </div>`;
   }
 
@@ -1359,7 +1365,7 @@ class PlanerPanel extends HTMLElement {
       })),
       ...as.filter((a) => a.uhrzeit).map((a) => {
         const s0 = zeit(a.uhrzeit);
-        return { s: s0, e: s0 + (a.dauer || 30), html: (stil, hoch) => `<button type="button" class="block a ${a.status === "erledigt" ? "fertig" : ""}" style="${stil};--k:${bereichFarbe(a.bereich, this._daten.farben)}" data-aktion="oeffnen" data-id="${a.id}" draggable="${a.status === "offen"}" data-ziehen="${a.id}"
+        return { s: s0, e: s0 + (a.dauer || 30), html: (stil, hoch) => `<button type="button" class="block a ${a.status === "erledigt" ? "fertig" : ""}" style="${stil};--k:${bereichFarbe(a.bereich, this._daten.farben) || "var(--accent)"}" data-aktion="oeffnen" data-id="${a.id}" draggable="${a.status === "offen"}" data-ziehen="${a.id}"
           aria-label="${esc(`Aufgabe ${a.titel} um ${a.uhrzeit}`)}"><b>${esc(a.titel)}</b>${hoch ? `<span>${a.uhrzeit} · Aufgabe</span>` : ""}</button>` };
       }),
     ].sort((x, y) => x.s - y.s || y.e - x.e);
@@ -1381,7 +1387,7 @@ class PlanerPanel extends HTMLElement {
     const jetztMin = jetzt.getHours() * 60 + jetzt.getMinutes();
     let html = "";
     if (ganz.length) html += `<div class="ganztags">${ganz.map((t) => `<button type="button" class="wpunkt t" style="--k:${this._farbe(t.kalender)}" data-termin="${esc(`${t.kalender}|${t.uid}|${t.start}`)}" aria-label="${esc(`${t.titel}, ganztägig`)}">${esc(t.titel)}</button>`).join("")}</div>`;
-    if (ohne.length) html += `<div class="ohnezeit">${ohne.map((a) => `<button type="button" class="wpunkt a ${a.top ? "top" : ""} ${a.status === "erledigt" ? "fertig" : ""}" data-aktion="oeffnen" data-id="${a.id}" draggable="${a.status === "offen"}" data-ziehen="${a.id}">${a.top ? `<span class="z">${a.top}</span>` : ""}${esc(a.titel)}</button>`).join("")}</div>`;
+    if (ohne.length) html += `<div class="ohnezeit">${ohne.map((a) => `<button type="button" class="wpunkt a ${a.top ? "top" : ""} ${a.status === "erledigt" ? "fertig" : ""}" style="--k:${bereichFarbe(a.bereich, this._daten.farben) || "var(--accent)"}" data-aktion="oeffnen" data-id="${a.id}" draggable="${a.status === "offen"}" data-ziehen="${a.id}">${a.top ? `<span class="z">${a.top}</span>` : ""}${esc(a.titel)}</button>`).join("")}</div>`;
     if (aussen.length) html += `<div class="ohnezeit">${aussen.map((x) => x.html("", true).replace('class="block', 'class="wpunkt block-aussen')).join("")}</div>`;
     if (imRaster.length || waehlbar) {
       html += `<div class="raster ${waehlbar ? "waehlbar" : ""}" style="--h:${hpx}px;height:${stunden * hpx}px" data-von="${von}" data-bis="${bis}" data-hpx="${hpx}">
@@ -1602,8 +1608,9 @@ class PlanerPanel extends HTMLElement {
     const jetzt = new Date();
     const jetztMin = jetzt.getHours() * 60 + jetzt.getMinutes();
     const bisStd = this._daten.einst?.tag_bis ?? 22;
+    const tlKal = this._daten.einst?.kalender_zeitleiste;
     const tagDaten = (tag) => {
-      const termine = this._termineAm(tag);
+      const termine = this._termineAm(tag).filter((t) => tlKal == null || tlKal.includes(t.kalender));
       const eintraege = [
         ...termine.filter((t) => !t.ganztag).map((t) => {
           const s0 = t.start.slice(0, 10) < tag ? 0 : zeit(uhr(t.start));
@@ -2335,11 +2342,12 @@ class PlanerPanel extends HTMLElement {
           <label class="check"><input type="checkbox" data-feld="andere_sehen" ${e.andere_sehen !== false ? "checked" : ""}> Sieht die Aufgaben der anderen</label>
           ${kal.length ? `<div class="tab-wrap"><table class="kal-tab">
             <caption class="sr">Kalender von ${esc(p.name)}</caption>
-            <thead><tr><th scope="col">Kalender</th><th scope="col">Sehen</th><th scope="col">Eintragen</th><th scope="col">Erinnern</th></tr></thead>
+            <thead><tr><th scope="col">Kalender</th><th scope="col">Sehen</th><th scope="col">Eintragen</th><th scope="col">Erinnern</th><th scope="col">Zeitleiste</th></tr></thead>
             <tbody>${kal.map((k) => `<tr><th scope="row" style="font-weight:400">${esc(k.name)}</th>
               <td><input type="checkbox" data-kal="sehen" value="${esc(k.id)}" aria-label="${esc(k.name)} sehen" ${sehen == null || sehen.includes(k.id) ? "checked" : ""}></td>
               <td>${k.anlegen ? `<input type="checkbox" data-kal="schreiben" value="${esc(k.id)}" aria-label="In ${esc(k.name)} eintragen" ${schreiben == null || schreiben.includes(k.id) ? "checked" : ""}>` : '<span class="sr">nicht möglich</span><span aria-hidden="true">–</span>'}</td>
-              <td><input type="checkbox" data-kal="erinnern" value="${esc(k.id)}" aria-label="An Termine aus ${esc(k.name)} erinnern" ${(e.kalender_erinnern || []).includes(k.id) ? "checked" : ""}></td></tr>`).join("")}</tbody>
+              <td><input type="checkbox" data-kal="erinnern" value="${esc(k.id)}" aria-label="An Termine aus ${esc(k.name)} erinnern" ${(e.kalender_erinnern || []).includes(k.id) ? "checked" : ""}></td>
+              <td><input type="checkbox" data-kal="zeitleiste" value="${esc(k.id)}" aria-label="${esc(k.name)} in der Zeitleiste zeigen" ${e.kalender_zeitleiste == null || e.kalender_zeitleiste.includes(k.id) ? "checked" : ""}></td></tr>`).join("")}</tbody>
           </table></div>
           <div class="feld"><label for="sk-${i}">Standard-Kalender für neue Termine</label>
             <select id="sk-${i}" data-feld="standard_kalender"><option value="">Zuletzt benutzter</option>
@@ -2395,6 +2403,7 @@ class PlanerPanel extends HTMLElement {
         werte.kalender_sehen = liste("sehen").length === alle("sehen") ? null : liste("sehen");
         werte.kalender_schreiben = liste("schreiben").length === alle("schreiben") ? null : liste("schreiben");
         werte.kalender_erinnern = liste("erinnern");
+        werte.kalender_zeitleiste = liste("zeitleiste").length === alle("zeitleiste") ? null : liste("zeitleiste");
         werte.standard_kalender = sec.querySelector('[data-feld="standard_kalender"]').value || null;
       }
       await this._ws({ type: "planer/einstellung", person: d.personen[i].id, werte });
