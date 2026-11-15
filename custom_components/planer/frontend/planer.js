@@ -922,6 +922,90 @@ input[role=switch]:focus-visible{outline:2px solid var(--accent);outline-offset:
 .schmal .schicht-summe{font-size:var(--t-klein)}
 .stempelleiste.unten{margin-top:var(--s3)}
 .schmal .stempelleiste.unten{position:sticky;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:3;padding:var(--s2);margin:var(--s3) calc(-1 * var(--s2)) 0;border-radius:var(--r-voll);background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+/* ---------- Kontextmenü (iOS-Stil) ---------- */
+.menue{position:fixed;z-index:1000;min-width:220px;max-width:min(300px,calc(100vw - 16px));overflow:auto;overscroll-behavior:contain;padding:6px 0;border-radius:14px;background:color-mix(in srgb,var(--card) 97%,transparent);-webkit-backdrop-filter:var(--glas-blur);backdrop-filter:var(--glas-blur);box-shadow:0 12px 40px rgba(0,0,0,.22),0 0 0 .5px var(--line2);color:var(--fg);animation:menue-auf .18s var(--bewegung)}
+.menue[data-seite="oben"]{animation-name:menue-auf-oben}
+@keyframes menue-auf{from{opacity:0;transform:translateY(-6px) scale(.97)}}
+@keyframes menue-auf-oben{from{opacity:0;transform:translateY(6px) scale(.97)}}
+.menue-punkt{display:flex;align-items:center;gap:var(--s2);width:100%;min-height:44px;padding:0 var(--s4) 0 var(--s2);border:0;background:none;color:inherit;font:inherit;font-size:var(--t-text);text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.menue-punkt:hover,.menue-punkt:focus-visible{background:var(--fill);outline:none}
+.menue-punkt:focus-visible{box-shadow:inset 0 0 0 2px var(--focus)}
+.menue-punkt:active{background:var(--fill2)}
+.menue-punkt:disabled{opacity:.4;cursor:default}
+.menue-punkt.gefahr{color:var(--rot)}
+.menue-haken{flex:none;width:18px;display:grid;place-items:center;color:var(--accent)}
+.menue-haken svg{width:16px;height:16px}
+.menue-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.menue-pfeil{flex:none;color:var(--muted);font-size:20px;line-height:1}
+.menue-icon{flex:none;width:22px;display:grid;place-items:center;color:var(--fg)}
+.menue-punkt.gefahr .menue-icon{color:var(--rot)}
+.menue-icon svg{width:20px;height:20px}
+.menue-icon .g-h1{font-weight:800;font-size:19px}
+.menue-icon .g-h2{font-weight:700;font-size:16px}
+.menue-icon .g-t{font-weight:600;font-size:15px}
+.menue-trenner{height:1px;margin:5px 0;background:var(--line)}
+.menue-eingabe{display:flex;align-items:center;gap:var(--s1);padding:var(--s1) var(--s2) var(--s1) var(--s4)}
+.menue-eingabe input{flex:1;min-width:0;min-height:40px;padding:0 var(--s2);border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--fg);font:inherit;font-size:max(16px,var(--t-text))}
+.menue-eingabe .knopf{min-height:44px;padding:0 var(--s2)}
+/* ---------- Notizen: Format, Tabellen, Links, Ordner ---------- */
+.nz-leiste{position:sticky;z-index:1;align-items:center;margin:0 calc(-1 * var(--s4));padding:var(--s2) var(--s4);background:var(--bg)}
+.nz-leiste .knopf{min-height:44px}
+.nz-aa{font-weight:700;font-size:17px;letter-spacing:-.02em;color:var(--accent)}
+.nz-leiste-luecke{flex:1}
+.nz-mehr{width:44px;padding:0;justify-content:center}
+.nz-mehr svg{width:22px!important;height:22px!important}
+.nz-geteilt{display:inline-flex;align-items:center;gap:4px;font-size:var(--t-klein);font-weight:600;color:var(--accent);background:var(--mint-dim);border-radius:var(--r-voll);padding:3px var(--s2)}
+.nz-geteilt[hidden]{display:none}
+.nz-geteilt svg{width:15px;height:15px}
+.nz-meta{display:flex;flex-wrap:wrap;gap:var(--s2);margin-top:calc(-1 * var(--s2))}
+.nz-meta[hidden]{display:none}
+.nz-chip{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 var(--s3);border:0;border-radius:var(--r-voll);background:var(--fill);color:var(--fg);font:inherit;font-size:var(--t-fuss);font-weight:500;cursor:pointer;position:relative}
+.nz-chip::before{content:"";position:absolute;inset:-6px 0}
+.nz-chip svg{width:15px;height:15px;color:var(--muted)}
+.nz-punkt{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--nf);box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.menue-icon .nz-punkt{width:16px;height:16px}
+dialog.nz-farbig .blatt-kopf{box-shadow:inset 0 -3px 0 var(--nf)}
+.nz-h1 textarea{font-size:22px;font-weight:700;letter-spacing:-.01em;line-height:1.3;padding-top:var(--s2)}
+.nz-h2 textarea{font-size:18px;font-weight:650;line-height:1.35;padding-top:6px}
+.nz-mark{flex:none;min-width:22px;padding-top:5px;text-align:right;color:var(--muted);font-size:max(16px,var(--t-text));line-height:1.45;font-variant-numeric:tabular-nums}
+.nz[data-art="num"] .nz-mark{min-width:26px}
+.nz-tab{flex-direction:column;align-items:stretch;gap:var(--s1);padding:var(--s2) 0}
+.nz-tab-scroll{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
+.nz-tabelle{border-collapse:collapse;min-width:100%;table-layout:fixed}
+.nz-tabelle td{border:1px solid var(--line2);padding:0;min-width:96px;background:var(--card)}
+.nz-tabelle tr:first-child td{background:var(--fill)}
+.nz-tabelle tr:first-child .nz-zelle{font-weight:600}
+.nz-zelle{display:block;width:100%;min-width:96px;min-height:40px;box-sizing:border-box;border:0;background:transparent;color:var(--fg);padding:6px var(--s2);font:inherit;font-size:max(16px,var(--t-sub));outline:none;border-radius:0}
+.nz-zelle:focus{box-shadow:inset 0 0 0 2px var(--focus)}
+.nz-tab-knoepfe{display:flex;gap:var(--s2)}
+.nz-tab-knoepfe .knopf{min-height:36px;font-size:var(--t-fuss);gap:4px;background:var(--fill);border:0;box-shadow:none;color:var(--fg);position:relative}
+.nz-tab-knoepfe .knopf::before{content:"";position:absolute;inset:-4px 0}
+.nz-tab-knoepfe svg{width:16px;height:16px;color:var(--accent)}
+.nz-tab-mehr{width:44px;padding:0;justify-content:center}
+.nz-links{display:grid;gap:var(--s2)}
+.nz-links[hidden]{display:none}
+.nz-links-t{font-size:var(--t-klein);font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.nz-links ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:var(--s2)}
+.nz-link{display:inline-flex;align-items:center;gap:6px;min-height:44px;max-width:100%;padding:0 var(--s3);border-radius:var(--r-voll);background:var(--mint-dim);color:var(--accent);font-size:var(--t-sub);font-weight:600;text-decoration:none}
+.nz-link span:not(.sr){overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px}
+.nz-link svg{flex:none;width:17px;height:17px}
+.nz-toast{display:flex;align-items:center;justify-content:space-between;gap:var(--s2);padding:var(--s1) var(--s1) var(--s1) var(--s4);border-radius:var(--r-feld);background:var(--fg);color:var(--bg);font-size:var(--t-sub);position:sticky;bottom:calc(var(--s2) + env(safe-area-inset-bottom,0px));z-index:2;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.nz-toast[hidden]{display:none}
+.nz-toast .knopf{color:var(--bg);min-height:44px}
+.nsuche{margin:0 0 var(--s3);min-height:40px;background:var(--fill);border:0}
+.nsuche input{min-height:40px;color:var(--fg);font-size:max(16px,var(--t-text))}
+.nfilter{display:flex;gap:var(--s2);overflow-x:auto;margin:0 calc(-1 * var(--s4)) var(--s4);padding:2px var(--s4);scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.nfilter::-webkit-scrollbar{display:none}
+.nfilter button{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 var(--s3);border-radius:var(--r-voll);border:1px solid var(--line);background:var(--card);color:var(--fg);font:inherit;font-size:var(--t-fuss);font-weight:500;cursor:pointer;position:relative}
+.nfilter button::before{content:"";position:absolute;inset:-4px 0}
+.nfilter button svg{width:15px;height:15px;color:var(--muted)}
+.nfilter button[aria-pressed="true"]{background:var(--fg);color:var(--card);border-color:var(--fg);font-weight:700}
+.nfilter button[aria-pressed="true"] svg{color:inherit}
+.nrow-farbe .nrow-zeile{box-shadow:inset 4px 0 0 var(--nf)}
+.nrow-meta{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;margin-top:2px;min-width:0}
+.nrow-ordner{display:inline-flex;align-items:center;gap:3px;font-size:var(--t-klein);color:var(--muted)}
+.nrow-ordner svg{width:13px;height:13px}
+.nrow-tag{font-size:var(--t-klein);font-weight:600;color:var(--accent);background:var(--mint-dim);border-radius:var(--r-voll);padding:0 6px;line-height:18px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media (forced-colors:active){.haken[aria-checked="true"]::before{forced-color-adjust:none;background:Highlight}.seg button[aria-pressed="true"],nav.tabs button[aria-current="page"]{outline:2px solid Highlight}}
 `;
@@ -953,7 +1037,76 @@ const ICON = {
   aufgaben: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="6.5" r="1.6"/><circle cx="5.5" cy="12" r="1.6"/><circle cx="5.5" cy="17.5" r="1.6"/><path d="M10 6.5h10M10 12h10M10 17.5h10"/></svg>`,
   ort: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>`,
   menu: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>`,
+  mehr: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><circle cx="5.5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="18.5" cy="12" r="1.9"/></svg>`,
+  ordner: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3.5 7.5A2 2 0 0 1 5.5 5.5h4l2 2.2h7a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>`,
+  tabelle: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M3.5 10h17M3.5 14.5h17M12 5v14"/></svg>`,
+  muell: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l1 12.2h9L17.5 7M10.2 10.5v5.5M13.8 10.5v5.5"/></svg>`,
+  personen: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="16.8" cy="9.3" r="2.5"/><path d="M15.8 14.2c2.4-.3 4.3 1.3 4.8 4.3"/></svg>`,
+  link: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>`,
+  telefon: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6.5 3.8l2.6-.3 1.6 4-2 1.5a11 11 0 0 0 6.3 6.3l1.5-2 4 1.6-.3 2.6a2 2 0 0 1-2.1 1.8A16 16 0 0 1 4.7 5.9a2 2 0 0 1 1.8-2.1z"/></svg>`,
+  mail: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4 7l8 6 8-6"/></svg>`,
 };
+
+// ---------- Notiz-Format ----------
+// Gespeichert wird reiner Text, damit Notizen überall lesbar bleiben:
+// „# “ Überschrift, „## “ Zwischenüberschrift, „• “ Aufzählung, „1. “ Nummerierung, „☐ “/„☑ “ Checkliste,
+// „| a | b |“ Tabellenzeile, **fett**. Die erste Zeile ist der Titel.
+const NOTIZ_FARBEN = [["Rot", "#ff3b30"], ["Orange", "#ff9500"], ["Gelb", "#ffcc00"], ["Grün", "#34c759"], ["Türkis", "#00c7be"], ["Blau", "#007aff"], ["Lila", "#af52de"], ["Grau", "#8e8e93"]];
+function notizZeileLesen(z) {
+  z = String(z ?? "");
+  if (z.startsWith("## ")) return { art: "h2", wert: z.slice(3) };
+  if (z.startsWith("# ")) return { art: "h1", wert: z.slice(2) };
+  if (z === "•" || z.startsWith("• ")) return { art: "bullet", wert: z.slice(2) };
+  let m = /^(\d{1,3})\. /.exec(z);
+  if (m) return { art: "num", wert: z.slice(m[0].length) };
+  m = /^([☐☑]) ?/.exec(z);
+  if (m) return { art: "check", wert: z.slice(m[0].length), ok: m[1] === "☑" };
+  if (z === "|" || z.startsWith("| ")) return { art: "table", wert: z };
+  return { art: "text", wert: z };
+}
+function notizZellen(z) {
+  let s = z === "|" ? "" : z.slice(2);
+  if (s.endsWith(" |")) s = s.slice(0, -2); else if (s.endsWith("|")) s = s.slice(0, -1);
+  return s.split(" | ");
+}
+const notizOhneFett = (s) => String(s || "").replace(/\*\*(.+?)\*\*/g, "$1");
+// Zeile als lesbarer Text für Vorschau und Suche (ohne Präfixe)
+function notizKlartext(z) {
+  const p = notizZeileLesen(z);
+  return notizOhneFett(p.art === "table" ? notizZellen(z).map((c) => c.trim()).filter(Boolean).join(" · ") : p.wert).trim();
+}
+function notizTags(text) {
+  const raus = new Set();
+  for (const m of String(text || "").matchAll(/(^|[^\p{L}\p{N}_&/#])#([\p{L}\p{N}][\p{L}\p{N}_-]{0,39})/gu)) {
+    if (/\p{L}/u.test(m[2])) raus.add(m[2].toLowerCase());
+  }
+  return [...raus];
+}
+// Links, E-Mail-Adressen und Telefonnummern im Text
+function notizLinks(text) {
+  const t = String(text || "");
+  const raus = [], gesehen = new Set(), belegt = [];
+  const frei = (a, b) => !belegt.some(([x, y]) => a < y && b > x);
+  const dazu = (art, roh, href, a) => {
+    belegt.push([a, a + roh.length]);
+    if (gesehen.has(href)) return;
+    gesehen.add(href); raus.push({ art, text: roh, href });
+  };
+  for (const m of t.matchAll(/\b(?:https?:\/\/|www\.)[^\s<>"'|]+/gi)) {
+    const u = m[0].replace(/[.,;:!?)\]}*]+$/, "");
+    if (u.length > 4) dazu("web", u, /^www\./i.test(u) ? `https://${u}` : u, m.index);
+  }
+  for (const m of t.matchAll(/[\p{L}\p{N}._%+-]+@[\p{L}\p{N}-]+(?:\.[\p{L}\p{N}-]+)*\.\p{L}{2,}/gu)) {
+    if (frei(m.index, m.index + m[0].length)) dazu("mail", m[0], `mailto:${m[0]}`, m.index);
+  }
+  for (const m of t.matchAll(/(^|[^\p{L}\p{N}+])((?:\+\d{1,3}|0)[\d /-]{5,18}\d)(?!\d)/gu)) {
+    const a = m.index + m[1].length, roh = m[2].trim();
+    const ziffern = roh.replace(/\D/g, "");
+    if (ziffern.length < 6 || ziffern.length > 16 || !frei(a, a + roh.length)) continue;
+    dazu("tel", roh, `tel:${roh.replace(/[ /-]/g, "")}`, a);
+  }
+  return raus;
+}
 
 class PlanerPanel extends HTMLElement {
   constructor() {
@@ -1044,6 +1197,8 @@ class PlanerPanel extends HTMLElement {
       this._fehler = `Der Planer konnte nicht geladen werden (${e.message || e.code}). Ist die Integration unter Geräte & Dienste eingerichtet?`;
     }
     this._zeichnen();
+    // Offene Notiz bekommt Änderungen von anderen Geräten mit
+    try { this._notizLive?.(); } catch (e) { /* egal */ }
   }
 
   async _termineLaden() {
@@ -1131,7 +1286,7 @@ class PlanerPanel extends HTMLElement {
       eingang: offen.length,
       woche: offen.filter((a) => a.datum && a.datum >= iso(montag(new Date())) && a.datum <= iso(plusTage(montag(new Date()), 6))).length,
       notizen: this._notizenSichtbar().length,
-      einkauf: (this._eArtikel?.liste === this._eListeId() ? this._eArtikel.items.filter((x) => !x.erledigt).length : 0),
+      einkauf: (this._eArtikel && this._eArtikel.liste === this._eListeId() ? this._eArtikel.items.filter((x) => !x.erledigt).length : 0),
     };
     const tabs = [["heute", "Heute"], ["woche", "Kalender"], ["demnaechst", "Demnächst"]];
     tabs.push(["notizen", "Notizen"]);
@@ -1226,6 +1381,7 @@ class PlanerPanel extends HTMLElement {
     if (fokus && !root.querySelector("dialog[open]")) {
       const el = this._app.querySelector(`[data-fokus="${CSS_escape(fokus)}"]`);
       if (el) el.focus();
+      if (el?.id === "n-suche") { try { el.setSelectionRange(el.value.length, el.value.length); } catch (e) { /* egal */ } }
     }
   }
 
@@ -2442,10 +2598,9 @@ class PlanerPanel extends HTMLElement {
       this._zeichnen();
     }));
     this._app.querySelectorAll("[data-aktion]").forEach((b) => b.addEventListener("click", () => this._aktion(b.dataset.aktion, b.dataset.id)));
-    this._app.querySelectorAll("[data-notiz]").forEach((b) => b.addEventListener("click", () => { const n = this._notiz(b.dataset.notiz); if (n) this._notizOeffnen(n); }));
     this._app.querySelectorAll("li.aufgabe").forEach((li) => this._wischen(li));
-    this._nOffen = null;
-    this._app.querySelectorAll("li.nrow").forEach((li) => this._notizWischen(li));
+    this._notizListeBinden(this._app);
+    this._notizFilterBinden();
     this._einkaufBinden(root);
     this._app.querySelectorAll("[data-kal-ansicht]").forEach((b) => b.addEventListener("click", () => {
       this._kalAnsicht = b.dataset.kalAnsicht;
@@ -2713,10 +2868,10 @@ class PlanerPanel extends HTMLElement {
         .filter((t) => { const k = `${t.kalender}|${t.uid}|${t.start}`; if (gesehen.has(k)) return false; gesehen.add(k); return true; })
         .sort((a, b) => a.start.localeCompare(b.start)).slice(0, 30);
       const einkauf = (this._eArtikel?.items || []).filter((x) => passt(x.text, x.beschreibung)).slice(0, 20);
-      const notizenTreffer = this._notizenSichtbar().filter((n) => passt(n.titel, n.text)).sort((a, b) => (b.geaendert || "").localeCompare(a.geaendert || "")).slice(0, 20);
+      const notizenTreffer = this._notizenSichtbar().filter((n) => passt(n.titel, n.text, n.ordner, ...this._notizTagsVon(n).map((t) => `#${t}`))).sort((a, b) => (b.geaendert || "").localeCompare(a.geaendert || "")).slice(0, 20);
       const teil = (titel, inhalt) => inhalt ? `<section class="gruppe"><h3>${titel}</h3><ul class="liste gruppiert">${inhalt}</ul></section>` : "";
       const html = teil("Aufgaben", aufg.map((a) => `<li><button type="button" class="treffer" data-sa="${a.id}"><span class="titel">${esc(a.titel)}</span><span class="unter">${a.status === "erledigt" ? "Erledigt" : a.datum ? esc(datumText(a.datum)) : "Ohne Datum"}${a.uhrzeit ? `, ${a.uhrzeit} Uhr` : ""}${a.bereich ? ` · ${esc(a.bereich)}` : ""}</span></button></li>`).join(""))
-        + teil("Notizen", notizenTreffer.map((n) => `<li><button type="button" class="treffer" data-sn="${esc(n.id)}"><span class="titel">${esc(this._notizTitel(n))}</span><span class="unter">${esc(this._notizZeit(n.geaendert))}${n.text && n.titel ? ` · ${esc(n.text.replace(/\s+/g, " ").slice(0, 60))}` : ""}</span></button></li>`).join(""))
+        + teil("Notizen", notizenTreffer.map((n) => `<li><button type="button" class="treffer" data-sn="${esc(n.id)}"><span class="titel">${esc(this._notizTitel(n))}</span><span class="unter">${esc(this._notizZeit(n.geaendert))}${n.ordner ? ` · ${esc(n.ordner)}` : ""}${n.text && n.titel ? ` · ${esc(n.text.split("\n").map(notizKlartext).filter(Boolean).join(" ").slice(0, 60))}` : ""}</span></button></li>`).join(""))
         + teil("Termine", termine.map((t) => `<li><button type="button" class="treffer" data-st="${esc(`${t.kalender}|${t.uid}|${t.start}`)}"><span class="titel">${esc(t.titel)}</span><span class="unter">${esc(datumText(t.start.slice(0, 10)))}${t.ganztag ? "" : `, ${uhr(t.start)} Uhr`} · ${esc(this._kal(t.kalender).name)}</span></button></li>`).join(""))
         + teil("Einkauf", einkauf.map((x) => `<li><button type="button" class="treffer" data-se="1"><span class="titel">${esc(x.text)}</span><span class="unter">${x.erledigt ? "Gekauft" : "Auf der Liste"}${x.beschreibung ? ` · ${esc(x.beschreibung)}` : ""}</span></button></li>`).join(""));
       erg.innerHTML = html || `<p class="leer">Nichts gefunden für „${esc(q.value.trim())}“.</p>`;
@@ -3010,6 +3165,140 @@ class PlanerPanel extends HTMLElement {
     else if (!$("b-titel").value.trim()) $("b-titel").focus();
   }
 
+  // ---------- Kontextmenü (iOS-Stil) ----------
+  // Kleines Menü an einem Knopf. eintraege: { text, icon?, aktion(info), gefahr?, aktiv?, radio?, untermenue?, aus? },
+  // { eingabe: true, text, knopf, max, wert?, aktion(wert) } für ein Textfeld, "-" als Trenner.
+  // Schließt bei Tipp daneben, Escape oder Auswahl. Pfeiltasten, Pos1/Ende und Tab funktionieren.
+  _menue(anker, eintraege, { titel = "", tastatur = false } = {}) {
+    const st = this._menueStatus;
+    // Tipp auf denselben Knopf bei offenem Menü schließt nur (nicht gleich wieder öffnen)
+    if (st && st.anker === anker && Date.now() - st.zeit < 400) { this._menueStatus = null; return; }
+    this._menueZu?.(false);
+    const root = this.shadowRoot;
+    const wirt = anker.closest("dialog") || root.getElementById("rahmen");
+    const m = document.createElement("div");
+    m.className = "menue";
+    m.setAttribute("role", "menu");
+    m.tabIndex = -1;
+    if (titel) m.setAttribute("aria-label", titel);
+    const punkte = [];
+    const zu = (fokusZurueck) => {
+      if (!m.isConnected) return;
+      const drin = m.contains(root.activeElement);
+      m.remove();
+      document.removeEventListener("pointerdown", aussen, true);
+      document.removeEventListener("keydown", taste, true);
+      window.removeEventListener("resize", groesse);
+      window.visualViewport?.removeEventListener("resize", platz);
+      wirt.removeEventListener("scroll", rollen, true);
+      wirt.removeEventListener("cancel", abbruch);
+      anker.setAttribute("aria-expanded", "false");
+      if (this._menueZu === zu) this._menueZu = null;
+      if (fokusZurueck !== false && drin) anker.focus({ preventScroll: true });
+    };
+    const waehlen = (e, ev) => {
+      const info = { tastatur: ev?.detail === 0 };
+      zu(!e.untermenue && info.tastatur);
+      try { e.aktion?.(info); } catch (err) { console.error(err); }
+    };
+    for (const e of eintraege) {
+      if (!e) continue;
+      if (e === "-") {
+        if (m.lastElementChild && !m.lastElementChild.classList.contains("menue-trenner")) {
+          const t = document.createElement("div"); t.className = "menue-trenner"; t.setAttribute("role", "separator"); m.append(t);
+        }
+        continue;
+      }
+      if (e.eingabe) {
+        const f = document.createElement("div");
+        f.className = "menue-eingabe";
+        f.innerHTML = `<input type="text" maxlength="${e.max || 40}" placeholder="${esc(e.text)}" aria-label="${esc(e.text)}" enterkeyhint="done" autocomplete="off" value="${esc(e.wert || "")}"><button type="button" class="knopf text fett">${esc(e.knopf || "OK")}</button>`;
+        const inp = f.querySelector("input"), b = f.querySelector("button");
+        const los = () => { const w = inp.value.trim(); if (!w) { inp.focus(); return; } zu(false); e.aktion(w); };
+        inp.addEventListener("keydown", (ev) => { if (ev.key === "Enter") { ev.preventDefault(); los(); } });
+        b.addEventListener("click", los);
+        m.append(f);
+        punkte.push(inp, b);
+        continue;
+      }
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = `menue-punkt${e.gefahr ? " gefahr" : ""}`;
+      b.tabIndex = -1;
+      b.setAttribute("role", e.aktiv === undefined ? "menuitem" : e.radio ? "menuitemradio" : "menuitemcheckbox");
+      if (e.aktiv !== undefined) b.setAttribute("aria-checked", String(!!e.aktiv));
+      if (e.untermenue) b.setAttribute("aria-haspopup", "menu");
+      if (e.aus) b.disabled = true;
+      b.innerHTML = `<span class="menue-haken" aria-hidden="true">${e.aktiv ? ICON.haken : ""}</span><span class="menue-text">${esc(e.text)}</span>${e.untermenue ? '<span class="menue-pfeil" aria-hidden="true">›</span>' : ""}${e.icon ? `<span class="menue-icon" aria-hidden="true">${e.icon}</span>` : ""}`;
+      // Fokus (und damit die Bildschirmtastatur) bleibt im Textfeld
+      b.addEventListener("pointerdown", (ev) => ev.preventDefault());
+      b.addEventListener("click", (ev) => waehlen(e, ev));
+      m.append(b);
+      punkte.push(b);
+    }
+    if (m.lastElementChild?.classList.contains("menue-trenner")) m.lastElementChild.remove();
+    const aktive = () => punkte.filter((x) => !x.disabled);
+    const aussen = (ev) => {
+      const ziel = ev.composedPath()[0];
+      if (m.contains(ziel)) return;
+      if (anker.contains(ziel)) this._menueStatus = { anker, zeit: Date.now() };
+      zu(false);
+    };
+    const taste = (ev) => {
+      if (ev.key === "Escape") { ev.preventDefault(); ev.stopPropagation(); zu(true); return; }
+      if (!m.contains(root.activeElement)) {
+        // Fokus noch im Textfeld: Pfeil nach unten holt das Menü in den Fokus
+        if (ev.key === "ArrowDown" && root.activeElement === anker) { ev.preventDefault(); aktive()[0]?.focus(); }
+        return;
+      }
+      const liste = aktive(), i = liste.indexOf(root.activeElement);
+      const imFeld = root.activeElement?.tagName === "INPUT";
+      let ziel = null;
+      if (ev.key === "ArrowDown") ziel = liste[(i + 1) % liste.length];
+      else if (ev.key === "ArrowUp") ziel = liste[(i - 1 + liste.length) % liste.length];
+      else if (ev.key === "Home" && !imFeld) ziel = liste[0];
+      else if (ev.key === "End" && !imFeld) ziel = liste[liste.length - 1];
+      else if (ev.key === "Tab") { ev.preventDefault(); zu(true); return; }
+      if (ziel) { ev.preventDefault(); ziel.focus(); }
+    };
+    const platz = () => {
+      if (!m.isConnected) return;
+      const r = anker.getBoundingClientRect();
+      const vv = window.visualViewport;
+      const oben0 = vv ? vv.offsetTop : 0, hoehe = vv ? vv.height : innerHeight, breite = vv ? vv.width : innerWidth;
+      m.style.maxHeight = "";
+      const w = Math.min(m.offsetWidth, breite - 16);
+      let x = r.left;
+      if (x + w > breite - 8) x = r.right - w;
+      x = Math.max(8, Math.min(x, breite - w - 8));
+      const unten = oben0 + hoehe - r.bottom - 12, darueber = r.top - oben0 - 12;
+      const h = m.offsetHeight;
+      let y;
+      if (h <= unten || unten >= darueber) { y = r.bottom + 6; m.style.maxHeight = `${Math.max(120, unten)}px`; m.dataset.seite = "unten"; }
+      else { y = Math.max(oben0 + 8, r.top - 6 - Math.min(h, darueber)); m.style.maxHeight = `${Math.max(120, darueber)}px`; m.dataset.seite = "oben"; }
+      m.style.left = `${Math.round(x)}px`;
+      m.style.top = `${Math.round(y)}px`;
+    };
+    // Bildschirmtastatur, Drehen oder Scrollen: Menü bleibt am Knopf
+    const groesse = () => platz();
+    const rollen = (ev) => { if (!m.contains(ev.target)) platz(); };
+    const abbruch = (ev) => { ev.preventDefault(); zu(true); };
+    m.addEventListener("keydown", (ev) => { if (ev.key === " " && ev.target.tagName === "INPUT") ev.stopPropagation(); });
+    wirt.append(m);
+    platz();
+    anker.setAttribute("aria-expanded", "true");
+    document.addEventListener("pointerdown", aussen, true);
+    document.addEventListener("keydown", taste, true);
+    window.addEventListener("resize", groesse);
+    window.visualViewport?.addEventListener("resize", platz);
+    wirt.addEventListener("scroll", rollen, true);
+    wirt.addEventListener("cancel", abbruch);
+    this._menueZu = zu;
+    this._menueStatus = null;
+    if (tastatur) (aktive().find((x) => x.getAttribute("aria-checked") === "true") || aktive()[0])?.focus();
+    return zu;
+  }
+
   // ---------- Notizen ----------
   _notiz(id) { return (this._daten?.notizen || []).find((n) => n.id === id); }
   _notizenSichtbar() {
@@ -3019,7 +3308,7 @@ class PlanerPanel extends HTMLElement {
     return (d.notizen || []).filter((n) => f === "alle" || (f === "ich" ? n.person === d.ich || n.person === GEMEINSAM : n.person === f));
   }
   _notizTitel(n) {
-    return (n.titel || "").trim() || (n.text || "").trim().split("\n")[0].slice(0, 80) || "Ohne Titel";
+    return notizOhneFett((n.titel || "").trim()) || notizKlartext((n.text || "").trim().split("\n")[0]).slice(0, 80) || "Ohne Titel";
   }
   // „Heute 14:05“, „Gestern 09:30“, „12. Nov“ (mit Jahr, wenn nicht aktuell)
   _notizZeit(s) {
@@ -3060,28 +3349,60 @@ class PlanerPanel extends HTMLElement {
     }
     return { n: gesamt, ok };
   }
+  _notizTagsVon(n) { return notizTags(`${n.titel || ""}\n${n.text || ""}`); }
+  // Notizen nach Ordner, #Tag und Suchwort
+  _notizenGefiltert() {
+    const w = (this._nSuche || "").trim().toLowerCase();
+    return this._notizenSichtbar().filter((n) => {
+      if (this._nOrdner && (n.ordner || "") !== this._nOrdner) return false;
+      const tags = this._notizTagsVon(n);
+      if (this._nTag && !tags.includes(this._nTag)) return false;
+      if (!w) return true;
+      return [n.titel, n.text, n.ordner, ...tags.map((t) => `#${t}`)].some((x) => String(x || "").toLowerCase().includes(w));
+    });
+  }
   _notizZeile(n) {
     const d = this._daten;
     const fort = this._notizFortschritt(n);
     const zeilen = (n.titel ? (n.text || "") : (n.text || "").split("\n").slice(1).join("\n")).split("\n").map((z) => z.trim()).filter(Boolean);
-    const erste = zeilen.find((z) => !/^[☐☑]/.test(z)) || (zeilen[0] || "").replace(/^[☐☑]\s*/, "");
+    const ersteRoh = zeilen.find((z) => notizZeileLesen(z).art !== "check");
+    const erste = ersteRoh ? notizKlartext(ersteRoh) : "";
     const vor = [];
     if (fort.n) vor.push(`<span class="fort">${fort.ok}/${fort.n} erledigt</span>`);
-    if (erste && !/^[☐☑]/.test(erste)) vor.push(esc(erste));
+    if (erste) vor.push(esc(erste));
     const person = this._filter !== "ich" || (n.person !== d.ich && n.person !== GEMEINSAM) ? this._name(n.person) : n.person === GEMEINSAM ? "Gemeinsam" : "";
+    const tags = this._notizTagsVon(n);
     const id = esc(n.id);
-    return `<li class="nrow" data-nid="${id}">
+    const farbe = /^#[0-9a-f]{6}$/i.test(n.farbe || "") ? n.farbe : "";
+    const farbName = farbe ? (NOTIZ_FARBEN.find(([, f]) => f === farbe.toLowerCase())?.[0] || "Farbe") : "";
+    return `<li class="nrow${farbe ? " nrow-farbe" : ""}" data-nid="${id}"${farbe ? ` style="--nf:${farbe}"` : ""}>
       <div class="nrow-aktionen" aria-hidden="true"><button type="button" class="nrow-an" data-nanheften="${id}" tabindex="-1">${n.angeheftet ? "Lösen" : "Anheften"}</button><button type="button" class="nrow-weg" data-nloeschen="${id}" tabindex="-1">Löschen</button></div>
       <button type="button" class="nrow-zeile" data-notiz="${id}" data-fokus="n-${id}">
-        <span class="nrow-titel"><span>${esc(this._notizTitel(n))}</span>${n.angeheftet ? `<span class="notiz-pin" title="Angeheftet">${ICON.pin}<span class="sr">Angeheftet</span></span>` : ""}</span>
+        <span class="nrow-titel"><span>${esc(notizOhneFett(this._notizTitel(n)))}</span>${farbe ? `<span class="sr">, ${esc(farbName)}</span>` : ""}${n.angeheftet ? `<span class="notiz-pin" title="Angeheftet">${ICON.pin}<span class="sr">Angeheftet</span></span>` : ""}</span>
         <span class="nrow-unter"><span class="nrow-zeit">${esc(this._notizKurz(n.geaendert))}</span><span class="nrow-vor">${vor.join(" · ") || "Kein weiterer Text"}${person ? ` · ${esc(person)}` : ""}</span></span>
+        ${n.ordner || tags.length ? `<span class="nrow-meta">${n.ordner ? `<span class="nrow-ordner">${ICON.ordner}<span class="sr">Ordner </span>${esc(n.ordner)}</span>` : ""}${tags.slice(0, 4).map((t) => `<span class="nrow-tag">#${esc(t)}</span>`).join("")}${tags.length > 4 ? `<span class="nrow-tag">+${tags.length - 4}</span>` : ""}</span>` : ""}
       </button>
     </li>`;
   }
   _notizenHtml() {
-    const alle = [...this._notizenSichtbar()].sort((a, b) => (b.geaendert || "").localeCompare(a.geaendert || ""));
+    const sichtbar = this._notizenSichtbar();
     const hinweis = `<p class="hinweis notiz-hinweis">Ideen, Listen und Gedanken. Änderungen werden automatisch gespeichert.${this._narrow ? " Nach links wischen für Anheften und Löschen." : ""}</p>`;
-    if (!alle.length) return `${hinweis}<p class="leer">Noch keine Notizen. Schreib oben einen Titel oder tippe auf Plus.</p>`;
+    if (!sichtbar.length) return `${hinweis}<p class="leer">Noch keine Notizen. Schreib oben einen Titel oder tippe auf Plus.</p>`;
+    const ordnerListe = [...new Set(sichtbar.map((n) => n.ordner).filter(Boolean))].sort((a, b) => a.localeCompare(b, "de"));
+    const tagListe = [...new Set(sichtbar.flatMap((n) => this._notizTagsVon(n)))].sort((a, b) => a.localeCompare(b, "de"));
+    if (this._nOrdner && !ordnerListe.includes(this._nOrdner)) this._nOrdner = "";
+    if (this._nTag && !tagListe.includes(this._nTag)) this._nTag = "";
+    const filter = ordnerListe.length || tagListe.length ? `<div class="nfilter" role="group" aria-label="Notizen filtern">
+        <button type="button" data-nordner="" data-fokus="nf-alle" aria-pressed="${!this._nOrdner && !this._nTag}">Alle</button>
+        ${ordnerListe.map((o) => `<button type="button" data-nordner="${esc(o)}" data-fokus="nf-o-${esc(o)}" aria-pressed="${this._nOrdner === o}">${ICON.ordner}${esc(o)}</button>`).join("")}
+        ${tagListe.map((t) => `<button type="button" data-ntag="${esc(t)}" data-fokus="nf-t-${esc(t)}" aria-pressed="${this._nTag === t}">#${esc(t)}</button>`).join("")}
+      </div>` : "";
+    const suche = `<div class="suchfeld nsuche">${ICON.suche}<label class="sr" for="n-suche">Notizen durchsuchen</label><input id="n-suche" type="search" data-fokus="n-suche" placeholder="Notizen durchsuchen" value="${esc(this._nSuche || "")}" enterkeyhint="search" autocomplete="off"></div>`;
+    return `${hinweis}${suche}${filter}<div id="n-listen">${this._notizenListeHtml()}</div>`;
+  }
+  _notizenListeHtml() {
+    const alle = [...this._notizenGefiltert()].sort((a, b) => (b.geaendert || "").localeCompare(a.geaendert || ""));
+    if (!alle.length) return `<p class="leer">Keine passenden Notizen.</p>`;
     const jahr = new Date().getFullYear();
     const gruppen = new Map();
     const dazu = (name, n) => { if (!gruppen.has(name)) gruppen.set(name, []); gruppen.get(name).push(n); };
@@ -3100,6 +3421,34 @@ class PlanerPanel extends HTMLElement {
       <h2 id="${id}">${esc(name)}</h2>
       <ul class="nliste">${liste.map((n) => this._notizZeile(n)).join("")}</ul>
     </section>`; }).join("");
+  }
+  _notizListeBinden(wurzel) {
+    wurzel.querySelectorAll("[data-notiz]").forEach((b) => b.addEventListener("click", () => { const n = this._notiz(b.dataset.notiz); if (n) this._notizOeffnen(n); }));
+    this._nOffen = null;
+    wurzel.querySelectorAll("li.nrow").forEach((li) => this._notizWischen(li));
+  }
+  _notizFilterBinden() {
+    const app = this._app;
+    app.querySelectorAll("[data-nordner]").forEach((b) => b.addEventListener("click", () => {
+      const o = b.dataset.nordner;
+      if (!o) { this._nOrdner = ""; this._nTag = ""; } else this._nOrdner = this._nOrdner === o ? "" : o;
+      this._zeichnen();
+      this._sagen(this._nOrdner ? `Ordner ${this._nOrdner}` : this._nTag ? `Nur #${this._nTag}` : "Alle Notizen");
+    }));
+    app.querySelectorAll("[data-ntag]").forEach((b) => b.addEventListener("click", () => {
+      this._nTag = this._nTag === b.dataset.ntag ? "" : b.dataset.ntag;
+      this._zeichnen();
+      this._sagen(this._nTag ? `Nur #${this._nTag}` : "Alle Notizen");
+    }));
+    const q = app.querySelector("#n-suche");
+    q?.addEventListener("input", () => {
+      this._nSuche = q.value;
+      const ziel = app.querySelector("#n-listen");
+      if (!ziel) return;
+      ziel.innerHTML = this._notizenListeHtml();
+      this._notizListeBinden(ziel);
+    });
+    q?.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); q.blur(); } });
   }
 
   // Wischen nach links zeigt „Anheften“ und „Löschen“ (nur Touch)
@@ -3148,7 +3497,7 @@ class PlanerPanel extends HTMLElement {
     li.querySelector("[data-nloeschen]").addEventListener("click", async () => {
       const n = this._notiz(id);
       if (!n) return;
-      const kopie = { titel: n.titel, text: n.text, person: n.person, angeheftet: !!n.angeheftet };
+      const kopie = { titel: n.titel, text: n.text, person: n.person, angeheftet: !!n.angeheftet, ordner: n.ordner || "", farbe: n.farbe || "", erledigte_unten: n.erledigte_unten !== false };
       const titel = this._notizTitel(n);
       try { await this._ws({ type: "planer/notiz_loeschen", notiz_id: id }); } catch (err) { return; }
       this._sagen(`Gelöscht: ${titel}`);
@@ -3163,14 +3512,26 @@ class PlanerPanel extends HTMLElement {
     const personen = [...d.personen.map((p) => [p.id, p.name]), [GEMEINSAM, "Gemeinsam"]];
     let id = n.id || null;
     let angeheftet = !!n.angeheftet;
+    let ordner = n.ordner || "", farbe = n.farbe || "", erledigteUnten = n.erledigte_unten !== false;
+    const ruhig = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const CHECK_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="7" r="2.5"/><path d="M5 7l.8.8L7.3 6.3"/><circle cx="6" cy="17" r="2.5"/><path d="M11 7h9M11 17h9"/></svg>`;
     dlg.innerHTML = `<form method="dialog" id="nform" novalidate>
       <div class="blatt-kopf">${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
         <span class="l stand" id="n-stand" aria-live="polite"></span>
         <h2 id="blatt-titel">Notiz</h2>
         <button type="submit" class="knopf text fett r">Fertig</button>
       </div>
-      <div class="nz-leiste" role="toolbar" aria-label="Formatierung"><button type="button" class="knopf klein" id="n-check"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="7" r="2.5"/><path d="M5 7l.8.8L7.3 6.3"/><circle cx="6" cy="17" r="2.5"/><path d="M11 7h9M11 17h9"/></svg>Checkliste</button></div>
+      <div class="nz-leiste" id="n-leiste" role="toolbar" aria-label="Notiz bearbeiten">
+        <button type="button" class="knopf klein" id="n-format" aria-haspopup="menu" aria-expanded="false"><span class="nz-aa" aria-hidden="true">Aa</span>Format</button>
+        <button type="button" class="knopf klein" id="n-check" tabindex="-1">${CHECK_SVG}Checkliste</button>
+        <span class="nz-leiste-luecke"></span>
+        <span class="nz-geteilt" id="n-geteilt" hidden>${ICON.personen}Gemeinsam</span>
+        <button type="button" class="knopf klein nz-mehr" id="n-mehr" tabindex="-1" aria-haspopup="menu" aria-expanded="false" aria-label="Mehr Optionen">${ICON.mehr}</button>
+      </div>
+      <div class="nz-meta" id="n-meta" hidden></div>
       <div class="nz-liste" id="n-zeilen" role="group" aria-label="Notiztext. Die erste Zeile ist der Titel."></div>
+      <div class="nz-links" id="n-links" hidden></div>
+      <div class="nz-toast" id="n-toast" role="status" hidden></div>
       <div class="reihe">
         <div class="feld"><label for="n-person">Für</label><select id="n-person">${personen.map(([pid, name]) => `<option value="${esc(pid)}" ${n.person === pid ? "selected" : ""}>${esc(name)}</option>`).join("")}</select></div>
         <div class="feld"><span class="lbl" id="n-pin-l">Anheften</span><button type="button" class="knopf notiz-pinknopf" id="n-pin" aria-pressed="${angeheftet}" aria-labelledby="n-pin-l">${ICON.pin}<span id="n-pin-t">${angeheftet ? "Angeheftet" : "Nicht angeheftet"}</span></button></div>
@@ -3180,95 +3541,476 @@ class PlanerPanel extends HTMLElement {
     </form>`;
     const $ = (x) => dlg.querySelector(`#${x}`);
     const liste = $("n-zeilen");
-    // Zeilenmodell: Zeile 1 ist der Titel; „☐ “ / „☑ “ am Zeilenanfang macht eine Zeile zum Checklistenpunkt
+    const ARIA = { h1: "Überschrift", h2: "Zwischenüberschrift", bullet: "Aufzählungspunkt", num: "Listenpunkt", check: "Checklistenpunkt", text: "Zeile" };
+    const LISTEN = ["check", "bullet", "num"];
+
+    // ---- Zeilenmodell: Zeile 1 ist der Titel, jede weitere Zeile ein eigenes Feld; Tabellen sind ein Block ----
     const wachsen = (ta) => { ta.style.height = "auto"; ta.style.height = `${ta.scrollHeight}px`; };
     const alleWachsen = () => liste.querySelectorAll("textarea").forEach(wachsen);
+    const istTitel = (el) => el === liste.firstElementChild;
+    const feldVon = (el) => (el.dataset.art === "table" ? (el._zelle && el.querySelector(`tr:nth-child(${el._zelle[0] + 1}) td:nth-child(${el._zelle[1] + 1}) input`)) || el.querySelector("input") : el.querySelector("textarea"));
     const artSetzen = (el, art, ok = false) => {
       const ta = el.querySelector("textarea");
       el.querySelector(".nz-box")?.remove();
+      el.querySelector(".nz-mark")?.remove();
+      el.classList.remove("nz-h1", "nz-h2");
       if (art === "check") {
         const b = document.createElement("button");
         b.type = "button"; b.className = "nz-box"; b.setAttribute("role", "checkbox");
         b.addEventListener("pointerdown", (e) => e.preventDefault());
-        b.addEventListener("click", () => { const neu = el.dataset.ok !== "1"; el.dataset.ok = neu ? "1" : "0"; b.setAttribute("aria-checked", String(neu)); b.setAttribute("aria-label", `${ta.value || "Punkt"} erledigt`); merken(true); });
+        b.addEventListener("click", () => haken(el, el.dataset.ok !== "1"));
         el.prepend(b);
         el.dataset.ok = ok ? "1" : "0";
         b.setAttribute("aria-checked", String(ok)); b.setAttribute("aria-label", `${ta.value || "Punkt"} erledigt`);
       } else delete el.dataset.ok;
+      if (art === "bullet" || art === "num") {
+        const s = document.createElement("span");
+        s.className = "nz-mark"; s.setAttribute("aria-hidden", "true"); s.textContent = art === "bullet" ? "•" : "1.";
+        el.prepend(s);
+      }
+      if (art === "h1" || art === "h2") el.classList.add(`nz-${art}`);
       el.dataset.art = art;
+      ta.setAttribute("aria-label", ARIA[art] || "Zeile");
     };
-    const neueZeile = (z, titel = false) => {
+    const textZeile = (wert, art = "text", ok = false, titel = false) => {
       const el = document.createElement("div");
       el.className = titel ? "nz nz-titel" : "nz";
       const ta = document.createElement("textarea");
       ta.rows = 1; ta.autocomplete = "off"; ta.setAttribute("enterkeyhint", "enter");
       ta.autocapitalize = "sentences";
-      if (titel) { ta.maxLength = 200; ta.placeholder = "Titel"; ta.setAttribute("aria-label", "Titel"); }
-      else ta.setAttribute("aria-label", "Zeile");
-      const m = titel ? null : /^([☐☑]) ?/.exec(z);
-      ta.value = m ? z.slice(m[0].length) : z;
+      ta.value = wert;
       el.append(ta);
-      artSetzen(el, m ? "check" : "text", m?.[1] === "☑");
+      if (titel) { ta.maxLength = 200; ta.placeholder = "Titel"; el.dataset.art = "text"; ta.setAttribute("aria-label", "Titel"); }
+      else artSetzen(el, art, ok);
       return el;
     };
-    const fokus = (el, pos) => { const ta = el.querySelector("textarea"); ta.focus({ preventScroll: false }); const p = pos === undefined ? ta.value.length : pos; try { ta.setSelectionRange(p, p); } catch (err) { /* egal */ } };
-    const zeilenLesen = () => [...liste.children].map((el, i) => (el.dataset.art === "check" && i > 0 ? (el.dataset.ok === "1" ? "☑ " : "☐ ") : "") + el.querySelector("textarea").value.replace(/\n/g, " "));
-    const start = n.titel ? [n.titel, ...(n.text || "").split("\n")] : (n.text || "").split("\n");
-    if (start.length < 2) start.push("");
-    start.forEach((z, i) => liste.append(neueZeile(z, i === 0)));
-    let aktuell = null;
-    liste.addEventListener("focusin", (e) => { aktuell = e.target.closest(".nz") || aktuell; });
+    const neueZeile = (z) => { const p = notizZeileLesen(z); return p.art === "table" ? tabelle([notizZellen(z)]) : textZeile(p.wert, p.art, p.ok); };
+    // Zeilen zu Elementen; aufeinanderfolgende Tabellenzeilen werden eine Tabelle
+    const bauen = (zeilen, ersteIstTitel) => {
+      const raus = [];
+      let tab = null;
+      zeilen.forEach((z, i) => {
+        if (ersteIstTitel && i === 0) { raus.push(textZeile(z, "text", false, true)); return; }
+        if (notizZeileLesen(z).art === "table") { if (tab) tab.push(notizZellen(z)); else { tab = [notizZellen(z)]; raus.push(tab); } return; }
+        tab = null;
+        raus.push(neueZeile(z));
+      });
+      return raus.map((x) => (Array.isArray(x) ? tabelle(x) : x));
+    };
+
+    // ---- Tabellen ----
+    const tabLesen = (el) => [...el.querySelectorAll("tr")].map((tr) => [...tr.querySelectorAll("input")].map((i) => i.value));
+    const tabZeichnen = (el, zeilen, fokusRC) => {
+      const sp = Math.max(1, ...zeilen.map((r) => r.length));
+      zeilen = zeilen.map((r) => [...r, ...Array(sp - r.length).fill("")]);
+      el.innerHTML = `<div class="nz-tab-scroll"><table class="nz-tabelle"><caption class="sr">Tabelle mit ${zeilen.length} Zeilen und ${sp} Spalten</caption><tbody>${zeilen.map((r, ri) => `<tr>${r.map((c, ci) => `<td><input type="text" class="nz-zelle" value="${esc(c)}" data-r="${ri}" data-c="${ci}" aria-label="Zeile ${ri + 1}, Spalte ${ci + 1}" autocomplete="off" enterkeyhint="next"></td>`).join("")}</tr>`).join("")}</tbody></table></div>
+        <div class="nz-tab-knoepfe"><button type="button" class="knopf klein" data-tab="zeile">${ICON.plus}Zeile</button><button type="button" class="knopf klein" data-tab="spalte">${ICON.plus}Spalte</button><button type="button" class="knopf klein nz-tab-mehr" data-tab="menue" aria-haspopup="menu" aria-expanded="false" aria-label="Tabelle bearbeiten">${ICON.mehr}</button></div>`;
+      el._zelle = fokusRC || el._zelle || [0, 0];
+      el._zelle = [Math.min(el._zelle[0], zeilen.length - 1), Math.min(el._zelle[1], sp - 1)];
+      if (fokusRC) { const i = feldVon(el); i?.focus(); try { i.setSelectionRange(i.value.length, i.value.length); } catch (err) { /* egal */ } }
+    };
+    const tabelle = (zeilen) => {
+      const el = document.createElement("div");
+      el.className = "nz nz-tab"; el.dataset.art = "table";
+      tabZeichnen(el, zeilen.length ? zeilen : [["", ""], ["", ""]]);
+      return el;
+    };
+    const tabAktion = (el, art, info = {}) => {
+      const z = tabLesen(el);
+      const [r, c] = el._zelle || [z.length - 1, 0];
+      const sp = z[0]?.length || 1;
+      if (art === "zeile") { z.splice(r + 1, 0, Array(sp).fill("")); tabZeichnen(el, z, [r + 1, c]); }
+      else if (art === "zeile-oben") { z.splice(r, 0, Array(sp).fill("")); tabZeichnen(el, z, [r, c]); }
+      else if (art === "spalte") { z.forEach((x) => x.splice(c + 1, 0, "")); tabZeichnen(el, z, [r, c + 1]); }
+      else if (art === "zeile-weg" || art === "spalte-weg" || art === "weg") {
+        if (art === "zeile-weg") z.splice(r, 1);
+        if (art === "spalte-weg") z.forEach((x) => x.splice(c, 1));
+        if (art === "weg" || !z.length || !z[0].length) {
+          const vorher = el.previousElementSibling;
+          let nach = el.nextElementSibling;
+          el.remove();
+          if (!nach || nach.dataset.art === "table") { nach = textZeile(""); vorher.after(nach); }
+          aktuell = nach;
+          fokus(nach, 0);
+          this._sagen("Tabelle gelöscht");
+        } else tabZeichnen(el, z, [Math.min(r, z.length - 1), Math.min(c, z[0].length - 1)]);
+      }
+      merken(true);
+      if (info.tastatur) feldVon(el)?.focus();
+    };
+    const tabMenue = (el, knopf, info) => this._menue(knopf, [
+      { text: "Zeile darunter", icon: ICON.plus, aktion: (i) => tabAktion(el, "zeile", i) },
+      { text: "Zeile darüber", icon: ICON.plus, aktion: (i) => tabAktion(el, "zeile-oben", i) },
+      { text: "Spalte rechts", icon: ICON.plus, aktion: (i) => tabAktion(el, "spalte", i) },
+      "-",
+      { text: "Zeile löschen", gefahr: true, aktion: (i) => tabAktion(el, "zeile-weg", i) },
+      { text: "Spalte löschen", gefahr: true, aktion: (i) => tabAktion(el, "spalte-weg", i) },
+      { text: "Tabelle löschen", gefahr: true, icon: ICON.muell, aktion: (i) => tabAktion(el, "weg", i) },
+    ], { titel: "Tabelle", tastatur: info.tastatur });
+
+    const fokus = (el, pos) => {
+      if (!el) return;
+      if (el.dataset.art === "table") {
+        const z = el.querySelectorAll("tr");
+        el._zelle = pos === 0 ? [0, 0] : [z.length - 1, (z[z.length - 1]?.querySelectorAll("input").length || 1) - 1];
+        const i = feldVon(el); i?.focus(); return;
+      }
+      const ta = el.querySelector("textarea"); ta.focus({ preventScroll: false });
+      const p = pos === undefined ? ta.value.length : Math.min(pos, ta.value.length);
+      try { ta.setSelectionRange(p, p); } catch (err) { /* egal */ }
+    };
+    // Nummern neu zählen (jede zusammenhängende Liste beginnt bei 1)
+    const nummern = () => {
+      let k = 0;
+      for (const el of liste.children) {
+        if (el.dataset.art !== "num") { k = 0; continue; }
+        k++;
+        const m = el.querySelector(".nz-mark");
+        if (m) m.textContent = `${k}.`;
+        el.querySelector("textarea").setAttribute("aria-label", `Punkt ${k}`);
+      }
+    };
+    const PRAEFIX = { h1: "# ", h2: "## ", bullet: "• " };
+    const zeilenLesen = () => {
+      const raus = [];
+      let k = 0;
+      [...liste.children].forEach((el, i) => {
+        const art = el.dataset.art;
+        if (art === "table") {
+          k = 0;
+          for (const r of tabLesen(el)) raus.push(`| ${r.map((c) => c.replace(/\|/g, "/").replace(/\s+/g, " ")).join(" | ")} |`);
+          return;
+        }
+        const w = el.querySelector("textarea").value.replace(/\r?\n/g, " ");
+        if (i === 0) { raus.push(w); return; }
+        k = art === "num" ? k + 1 : 0;
+        raus.push((art === "check" ? (el.dataset.ok === "1" ? "☑ " : "☐ ") : art === "num" ? `${k}. ` : PRAEFIX[art] || "") + w);
+      });
+      return raus;
+    };
+    const startZeilen = (x) => { const z = x.titel ? [x.titel, ...(x.text || "").split("\n")] : (x.text || "").split("\n"); if (z.length < 2) z.push(""); return z; };
+    liste.append(...bauen(startZeilen(n), true));
+    nummern();
+
+    // ---- Checkliste: abhaken, Erledigte nach unten ----
+    const blockVon = (el) => {
+      const ist = (x) => x && x.dataset.art === "check" && !istTitel(x);
+      let a = el; while (ist(a.previousElementSibling)) a = a.previousElementSibling;
+      const block = [];
+      for (let x = a; ist(x); x = x.nextElementSibling) block.push(x);
+      return block;
+    };
+    const flip = (els, tun) => {
+      const vor = new Map(els.map((x) => [x, x.getBoundingClientRect().top]));
+      const akt = this.shadowRoot.activeElement, a = akt?.selectionStart, b = akt?.selectionEnd;
+      tun();
+      if (akt && liste.contains(akt) && this.shadowRoot.activeElement !== akt) { akt.focus({ preventScroll: true }); try { akt.setSelectionRange(a, b); } catch (err) { /* egal */ } }
+      if (ruhig) return;
+      for (const x of els) {
+        const dy = vor.get(x) - x.getBoundingClientRect().top;
+        if (Math.abs(dy) > 1) x.animate?.([{ transform: `translateY(${dy}px)` }, { transform: "none" }], { duration: 300, easing: "cubic-bezier(.2,.8,.2,1)" });
+      }
+    };
+    // Abgehakter Punkt ans Ende seiner Liste, wieder geöffneter vor den ersten erledigten
+    const einsortieren = (el) => {
+      if (!erledigteUnten || !el.isConnected || el.dataset.art !== "check") return false;
+      const block = blockVon(el);
+      const ok = el.dataset.ok === "1";
+      const andere = block.filter((x) => x !== el);
+      const ziel = ok ? null : andere.find((x) => x.dataset.ok === "1");
+      if (ok ? block[block.length - 1] === el : (ziel ? el.nextElementSibling === ziel || block.indexOf(el) < block.indexOf(ziel) : true)) return false;
+      flip(block, () => { if (ok) block[block.length - 1].after(el); else ziel.before(el); });
+      return true;
+    };
+    const allesSortieren = () => {
+      const bloecke = [];
+      for (const el of liste.children) if (el.dataset.art === "check" && !istTitel(el) && el.previousElementSibling?.dataset.art !== "check") bloecke.push(blockVon(el));
+      for (const block of bloecke) {
+        const neu = [...block.filter((x) => x.dataset.ok !== "1"), ...block.filter((x) => x.dataset.ok === "1")];
+        if (neu.every((x, i) => x === block[i])) continue;
+        flip(block, () => { const vor = block[0].previousElementSibling; vor.after(...neu); });
+      }
+    };
+    let sortierTimer = null;
+    const haken = (el, ok, still = false) => {
+      el.dataset.ok = ok ? "1" : "0";
+      const b = el.querySelector(".nz-box"), ta = el.querySelector("textarea");
+      b?.setAttribute("aria-checked", String(ok)); b?.setAttribute("aria-label", `${ta.value || "Punkt"} erledigt`);
+      merken(true);
+      if (!still) this._sagen(ok ? `${ta.value || "Punkt"} erledigt` : `${ta.value || "Punkt"} offen`);
+      if (erledigteUnten) {
+        clearTimeout(sortierTimer);
+        sortierTimer = setTimeout(() => { if (einsortieren(el)) merken(true); }, ruhig ? 0 : 450);
+      }
+    };
+
+    // ---- Links, Telefonnummern, E-Mail ----
+    const linksZeigen = () => {
+      const l = notizLinks(zeilenLesen().join("\n"));
+      const box = $("n-links");
+      box.hidden = !l.length;
+      box.innerHTML = l.length ? `<span class="nz-links-t" id="n-links-t">Links</span><ul aria-labelledby="n-links-t">${l.slice(0, 12).map((x) => `<li><a class="nz-link" href="${esc(x.href)}" ${x.art === "web" ? 'target="_blank" rel="noopener noreferrer"' : ""}>${x.art === "tel" ? ICON.telefon : x.art === "mail" ? ICON.mail : ICON.link}<span>${esc(x.art === "web" ? x.text.replace(/^https?:\/\//i, "").replace(/\/$/, "") : x.text)}</span>${x.art === "tel" ? '<span class="sr"> anrufen</span>' : x.art === "mail" ? '<span class="sr"> E-Mail schreiben</span>' : '<span class="sr"> öffnen, neues Fenster</span>'}</a></li>`).join("")}</ul>` : "";
+    };
+    // ---- Kopfzeilen-Infos: Ordner, Farbe, Gemeinsam ----
+    const metaZeigen = () => {
+      const m = $("n-meta");
+      const fName = NOTIZ_FARBEN.find(([, f]) => f === farbe)?.[0];
+      m.hidden = !ordner && !farbe;
+      m.innerHTML = `${ordner ? `<button type="button" class="nz-chip" id="n-meta-ordner" aria-haspopup="menu" aria-expanded="false" aria-label="Ordner ${esc(ordner)} ändern">${ICON.ordner}${esc(ordner)}</button>` : ""}${farbe ? `<button type="button" class="nz-chip" id="n-meta-farbe" aria-haspopup="menu" aria-expanded="false" aria-label="Farbe ${esc(fName || "")} ändern"><span class="nz-punkt" style="--nf:${esc(farbe)}" aria-hidden="true"></span>${esc(fName || "Farbe")}</button>` : ""}`;
+      m.querySelector("#n-meta-ordner")?.addEventListener("click", (e) => ordnerMenue(e.currentTarget, { tastatur: e.detail === 0 }));
+      m.querySelector("#n-meta-farbe")?.addEventListener("click", (e) => farbMenue(e.currentTarget, { tastatur: e.detail === 0 }));
+      dlg.style.setProperty("--nf", farbe || "transparent");
+      dlg.classList.toggle("nz-farbig", !!farbe);
+      $("n-geteilt").hidden = $("n-person").value !== GEMEINSAM;
+    };
+
+    // ---- Bearbeiten ----
+    let aktuell = null, letztesFeld = null;
+    liste.addEventListener("focusin", (e) => {
+      aktuell = e.target.closest(".nz") || aktuell;
+      if (e.target.matches("textarea, input")) letztesFeld = e.target;
+      if (e.target.classList.contains("nz-zelle")) aktuell._zelle = [+e.target.dataset.r, +e.target.dataset.c];
+    });
+    liste.addEventListener("click", (e) => {
+      const k = e.target.closest("[data-tab]");
+      if (!k) return;
+      const el = k.closest(".nz");
+      aktuell = el;
+      if (k.dataset.tab === "menue") tabMenue(el, k, { tastatur: e.detail === 0 });
+      else tabAktion(el, k.dataset.tab, { tastatur: e.detail === 0 });
+    });
+    liste.addEventListener("pointerdown", (e) => { if (e.target.closest("[data-tab]:not([data-tab=menue])")) e.preventDefault(); });
     liste.addEventListener("input", (e) => {
       const ta = e.target, el = ta.closest(".nz");
-      if (!el) return;
+      if (!el || ta.tagName !== "TEXTAREA") return;
       if (ta.value.includes("\n")) {
-        // Einfügen mehrerer Zeilen: auf Zeilen verteilen
+        // Einfügen mehrerer Zeilen: auf Zeilen verteilen; in Listen bekommen neue Zeilen dieselbe Art
         const teile = ta.value.split(/\r?\n/);
-        const istTitel = el === liste.firstElementChild;
         ta.value = teile[0];
-        let vor = el;
-        for (const t of teile.slice(1)) { const z = neueZeile(/^[☐☑] /.test(t) || el.dataset.art !== "check" ? t : `☐ ${t}`); vor.after(z); vor = z; }
-        if (istTitel && el.dataset.art === "check") artSetzen(el, "text");
-        fokus(vor);
-        alleWachsen();
-      } else wachsen(ta);
+        const art = el.dataset.art;
+        const fort = LISTEN.includes(art) && !istTitel(el);
+        const neu = bauen(teile.slice(1).map((t) => (fort && notizZeileLesen(t).art === "text" ? (art === "check" ? "☐ " : art === "num" ? "1. " : "• ") + t : t)), false);
+        el.after(...neu);
+        if (neu.length) fokus(neu[neu.length - 1]);
+        nummern(); alleWachsen();
+        return;
+      }
+      // Kurzbefehle am Zeilenanfang wie in Apple Notizen: „- “ Aufzählung, „1. “ Nummerierung, „[] “ Checkliste
+      if (!istTitel(el) && el.dataset.art === "text") {
+        const m = /^(?:([-*•]) |(1)\. |(\[ ?\]) )/.exec(ta.value);
+        if (m && ta.selectionStart === m[0].length) {
+          ta.value = ta.value.slice(m[0].length);
+          artSetzen(el, m[1] ? "bullet" : m[2] ? "num" : "check");
+          nummern(); fokus(el, 0);
+        }
+      }
+      wachsen(ta);
     });
     liste.addEventListener("keydown", (e) => {
       const ta = e.target, el = ta.closest(".nz");
       if (!el || e.isComposing) return;
-      const titel = el === liste.firstElementChild;
+      if (ta.classList.contains("nz-zelle")) {
+        const tr = ta.closest("tr"), td = ta.closest("td");
+        const ri = [...tr.parentElement.children].indexOf(tr), ci = [...tr.children].indexOf(td);
+        const zeilen = tr.parentElement.children;
+        if (e.key === "Enter") {
+          e.preventDefault();
+          if (ri === zeilen.length - 1) { el._zelle = [ri, ci]; tabAktion(el, "zeile"); }
+          else zeilen[ri + 1].children[ci]?.querySelector("input")?.focus();
+        } else if (e.key === "ArrowDown") {
+          e.preventDefault();
+          if (ri < zeilen.length - 1) zeilen[ri + 1].children[ci]?.querySelector("input")?.focus();
+          else { let nach = el.nextElementSibling; if (!nach) { nach = textZeile(""); el.after(nach); } fokus(nach, 0); }
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          if (ri > 0) zeilen[ri - 1].children[ci]?.querySelector("input")?.focus();
+          else fokus(el.previousElementSibling);
+        }
+        return;
+      }
+      if (ta.tagName !== "TEXTAREA") return;
+      const titel = istTitel(el);
+      const art = el.dataset.art;
       if (e.key === "Enter") {
         e.preventDefault();
-        if (el.dataset.art === "check" && !ta.value.trim()) { artSetzen(el, "text"); ta.value = ""; merken(true); fokus(el); return; }
+        if (LISTEN.includes(art) && !ta.value.trim()) { artSetzen(el, "text"); ta.value = ""; nummern(); merken(true); fokus(el); return; }
         const vor = ta.value.slice(0, ta.selectionStart), nach = ta.value.slice(ta.selectionEnd);
         ta.value = vor;
-        const z = neueZeile(el.dataset.art === "check" && !titel ? `☐ ${nach}` : nach);
+        const z = textZeile(nach, !titel && LISTEN.includes(art) ? art : "text");
         el.after(z);
-        alleWachsen(); fokus(z, 0); merken(true);
+        nummern(); alleWachsen(); fokus(z, 0); merken(true);
       } else if (e.key === "Backspace" && ta.selectionStart === 0 && ta.selectionEnd === 0) {
-        if (el.dataset.art === "check") { e.preventDefault(); artSetzen(el, "text"); merken(true); fokus(el, 0); }
+        if (!titel && art !== "text") { e.preventDefault(); artSetzen(el, "text"); nummern(); merken(true); fokus(el, 0); }
         else if (!titel) {
           e.preventDefault();
-          const vorher = el.previousElementSibling, pt = vorher.querySelector("textarea"), l = pt.value.length;
+          const vorher = el.previousElementSibling;
+          if (vorher.dataset.art === "table") {
+            if (!ta.value) { el.remove(); if (!vorher.nextElementSibling) vorher.after(textZeile("")); merken(true); }
+            fokus(vorher);
+            return;
+          }
+          const pt = vorher.querySelector("textarea"), l = pt.value.length;
           pt.value += ta.value;
-          el.remove(); alleWachsen(); fokus(vorher, l); merken(true);
+          el.remove(); nummern(); alleWachsen(); fokus(vorher, l); merken(true);
         }
       } else if (e.key === "ArrowUp" && ta.selectionStart === 0 && el.previousElementSibling) { e.preventDefault(); fokus(el.previousElementSibling); }
       else if (e.key === "ArrowDown" && ta.selectionStart === ta.value.length && el.nextElementSibling) { e.preventDefault(); fokus(el.nextElementSibling, 0); }
+      else if ((e.key === "b" || e.key === "B") && (e.ctrlKey || e.metaKey) && !e.altKey) { e.preventDefault(); fett(); }
     });
-    const checkKnopf = $("n-check");
-    checkKnopf.addEventListener("pointerdown", (e) => e.preventDefault());
-    checkKnopf.addEventListener("click", () => {
+
+    // Zeile, auf die eine Formatierung wirkt (nie der Titel, nie eine Tabelle: dann eine neue Zeile dahinter)
+    const zielZeile = () => {
       let el = aktuell && liste.contains(aktuell) ? aktuell : liste.lastElementChild;
-      if (el === liste.firstElementChild) { el = el.nextElementSibling || (liste.append(neueZeile("")), liste.lastElementChild); }
+      if (istTitel(el)) {
+        const nach = el.nextElementSibling;
+        if (nach && nach.dataset.art !== "table") el = nach;
+        else { const z = textZeile(""); el.after(z); el = z; }
+      } else if (el.dataset.art === "table") { const z = textZeile(""); el.after(z); el = z; }
+      return el;
+    };
+    const formatSetzen = (art) => {
+      const el = zielZeile();
       const ta = el.querySelector("textarea");
-      if (el.dataset.art === "check") artSetzen(el, "text"); else artSetzen(el, "check");
-      aktuell = el; alleWachsen(); merken(true); fokus(el, ta.selectionStart ?? undefined);
+      const pos = ta.selectionStart ?? ta.value.length;
+      const neu = el.dataset.art === art && art !== "text" ? "text" : art;
+      artSetzen(el, neu, false);
+      aktuell = el;
+      nummern(); alleWachsen(); merken(true); fokus(el, pos);
+      this._sagen(neu === "text" ? "Normaler Text" : `${ARIA[neu]}`);
+    };
+    const fett = () => {
+      const f = letztesFeld && liste.contains(letztesFeld) ? letztesFeld : null;
+      if (!f) { this._sagen("Erst Text auswählen."); return; }
+      const v = f.value;
+      let a = f.selectionStart ?? v.length, b = f.selectionEnd ?? a;
+      let neu, na, nb;
+      if (b - a >= 4 && v.slice(a, a + 2) === "**" && v.slice(b - 2, b) === "**") { neu = v.slice(0, a) + v.slice(a + 2, b - 2) + v.slice(b); na = a; nb = b - 4; }
+      else if (v.slice(a - 2, a) === "**" && v.slice(b, b + 2) === "**") { neu = v.slice(0, a - 2) + v.slice(a, b) + v.slice(b + 2); na = a - 2; nb = b - 2; }
+      else { neu = `${v.slice(0, a)}**${v.slice(a, b)}**${v.slice(b)}`; na = a + 2; nb = b + 2; }
+      f.value = neu;
+      f.focus();
+      try { f.setSelectionRange(na, nb); } catch (err) { /* egal */ }
+      if (f.tagName === "TEXTAREA") wachsen(f);
+      merken(true);
+    };
+    const tabelleEinfuegen = () => {
+      let el = aktuell && liste.contains(aktuell) ? aktuell : liste.lastElementChild;
+      const t = tabelle([["", ""], ["", ""]]);
+      if (!istTitel(el) && el.dataset.art !== "table" && !el.querySelector("textarea").value.trim()) el.replaceWith(t);
+      else el.after(t);
+      const nach = t.nextElementSibling;
+      if (!nach || nach.dataset.art === "table") t.after(textZeile(""));
+      aktuell = t;
+      nummern(); fokus(t, 0); merken(true);
+      this._sagen("Tabelle mit 2 Spalten und 2 Zeilen eingefügt");
+    };
+    const aktuelleArt = () => { const el = aktuell && liste.contains(aktuell) ? aktuell : null; return !el || istTitel(el) ? "" : el.dataset.art; };
+    const formatMenue = (knopf, info) => {
+      const art = aktuelleArt();
+      this._menue(knopf, [
+        { text: "Überschrift", icon: '<span class="g-h1">T</span>', radio: true, aktiv: art === "h1", aktion: () => formatSetzen("h1") },
+        { text: "Zwischenüberschrift", icon: '<span class="g-h2">T</span>', radio: true, aktiv: art === "h2", aktion: () => formatSetzen("h2") },
+        { text: "Normaler Text", icon: '<span class="g-t">T</span>', radio: true, aktiv: art === "text", aktion: () => formatSetzen("text") },
+        "-",
+        { text: "Aufzählung", icon: '<span class="g-t">•</span>', radio: true, aktiv: art === "bullet", aktion: () => formatSetzen("bullet") },
+        { text: "Nummerierte Liste", icon: '<span class="g-t">1.</span>', radio: true, aktiv: art === "num", aktion: () => formatSetzen("num") },
+        { text: "Checkliste", icon: CHECK_SVG, radio: true, aktiv: art === "check", aktion: () => formatSetzen("check") },
+        "-",
+        { text: "Fett", icon: '<b class="g-t">B</b>', aktion: fett },
+        { text: "Tabelle einfügen", icon: ICON.tabelle, aktion: tabelleEinfuegen },
+      ], { titel: "Format", tastatur: info.tastatur });
+    };
+
+    // ---- Punkt als Aufgabe übernehmen ----
+    const toast = (text, rueck) => {
+      const t = $("n-toast");
+      clearTimeout(t._zeit);
+      t.innerHTML = `<span>${esc(text)}</span>${rueck ? '<button type="button" class="knopf text fett">Rückgängig</button>' : ""}`;
+      t.hidden = false;
+      t.querySelector("button")?.addEventListener("click", async () => { t.hidden = true; try { await rueck(); this._sagen("Rückgängig gemacht"); } catch (err) { /* angesagt */ } });
+      t._zeit = setTimeout(() => { t.hidden = true; }, 6000);
+    };
+    const alsAufgabe = async () => {
+      const el = aktuell && liste.contains(aktuell) ? aktuell : null;
+      const f = el ? feldVon(el) : null;
+      const titel = notizOhneFett(f?.value || "").replace(/\s+/g, " ").trim().slice(0, 200);
+      if (!titel) { toast("Tippe zuerst in die Zeile, die eine Aufgabe werden soll."); this._sagen("Keine Zeile ausgewählt"); return; }
+      let neu;
+      try { neu = await this._ws({ type: "planer/speichern", aufgabe: { titel, person: $("n-person").value, datum: null } }); } catch (err) { return; }
+      const warOffen = el.dataset.art === "check" && el.dataset.ok !== "1";
+      if (warOffen) haken(el, true, true);
+      this._sagen(`Aufgabe angelegt: ${titel}, im Eingang`);
+      toast(`Aufgabe „${titel}“ im Eingang`, async () => {
+        if (neu?.id) await this._ws({ type: "planer/loeschen", aufgabe_id: neu.id });
+        if (warOffen && el.isConnected) haken(el, false, true);
+      });
+    };
+
+    // ---- Ordner und Farbe ----
+    const ordnerSetzen = (o) => { ordner = String(o || "").trim().slice(0, 40); metaZeigen(); merken(true); this._sagen(ordner ? `In Ordner ${ordner}` : "Kein Ordner"); };
+    const farbeSetzen = (f) => { farbe = f; metaZeigen(); merken(true); this._sagen(f ? `Farbe ${NOTIZ_FARBEN.find(([, x]) => x === f)?.[0] || ""}` : "Keine Farbe"); };
+    const ordnerMenue = (knopf, info, zurueck) => {
+      const alle = [...new Set((this._daten?.notizen || []).map((x) => x.ordner).filter(Boolean).concat(ordner ? [ordner] : []))].sort((a, b) => a.localeCompare(b, "de"));
+      this._menue(knopf, [
+        zurueck ? { text: "Zurück", icon: "‹", aktion: zurueck } : null,
+        zurueck ? "-" : null,
+        ...alle.map((o) => ({ text: o, icon: ICON.ordner, radio: true, aktiv: o === ordner, aktion: () => ordnerSetzen(o) })),
+        { text: "Kein Ordner", radio: true, aktiv: !ordner, aktion: () => ordnerSetzen("") },
+        "-",
+        { eingabe: true, text: "Neuer Ordner", knopf: "Anlegen", max: 40, aktion: (w) => ordnerSetzen(w) },
+      ], { titel: "Ordner", tastatur: info?.tastatur });
+    };
+    const farbMenue = (knopf, info, zurueck) => this._menue(knopf, [
+      zurueck ? { text: "Zurück", icon: "‹", aktion: zurueck } : null,
+      zurueck ? "-" : null,
+      ...NOTIZ_FARBEN.map(([name, f]) => ({ text: name, icon: `<span class="nz-punkt" style="--nf:${f}"></span>`, radio: true, aktiv: farbe === f, aktion: () => farbeSetzen(f) })),
+      "-",
+      { text: "Keine Farbe", radio: true, aktiv: !farbe, aktion: () => farbeSetzen("") },
+    ], { titel: "Farbe", tastatur: info?.tastatur });
+    const mehrKnopf = $("n-mehr");
+    const mehrMenue = (info) => this._menue(mehrKnopf, [
+      { text: angeheftet ? "Loslösen" : "Anheften", icon: ICON.pin, aktion: pinUmschalten },
+      { text: "Als Aufgabe übernehmen", icon: ICON.aufgaben, aktion: alsAufgabe },
+      "-",
+      { text: ordner ? `Ordner: ${ordner}` : "Ordner …", icon: ICON.ordner, untermenue: true, aktion: (i) => ordnerMenue(mehrKnopf, i, mehrMenue) },
+      { text: "Farbe", icon: `<span class="nz-punkt" style="--nf:${farbe || "transparent"}"></span>`, untermenue: true, aktion: (i) => farbMenue(mehrKnopf, i, mehrMenue) },
+      { text: "Erledigte nach unten", aktiv: erledigteUnten, aktion: () => {
+        erledigteUnten = !erledigteUnten;
+        if (erledigteUnten) allesSortieren();
+        merken(true);
+        this._sagen(erledigteUnten ? "Erledigte wandern nach unten" : "Erledigte bleiben an ihrem Platz");
+      } },
+      "-",
+      { text: "Notiz löschen", icon: ICON.muell, gefahr: true, aktion: () => loeschen() },
+    ], { titel: "Mehr", tastatur: info?.tastatur });
+
+    // ---- Werkzeugleiste ----
+    const leiste = $("n-leiste");
+    const formatKnopf = $("n-format"), checkKnopf = $("n-check");
+    [formatKnopf, checkKnopf, mehrKnopf].forEach((k) => k.addEventListener("pointerdown", (e) => e.preventDefault()));
+    formatKnopf.addEventListener("click", (e) => formatMenue(formatKnopf, { tastatur: e.detail === 0 }));
+    checkKnopf.addEventListener("click", () => formatSetzen("check"));
+    mehrKnopf.addEventListener("click", (e) => mehrMenue({ tastatur: e.detail === 0 }));
+    // Pfeiltasten wandern durch die Werkzeugleiste (ein Tab-Stopp)
+    leiste.addEventListener("keydown", (e) => {
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight" && e.key !== "Home" && e.key !== "End") return;
+      const k = [formatKnopf, checkKnopf, mehrKnopf];
+      let i = k.indexOf(this.shadowRoot.activeElement);
+      if (i < 0) return;
+      e.preventDefault();
+      i = e.key === "Home" ? 0 : e.key === "End" ? k.length - 1 : (i + (e.key === "ArrowRight" ? 1 : -1) + k.length) % k.length;
+      k.forEach((x, j) => { x.tabIndex = j === i ? 0 : -1; });
+      k[i].focus();
     });
+
+    // ---- Speichern ----
     let sicher = false;
-    let zeitgeber = null, aenderung = false, geaendert = false, weg = false, laeuft = Promise.resolve();
+    let zeitgeber = null, aenderung = false, geaendert = false, weg = false, laeuft = Promise.resolve(), inFlug = 0, letzteEingabe = 0, liveTimer = null;
     const stand = (t) => { $("n-stand").textContent = t; };
-    const sammeln = () => { const z = zeilenLesen(); return { titel: z[0], text: z.slice(1).join("\n"), person: $("n-person").value, angeheftet }; };
+    const sammeln = () => { const z = zeilenLesen(); return { titel: z[0], text: z.slice(1).join("\n"), person: $("n-person").value, angeheftet, ordner, farbe, erledigte_unten: erledigteUnten }; };
+    const sig = (x) => JSON.stringify([x.titel || "", x.text || "", !!x.angeheftet, x.ordner || "", x.farbe || "", x.erledigte_unten !== false, x.person || ""]);
+    // Stände, die schon im Editor waren: kommen sie (verspätet) vom Server zurück, ist das keine fremde Änderung
+    const gesehen = new Set([sig(n)]);
     // Speichern läuft nacheinander. Eine neue Notiz bekommt ihre ID von der ersten Antwort; spätere Speicherungen nutzen sie.
     const autoSpeichern = () => {
       clearTimeout(zeitgeber); zeitgeber = null;
@@ -3277,47 +4019,97 @@ class PlanerPanel extends HTMLElement {
       if (!id && !notiz.titel.trim() && !notiz.text.trim()) { aenderung = false; stand(""); return laeuft; }
       aenderung = false;
       stand("Speichert …");
+      inFlug++;
       laeuft = laeuft.then(async () => {
         if (weg) return;
         try {
           const neu = await this._hass.callWS({ type: "planer/notiz_speichern", notiz: id ? { ...notiz, id } : notiz });
           id = neu.id; geaendert = true;
+          gesehen.add(sig(neu));
           $("n-loeschen").hidden = false;
           stand(aenderung ? "" : "Gespeichert");
         } catch (err) { aenderung = true; stand(""); $("n-fehler").textContent = err.message || "Speichern hat nicht geklappt."; }
-      });
+      }).finally(() => { inFlug--; });
       return laeuft;
     };
     const merken = (sofort = false) => {
       aenderung = true; stand(""); $("n-fehler").textContent = "";
       clearTimeout(zeitgeber);
+      linksZeigen();
       if (sofort) autoSpeichern(); else zeitgeber = setTimeout(autoSpeichern, 300);
     };
     const form = $("nform");
-    form.addEventListener("input", (e) => merken(e.target.tagName === "SELECT"));
-    form.addEventListener("change", () => merken(true));
+    form.addEventListener("input", (e) => {
+      if (e.target.closest(".menue")) return;
+      letzteEingabe = Date.now();
+      merken(e.target.tagName === "SELECT");
+    });
+    form.addEventListener("change", (e) => {
+      if (e.target.closest(".menue")) return;
+      if (e.target.id === "n-person") metaZeigen();
+      merken(true);
+    });
     form.addEventListener("focusout", () => { if (aenderung) autoSpeichern(); });
-    $("n-pin").addEventListener("click", () => {
+    const pinUmschalten = () => {
       angeheftet = !angeheftet;
       $("n-pin").setAttribute("aria-pressed", String(angeheftet));
       $("n-pin-t").textContent = angeheftet ? "Angeheftet" : "Nicht angeheftet";
       this._sagen(angeheftet ? "Notiz angeheftet" : "Anheften aufgehoben");
       merken(true);
-    });
+    };
+    $("n-pin").addEventListener("click", pinUmschalten);
+
+    // ---- Live: Änderungen von anderen (z. B. gemeinsame Notiz) übernehmen, wenn hier gerade nicht getippt wird ----
+    const uebernehmen = (s) => {
+      angeheftet = !!s.angeheftet; ordner = s.ordner || ""; farbe = s.farbe || ""; erledigteUnten = s.erledigte_unten !== false;
+      $("n-pin").setAttribute("aria-pressed", String(angeheftet));
+      $("n-pin-t").textContent = angeheftet ? "Angeheftet" : "Nicht angeheftet";
+      if ([...$("n-person").options].some((o) => o.value === s.person)) $("n-person").value = s.person;
+      metaZeigen();
+      const jetzt = sammeln();
+      if (jetzt.titel === (s.titel || "") && jetzt.text.replace(/\s+$/, "") === (s.text || "")) return;
+      const akt = this.shadowRoot.activeElement;
+      const hatteFokus = akt && liste.contains(akt);
+      const idx = hatteFokus ? [...liste.children].indexOf(akt.closest(".nz")) : -1;
+      const pos = hatteFokus ? akt.selectionStart : 0;
+      liste.replaceChildren(...bauen(startZeilen(s), true));
+      nummern(); alleWachsen(); linksZeigen();
+      aktuell = null;
+      if (idx >= 0) { const el = liste.children[Math.min(idx, liste.children.length - 1)]; fokus(el, el.dataset.art === "table" ? 0 : pos); }
+      stand("Aktualisiert");
+      this._sagen("Die Notiz wurde gerade woanders geändert und ist jetzt aktuell.");
+    };
+    const live = () => {
+      clearTimeout(liveTimer);
+      if (!dlg.open || weg || !id) return;
+      const s = this._notiz(id);
+      if (!s) return;
+      const k = sig(s);
+      if (gesehen.has(k)) return;
+      const ruhe = Date.now() - letzteEingabe;
+      if (aenderung || zeitgeber || inFlug || ruhe < 3000) { liveTimer = setTimeout(live, Math.max(400, 3000 - ruhe)); return; }
+      gesehen.add(k);
+      uebernehmen(s);
+    };
+    this._notizLive = live;
+
     // Beim Wegklicken/Schließen sofort sichern, nicht erst nach der Animation; ebenso wenn die App verlassen wird
-    dlg._vorZu = () => autoSpeichern();
+    dlg._vorZu = () => { this._menueZu?.(false); return autoSpeichern(); };
     const weglegen = () => { if (document.visibilityState === "hidden" && dlg.open) dlg._vorZu?.(); };
     document.addEventListener("visibilitychange", weglegen);
     window.addEventListener("pagehide", weglegen);
     dlg.addEventListener("close", () => { document.removeEventListener("visibilitychange", weglegen); window.removeEventListener("pagehide", weglegen); }, { once: true });
     dlg.onclose = async () => {
       dlg._vorZu = null;
+      this._menueZu?.(false);
+      clearTimeout(liveTimer);
+      if (this._notizLive === live) this._notizLive = null;
+      dlg.classList.remove("nz-farbig");
       if (weg) return;
       await autoSpeichern();
       if (geaendert) { geaendert = false; await this._lesen(); }
     };
-    $("n-loeschen").addEventListener("click", async () => {
-      if (!sicher) { sicher = true; $("n-loeschen").textContent = "Wirklich löschen?"; $("n-loeschen").focus(); return; }
+    const loeschen = async () => {
       weg = true; clearTimeout(zeitgeber);
       await laeuft;
       const kopie = sammeln();
@@ -3329,6 +4121,10 @@ class PlanerPanel extends HTMLElement {
       this._sagen(`Gelöscht: ${titel}`);
       if (id) this._hinweis(`Gelöscht: ${titel}`, () => this._ws({ type: "planer/notiz_speichern", notiz: kopie }));
       await this._lesen();
+    };
+    $("n-loeschen").addEventListener("click", async () => {
+      if (!sicher) { sicher = true; $("n-loeschen").textContent = "Wirklich löschen?"; $("n-loeschen").focus(); return; }
+      await loeschen();
     });
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -3338,8 +4134,12 @@ class PlanerPanel extends HTMLElement {
       this._zu(dlg);
     });
     this._wischZu(dlg);
+    metaZeigen();
+    linksZeigen();
     dlg.showModal();
     alleWachsen();
+    // Werkzeugleiste klebt unter der Kopfzeile
+    leiste.style.top = `${dlg.querySelector(".blatt-kopf").offsetHeight}px`;
     // Nur bei neuen Notizen direkt ins Textfeld (öffnet die Tastatur); bestehende öffnen ohne Tastatur.
     if (fokusText || !id) fokus(n.titel ? liste.children[1] : liste.firstElementChild, 0);
     else { $("blatt-titel").setAttribute("tabindex", "-1"); $("blatt-titel").focus({ preventScroll: true }); }

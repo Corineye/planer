@@ -316,23 +316,33 @@ class Planer:
             raise PermissionError("Diese Notiz gehört einer anderen Person.")
         n: dict[str, Any] = dict(alt or {})
         jetzt = dt_util.now().isoformat(timespec="seconds")
+        vorher = (n.get("titel", ""), n.get("text", ""))
         if "titel" in roh:
             n["titel"] = _text(roh["titel"], 200)
         if "text" in roh:
-            # Zeilenumbrüche und Einrückung bleiben erhalten, nur Ränder werden gekürzt
-            n["text"] = str(roh["text"] or "").strip()[:20000]
+            # Zeilenumbrüche und Einrückung bleiben erhalten; nur Leerzeilen am Anfang und Leerraum am Ende fallen weg
+            n["text"] = str(roh["text"] or "").rstrip().lstrip("\r\n")[:20000]
         if "person" in roh:
             p = roh["person"]
             n["person"] = p if p == GEMEINSAM or any(x["id"] == p for x in self.personen) else (benutzer_id or GEMEINSAM)
         if "angeheftet" in roh:
             n["angeheftet"] = bool(roh["angeheftet"])
+        if "ordner" in roh:
+            n["ordner"] = re.sub(r"[\x00-\x1f\x7f]", "", _text(roh["ordner"], 40)).strip()
+        if "farbe" in roh:
+            f = str(roh["farbe"] or "").strip()
+            n["farbe"] = f.lower() if re.fullmatch(r"#[0-9a-fA-F]{6}", f) else ""
+        if "erledigte_unten" in roh:
+            n["erledigte_unten"] = bool(roh["erledigte_unten"])
         if not alt:
             n.setdefault("titel", "")
             n.setdefault("text", "")
             n.setdefault("person", benutzer_id or GEMEINSAM)
             n.setdefault("angeheftet", False)
             n.update(id=uuid.uuid4().hex[:12], erstellt=jetzt, erstellt_von=benutzer_id)
-        n["geaendert"] = jetzt
+        # Nur echte Inhaltsänderungen zählen als „geändert“; Anheften, Ordner oder Farbe ändern die Reihenfolge nicht
+        if not alt or (n.get("titel", ""), n.get("text", "")) != vorher or not n.get("geaendert"):
+            n["geaendert"] = jetzt
         self.notizen[n["id"]] = n
         await self._sichern()
         return n
