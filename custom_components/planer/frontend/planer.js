@@ -743,6 +743,28 @@ dialog.pop form{display:grid;gap:var(--s3);padding:var(--s3) var(--s5) var(--s5)
 .kalzeile .punkt{width:12px;height:12px;border-radius:50%;background:var(--b)}
 .kalzeile .n{overflow-wrap:anywhere;color:var(--fg);font-weight:500}
 .kalzeile .schalter{width:22px;height:22px;accent-color:var(--accent-fill);margin:0}
+/* ---------- Notizen ---------- */
+.notiz-hinweis{margin:0 0 var(--s1)}
+.notizen-raster{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s3)}
+.notizen-raster li{display:grid;min-width:0}
+@media (max-width:1100px){.notizen-raster{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.schmal .notizen-raster{grid-template-columns:minmax(0,1fr)}
+.notiz-karte{display:flex;flex-direction:column;gap:var(--s2);align-items:stretch;text-align:left;width:100%;min-height:96px;padding:var(--s3) var(--s4);border:0;border-radius:var(--r-karte);background:var(--card);box-shadow:var(--karte-schatten);color:var(--fg);font:inherit;cursor:pointer;transition:transform .15s var(--bewegung)}
+.notiz-karte:active{transform:scale(.985)}
+.notiz-kopf{display:flex;gap:var(--s2);align-items:flex-start;justify-content:space-between;min-width:0}
+.notiz-titel-k{font-weight:700;font-size:var(--t-text);line-height:1.3;overflow-wrap:anywhere;min-width:0}
+.notiz-pin{flex:none;color:var(--accent);display:inline-grid;place-items:center}
+.notiz-pin svg{width:18px;height:18px}
+.notiz-vorschau{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;line-clamp:4;overflow:hidden;white-space:pre-line;overflow-wrap:anywhere;color:var(--muted);font-size:var(--t-sub);line-height:1.4}
+.notiz-meta{display:flex;gap:var(--s2);align-items:center;flex-wrap:wrap;margin-top:auto;font-size:var(--t-klein);color:var(--muted)}
+.feld.notiz-feld-titel input{min-height:52px;border:0;background:transparent;padding:var(--s2) 0;font-size:24px;font-weight:700;letter-spacing:-.01em;border-radius:0}
+.feld.notiz-feld-titel input::placeholder,.feld.notiz-feld-text textarea::placeholder{color:var(--muted);font-weight:500}
+.feld.notiz-feld-text textarea{min-height:calc(8 * 1.5em + 2 * var(--s2));border:0;background:transparent;padding:var(--s2) 0;font-size:max(16px,var(--t-text));line-height:1.5;resize:none;overflow:hidden;border-radius:0}
+.feld.notiz-feld-titel input:focus,.feld.notiz-feld-text textarea:focus{outline:none;box-shadow:none}
+.notiz-pinknopf{justify-content:flex-start;gap:var(--s2);min-height:44px;width:100%}
+.notiz-pinknopf svg{width:20px;height:20px}
+.notiz-pinknopf[aria-pressed="true"]{color:var(--accent);border-color:var(--accent)}
+.notiz-pinknopf[aria-pressed="true"] svg{fill:currentColor}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media (forced-colors:active){.haken[aria-checked="true"]::before{forced-color-adjust:none;background:Highlight}.seg button[aria-pressed="true"],nav.tabs button[aria-current="page"]{outline:2px solid Highlight}}
 `;
@@ -756,6 +778,8 @@ const ICON = {
   demnaechst: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>`,
   eingang: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 13.5l2.6-7.2A2 2 0 0 1 8 5h8a2 2 0 0 1 1.9 1.3l2.6 7.2V18a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/><path d="M3.5 13.5H8l1.5 2.5h5l1.5-2.5h4.5"/></svg>`,
   einkauf: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2.2l2.3 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6.3"/><circle cx="10" cy="20.5" r="1.2"/><circle cx="17" cy="20.5" r="1.2"/></svg>`,
+  notizen: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h7.5L19.5 8.5V18a2.5 2.5 0 0 1-2.5 2.5H7A2.5 2.5 0 0 1 4.5 18V6A2.5 2.5 0 0 1 7 3.5z"/><path d="M14.5 3.5v5h5M8.5 13h7M8.5 16.5h4.5"/></svg>`,
+  pin: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-.8 5.5L17.5 13h-11l3.3-3.5L9 4zM12 13v7"/></svg>`,
   plus: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`,
   regler: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>`,
   termin: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></svg>`,
@@ -936,9 +960,11 @@ class PlanerPanel extends HTMLElement {
       demnaechst: offen.filter((a) => a.datum && a.datum > h).length,
       eingang: offen.length,
       woche: offen.filter((a) => a.datum && a.datum >= iso(montag(new Date())) && a.datum <= iso(plusTage(montag(new Date()), 6))).length,
+      notizen: this._notizenSichtbar().length,
       einkauf: (this._eArtikel?.liste === this._eListeId() ? this._eArtikel.items.filter((x) => !x.erledigt).length : 0),
     };
     const tabs = [["heute", "Heute"], ["woche", "Kalender"], ["demnaechst", "Demnächst"]];
+    tabs.push(["notizen", "Notizen"]);
     if (this._ansicht === "eingang") this._ansicht = "heute";
     if ((d.einkauf_listen || []).length) tabs.push(["einkauf", "Einkauf"]);
     if (this._ansicht === "einkauf" && !(d.einkauf_listen || []).length) this._ansicht = "heute";
@@ -951,20 +977,21 @@ class PlanerPanel extends HTMLElement {
 
     const tabName = (tabs.find(([k]) => k === this._ansicht) || tabs[0])[1];
     const einkauf = this._ansicht === "einkauf";
+    const notizen = this._ansicht === "notizen";
     const bListe = [...new Set(d.aufgaben.filter((a) => a.status === "offen").flatMap((a) => [a.bereich, ...(a.tags || [])]).filter(Boolean))].sort();
     if (this._bereich && !bListe.includes(this._bereich)) bListe.push(this._bereich);
     const gross = (x) => x[0].toUpperCase() + x.slice(1);
-    const bereichChips = !schmal && bListe.length && !einkauf
+    const bereichChips = !schmal && bListe.length && !einkauf && !notizen
       ? `<div class="bereiche" role="group" aria-label="Nach Bereich filtern">
           <button type="button" data-bereich="" data-fokus="b-alle" aria-pressed="${!this._bereich}">Alle Bereiche</button>
           ${bListe.map((x) => `<button type="button" data-bereich="${esc(x)}" data-fokus="b-${esc(x)}" aria-pressed="${this._bereich === x}" style="--b:${bereichFarbe(x, d.farben)}"><span class="punkt" aria-hidden="true"></span>${esc(gross(x))}</button>`).join("")}
         </div>` : "";
-    const bereichWahl = schmal && bListe.length && !einkauf
+    const bereichWahl = schmal && bListe.length && !einkauf && !notizen
       ? `<span class="rund ${this._bereich ? "aktiv" : ""}" title="Nach Bereich filtern">${ICON.filter}
           <label class="sr" for="bwahl">Nach Bereich filtern</label>
           <select id="bwahl" data-fokus="bwahl"><option value="">Alle Bereiche</option>${bListe.map((x) => `<option value="${esc(x)}" ${this._bereich === x ? "selected" : ""}>${esc(gross(x))}</option>`).join("")}</select>
         </span>` : "";
-    const aktivFilter = schmal && this._bereich && !einkauf
+    const aktivFilter = schmal && this._bereich && !einkauf && !notizen
       ? `<div class="aktivfilter"><span>Nur</span><button type="button" data-bereich="" data-fokus="b-weg" aria-label="Filter ${esc(gross(this._bereich))} aufheben"><span class="punkt" style="--b:${bereichFarbe(this._bereich, d.farben)}" aria-hidden="true"></span>${esc(gross(this._bereich))}${ICON.zu}</button></div>` : "";
     const eingabeSichtbar = !schmal || this._eingabeOffen;
     const kannTermin = (d.kalender || []).some((k) => k.schreiben);
@@ -991,30 +1018,30 @@ class PlanerPanel extends HTMLElement {
       ${aktivFilter}
 
       <form class="schnell" id="schnellform" autocomplete="off" ${eingabeSichtbar ? "" : "hidden"}>
-        <label class="sr" for="schnell">${einkauf ? "Neuer Artikel" : "Neue Aufgabe"}</label>
+        <label class="sr" for="schnell">${einkauf ? "Neuer Artikel" : notizen ? "Neue Notiz" : "Neue Aufgabe"}</label>
         <div class="eingabe">
-          <input id="schnell" data-fokus="schnell" placeholder="${einkauf ? "Artikel, z. B. Milch, 2 Liter" : schmal ? "Neue Aufgabe" : "Neue Aufgabe, z. B. morgen 15 Uhr !1 Filament bestellen #werkstatt"}" aria-describedby="vorschau tipp" enterkeyhint="done">
-          <button class="knopf primaer" type="submit" aria-label="${einkauf ? "Artikel hinzufügen" : "Aufgabe hinzufügen"}">${ICON.plus}${schmal ? "" : "Hinzufügen"}</button>
-          ${schmal ? "" : `<button class="knopf" type="button" data-aktion="erweitert" title="Aufgabe mit allen Einstellungen anlegen">${ICON.regler}Erweitert</button>
+          <input id="schnell" data-fokus="schnell" placeholder="${einkauf ? "Artikel, z. B. Milch, 2 Liter" : notizen ? "Neue Notiz, z. B. Ideen fürs Wochenende" : schmal ? "Neue Aufgabe" : "Neue Aufgabe, z. B. morgen 15 Uhr !1 Filament bestellen #werkstatt"}" aria-describedby="vorschau tipp" enterkeyhint="done">
+          <button class="knopf primaer" type="submit" aria-label="${einkauf ? "Artikel hinzufügen" : notizen ? "Notiz hinzufügen" : "Aufgabe hinzufügen"}">${ICON.plus}${schmal ? "" : "Hinzufügen"}</button>
+          ${schmal || notizen ? "" : `<button class="knopf" type="button" data-aktion="erweitert" title="Aufgabe mit allen Einstellungen anlegen">${ICON.regler}Erweitert</button>
           ${kannTermin ? `<button class="knopf" type="button" data-aktion="termin" title="Termin in den Kalender eintragen">${ICON.termin}Termin</button>` : ""}`}
         </div>
         ${schmal ? `<div class="zusatz">
-          <button class="knopf text" type="button" data-aktion="erweitert">${ICON.regler}Erweitert</button>
-          ${kannTermin ? `<button class="knopf text" type="button" data-aktion="termin">${ICON.termin}Termin</button>` : ""}
+          ${notizen ? "" : `<button class="knopf text" type="button" data-aktion="erweitert">${ICON.regler}Erweitert</button>
+          ${kannTermin ? `<button class="knopf text" type="button" data-aktion="termin">${ICON.termin}Termin</button>` : ""}`}
           <button class="rund" type="button" data-aktion="eingabe-zu" aria-label="Eingabe schließen" title="Schließen" style="margin-left:auto;box-shadow:none">${ICON.zu}</button>
         </div>` : ""}
         <div class="hinweis" id="vorschau" aria-live="polite"></div>
-        <span class="sr" id="tipp">${einkauf ? "Menge nach dem Komma, zum Beispiel Milch, 2 Liter. Erscheint sofort auch in Bring!." : ""}Erkennt heute, morgen, Wochentage, Datum wie 24.12., Uhrzeit wie 15 Uhr, !1 bis !3 für Top 3, # für Bereich, @ für Person und Wiederholungen wie jeden Montag oder täglich. Taste N springt hierher.</span>
+        <span class="sr" id="tipp">${notizen ? "Titel der neuen Notiz eingeben. Danach öffnet sich der Editor. Taste N springt hierher." : ""}${einkauf ? "Menge nach dem Komma, zum Beispiel Milch, 2 Liter. Erscheint sofort auch in Bring!." : ""}Erkennt heute, morgen, Wochentage, Datum wie 24.12., Uhrzeit wie 15 Uhr, !1 bis !3 für Top 3, # für Bereich, @ für Person und Wiederholungen wie jeden Montag oder täglich. Taste N springt hierher.</span>
       </form>
 
       <nav class="tabs" aria-label="Ansichten">
-        ${tabs.map(([k, t]) => `<button type="button" data-ansicht="${k}" data-fokus="t-${k}" ${this._ansicht === k ? 'aria-current="page"' : ""}>${(k === "eingang" ? ICON.aufgaben : ICON[k]) || ""}<span>${t}</span><span class="zahl ${!zaehler[k] ? "null" : ""}" aria-label="${zaehler[k]} offen">${zaehler[k]}</span></button>`).join("")}
+        ${tabs.map(([k, t]) => `<button type="button" data-ansicht="${k}" data-fokus="t-${k}" ${this._ansicht === k ? 'aria-current="page"' : ""}>${(k === "eingang" ? ICON.aufgaben : ICON[k]) || ""}<span>${t}</span><span class="zahl ${!zaehler[k] ? "null" : ""}" aria-label="${zaehler[k]} ${k === "notizen" ? (zaehler[k] === 1 ? "Notiz" : "Notizen") : "offen"}">${zaehler[k]}</span></button>`).join("")}
       </nav>
       ${bereichChips}
 
       <main id="inhalt">${this._ansichtHtml(alle, offen)}</main>
     </div>
-    ${schmal && !this._eingabeOffen ? `<button type="button" class="fab" data-aktion="neu" data-fokus="fab" aria-label="${einkauf ? "Artikel hinzufügen" : "Neue Aufgabe"}">${ICON.plus}</button>` : ""}`;
+    ${schmal && !this._eingabeOffen ? `<button type="button" class="fab" data-aktion="neu" data-fokus="fab" aria-label="${einkauf ? "Artikel hinzufügen" : notizen ? "Neue Notiz" : "Neue Aufgabe"}">${ICON.plus}</button>` : ""}`;
     if (neueAnsicht) this._app.querySelector("main")?.classList.add("einblenden");
 
     const s = root.getElementById("schnell");
@@ -1088,6 +1115,7 @@ class PlanerPanel extends HTMLElement {
   _ansichtHtml(alle, offen) {
     const h = this._tag;
     if (this._ansicht === "einkauf") return this._einkaufHtml();
+    if (this._ansicht === "notizen") return this._notizenHtml();
     if (this._ansicht === "woche") return this._kalAnsicht === "monat" ? this._monatHtml(alle) : this._wocheHtml(alle);
     if (this._ansicht === "demnaechst") {
       const kommend = offen.filter((a) => a.datum && a.datum > h).sort((a, b) => a.datum.localeCompare(b.datum));
@@ -1718,7 +1746,7 @@ class PlanerPanel extends HTMLElement {
     const s = root.getElementById("schnell");
     const v = root.getElementById("vorschau");
     if (!s || !v) return;
-    if (!s.value.trim() || this._ansicht === "einkauf") { v.innerHTML = ""; return; }
+    if (!s.value.trim() || this._ansicht === "einkauf" || this._ansicht === "notizen") { v.innerHTML = ""; return; }
     const p = parse(s.value, this._daten.personen);
     const teile = [];
     teile.push(`<span class="chip">${esc(p.datum === undefined || p.datum === null ? "Eingang" : datumText(p.datum))}</span>`);
@@ -1760,6 +1788,7 @@ class PlanerPanel extends HTMLElement {
       this._zeichnen();
     }));
     this._app.querySelectorAll("[data-aktion]").forEach((b) => b.addEventListener("click", () => this._aktion(b.dataset.aktion, b.dataset.id)));
+    this._app.querySelectorAll("[data-notiz]").forEach((b) => b.addEventListener("click", () => { const n = this._notiz(b.dataset.notiz); if (n) this._notizOeffnen(n); }));
     this._app.querySelectorAll("li.aufgabe").forEach((li) => this._wischen(li));
     this._einkaufBinden(root);
     this._app.querySelectorAll("[data-kal-ansicht]").forEach((b) => b.addEventListener("click", () => {
@@ -1861,6 +1890,17 @@ class PlanerPanel extends HTMLElement {
       this.shadowRoot.getElementById("schnell")?.focus();
       return;
     }
+    if (this._ansicht === "notizen") {
+      const titel = s.value.trim();
+      if (!titel) { this._sagen("Bitte einen Titel eingeben."); return; }
+      const person = this._filter !== "ich" && this._filter !== "alle" ? this._filter : this._daten.ich;
+      let neu;
+      try { neu = await this._ws({ type: "planer/notiz_speichern", notiz: { titel, text: "", person, angeheftet: false } }); } catch (err) { return; }
+      s.value = "";
+      await this._lesen();
+      this._notizOeffnen(neu, true);
+      return;
+    }
     const p = parse(s.value, this._daten.personen);
     if (!p.titel) { this._sagen("Bitte einen Titel eingeben."); return; }
     const aufgabe = { ...p, datum: p.datum ?? (this._ansicht === "eingang" ? null : this._ansicht === "heute" ? heute() : null) };
@@ -1891,6 +1931,10 @@ class PlanerPanel extends HTMLElement {
     if (art === "termin") return this._terminNeu();
     if (art === "kal-wahl") return this._kalenderWahl();
     if (art === "erweitert") return this._erweitert();
+    if (art === "neu" && this._ansicht === "notizen") {
+      const person = this._filter !== "ich" && this._filter !== "alle" ? this._filter : this._daten.ich;
+      return this._notizOeffnen({ titel: "", text: "", person, angeheftet: false }, true);
+    }
     if (art === "neu" || art === "eingabe-zu") {
       this._eingabeOffen = art === "neu";
       if (!this._eingabeOffen) { const s = this.shadowRoot.getElementById("schnell"); if (s) s.value = ""; }
@@ -1991,7 +2035,7 @@ class PlanerPanel extends HTMLElement {
     const dlg = this.shadowRoot.getElementById("suchdlg");
     dlg.innerHTML = `<form method="dialog" class="such-blatt" autocomplete="off">
       <div class="blatt-kopf">${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}<span class="l"></span><h2 id="such-titel">Suchen</h2><button type="submit" class="knopf text fett r">Fertig</button></div>
-      <div class="suchfeld">${ICON.suche}<label class="sr" for="such-q">Suchbegriff</label><input id="such-q" type="search" placeholder="Aufgaben, Termine, Einkauf" enterkeyhint="search"></div>
+      <div class="suchfeld">${ICON.suche}<label class="sr" for="such-q">Suchbegriff</label><input id="such-q" type="search" placeholder="Aufgaben, Notizen, Termine, Einkauf" enterkeyhint="search"></div>
       <div id="such-erg" aria-live="polite"></div>
     </form>`;
     const q = dlg.querySelector("#such-q"), erg = dlg.querySelector("#such-erg");
@@ -2007,12 +2051,15 @@ class PlanerPanel extends HTMLElement {
         .filter((t) => { const k = `${t.kalender}|${t.uid}|${t.start}`; if (gesehen.has(k)) return false; gesehen.add(k); return true; })
         .sort((a, b) => a.start.localeCompare(b.start)).slice(0, 30);
       const einkauf = (this._eArtikel?.items || []).filter((x) => passt(x.text, x.beschreibung)).slice(0, 20);
+      const notizenTreffer = this._notizenSichtbar().filter((n) => passt(n.titel, n.text)).sort((a, b) => (b.geaendert || "").localeCompare(a.geaendert || "")).slice(0, 20);
       const teil = (titel, inhalt) => inhalt ? `<section class="gruppe"><h3>${titel}</h3><ul class="liste gruppiert">${inhalt}</ul></section>` : "";
       const html = teil("Aufgaben", aufg.map((a) => `<li><button type="button" class="treffer" data-sa="${a.id}"><span class="titel">${esc(a.titel)}</span><span class="unter">${a.status === "erledigt" ? "Erledigt" : a.datum ? esc(datumText(a.datum)) : "Ohne Datum"}${a.uhrzeit ? `, ${a.uhrzeit} Uhr` : ""}${a.bereich ? ` · ${esc(a.bereich)}` : ""}</span></button></li>`).join(""))
+        + teil("Notizen", notizenTreffer.map((n) => `<li><button type="button" class="treffer" data-sn="${esc(n.id)}"><span class="titel">${esc(this._notizTitel(n))}</span><span class="unter">${esc(this._notizZeit(n.geaendert))}${n.text && n.titel ? ` · ${esc(n.text.replace(/\s+/g, " ").slice(0, 60))}` : ""}</span></button></li>`).join(""))
         + teil("Termine", termine.map((t) => `<li><button type="button" class="treffer" data-st="${esc(`${t.kalender}|${t.uid}|${t.start}`)}"><span class="titel">${esc(t.titel)}</span><span class="unter">${esc(datumText(t.start.slice(0, 10)))}${t.ganztag ? "" : `, ${uhr(t.start)} Uhr`} · ${esc(this._kal(t.kalender).name)}</span></button></li>`).join(""))
         + teil("Einkauf", einkauf.map((x) => `<li><button type="button" class="treffer" data-se="1"><span class="titel">${esc(x.text)}</span><span class="unter">${x.erledigt ? "Gekauft" : "Auf der Liste"}${x.beschreibung ? ` · ${esc(x.beschreibung)}` : ""}</span></button></li>`).join(""));
       erg.innerHTML = html || `<p class="leer">Nichts gefunden für „${esc(q.value.trim())}“.</p>`;
       erg.querySelectorAll("[data-sa]").forEach((b) => b.addEventListener("click", () => { const a = this._finde(b.dataset.sa); if (a) this._oeffnen(a); }));
+      erg.querySelectorAll("[data-sn]").forEach((b) => b.addEventListener("click", () => { const n = this._notiz(b.dataset.sn); if (n) this._notizOeffnen(n); }));
       erg.querySelectorAll("[data-st]").forEach((b) => b.addEventListener("click", () => { const t = this._alleTermine().find((x) => `${x.kalender}|${x.uid}|${x.start}` === b.dataset.st); if (t) this._terminZeigen(t); }));
       erg.querySelectorAll("[data-se]").forEach((b) => b.addEventListener("click", () => { this._zu(dlg); this._ansicht = "einkauf"; this._zeichnen(); }));
     };
@@ -2299,6 +2346,159 @@ class PlanerPanel extends HTMLElement {
     // Nur bei neuen Aufgaben direkt ins Titelfeld (öffnet die Tastatur); Details öffnen ohne Tastatur.
     if (a.id) { dlg.querySelector("#blatt-titel").setAttribute("tabindex", "-1"); dlg.querySelector("#blatt-titel").focus({ preventScroll: true }); }
     else $("b-titel").focus();
+  }
+
+  // ---------- Notizen ----------
+  _notiz(id) { return (this._daten?.notizen || []).find((n) => n.id === id); }
+  _notizenSichtbar() {
+    const d = this._daten;
+    if (!d) return [];
+    const f = this._filter;
+    return (d.notizen || []).filter((n) => f === "alle" || (f === "ich" ? n.person === d.ich || n.person === GEMEINSAM : n.person === f));
+  }
+  _notizTitel(n) {
+    return (n.titel || "").trim() || (n.text || "").trim().split("\n")[0].slice(0, 80) || "Ohne Titel";
+  }
+  // „Heute 14:05“, „Gestern 09:30“, „12. Nov“ (mit Jahr, wenn nicht aktuell)
+  _notizZeit(s) {
+    if (!s) return "";
+    const t = new Date(s);
+    if (isNaN(t)) return "";
+    const tag = iso(t);
+    const hm = `${String(t.getHours()).padStart(2, "0")}:${String(t.getMinutes()).padStart(2, "0")}`;
+    if (tag === heute()) return `Heute ${hm}`;
+    if (tag === iso(plusTage(new Date(), -1))) return `Gestern ${hm}`;
+    const kurz = `${t.getDate()}. ${MONATE[t.getMonth()].slice(0, 3)}`;
+    return t.getFullYear() === new Date().getFullYear() ? kurz : `${kurz} ${t.getFullYear()}`;
+  }
+  _notizKarte(n) {
+    const d = this._daten;
+    const meta = [`<span>${esc(this._notizZeit(n.geaendert))}</span>`];
+    if (this._filter !== "ich" || (n.person !== d.ich && n.person !== GEMEINSAM)) meta.push(`<span class="chip">${esc(this._name(n.person))}</span>`);
+    else if (n.person === GEMEINSAM) meta.push(`<span class="chip">Gemeinsam</span>`);
+    const text = n.titel ? (n.text || "").trim() : (n.text || "").trim().split("\n").slice(1).join("\n").trim();
+    return `<li><button type="button" class="notiz-karte" data-notiz="${esc(n.id)}" data-fokus="n-${esc(n.id)}">
+      <span class="notiz-kopf"><span class="notiz-titel-k">${esc(this._notizTitel(n))}</span>${n.angeheftet ? `<span class="notiz-pin" title="Angeheftet">${ICON.pin}<span class="sr">Angeheftet</span></span>` : ""}</span>
+      ${text ? `<span class="notiz-vorschau">${esc(text)}</span>` : ""}
+      <span class="notiz-meta">${meta.join("")}</span>
+    </button></li>`;
+  }
+  _notizenHtml() {
+    const alle = [...this._notizenSichtbar()].sort((a, b) => (b.geaendert || "").localeCompare(a.geaendert || ""));
+    const hinweis = `<p class="hinweis notiz-hinweis">Ideen, Listen und Gedanken. Änderungen werden automatisch gespeichert.</p>`;
+    if (!alle.length) return `${hinweis}<p class="leer">Noch keine Notizen. Schreib oben einen Titel oder tippe auf Plus.</p>`;
+    const fest = alle.filter((n) => n.angeheftet), rest = alle.filter((n) => !n.angeheftet);
+    const gruppe = (titel, liste, id) => `<section class="gruppe" aria-labelledby="${id}">
+      ${titel ? `<h2 id="${id}">${titel}<span class="zahl">${liste.length}</span></h2>` : ""}
+      <ul class="notizen-raster" ${titel ? "" : 'aria-label="Notizen"'}>${liste.map((n) => this._notizKarte(n)).join("")}</ul>
+    </section>`;
+    return hinweis + (fest.length ? gruppe("Angeheftet", fest, "n-fest") : "") + (rest.length ? gruppe(fest.length ? "Weitere Notizen" : "", rest, "n-rest") : "");
+  }
+
+  _notizOeffnen(n, fokusText = false) {
+    const dlg = this.shadowRoot.getElementById("blatt");
+    const d = this._daten;
+    const personen = [...d.personen.map((p) => [p.id, p.name]), [GEMEINSAM, "Gemeinsam"]];
+    let id = n.id || null;
+    let angeheftet = !!n.angeheftet;
+    dlg.innerHTML = `<form method="dialog" id="nform" novalidate>
+      <div class="blatt-kopf">${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
+        <span class="l stand" id="n-stand" aria-live="polite"></span>
+        <h2 id="blatt-titel">Notiz</h2>
+        <button type="submit" class="knopf text fett r">Fertig</button>
+      </div>
+      <div class="feld notiz-feld-titel"><label class="sr" for="n-titel">Titel</label><input id="n-titel" placeholder="Titel" maxlength="200" enterkeyhint="next" autocomplete="off" value="${esc(n.titel || "")}"></div>
+      <div class="feld notiz-feld-text"><label class="sr" for="n-text">Text</label><textarea id="n-text" placeholder="Notiz schreiben …" maxlength="20000">${esc(n.text || "")}</textarea></div>
+      <div class="reihe">
+        <div class="feld"><label for="n-person">Für</label><select id="n-person">${personen.map(([pid, name]) => `<option value="${esc(pid)}" ${n.person === pid ? "selected" : ""}>${esc(name)}</option>`).join("")}</select></div>
+        <div class="feld"><span class="lbl" id="n-pin-l">Anheften</span><button type="button" class="knopf notiz-pinknopf" id="n-pin" aria-pressed="${angeheftet}" aria-labelledby="n-pin-l">${ICON.pin}<span id="n-pin-t">${angeheftet ? "Angeheftet" : "Nicht angeheftet"}</span></button></div>
+      </div>
+      <p class="fehler" id="n-fehler" role="alert"></p>
+      <div class="fuss"><button type="button" class="knopf gefahr" id="n-loeschen" style="width:100%" ${id ? "" : "hidden"}>Notiz löschen</button></div>
+    </form>`;
+    const $ = (x) => dlg.querySelector(`#${x}`);
+    const feld = $("n-text");
+    const wachsen = () => { feld.style.height = "auto"; feld.style.height = `${feld.scrollHeight + 2}px`; };
+    feld.addEventListener("input", wachsen);
+    let sicher = false;
+    let zeitgeber = null, aenderung = false, geaendert = false, weg = false, laeuft = Promise.resolve();
+    const stand = (t) => { $("n-stand").textContent = t; };
+    const sammeln = () => ({ titel: $("n-titel").value, text: feld.value, person: $("n-person").value, angeheftet });
+    // Speichern läuft nacheinander. Eine neue Notiz bekommt ihre ID von der ersten Antwort; spätere Speicherungen nutzen sie.
+    const autoSpeichern = () => {
+      clearTimeout(zeitgeber); zeitgeber = null;
+      if (weg || !aenderung) return laeuft;
+      const notiz = sammeln();
+      if (!id && !notiz.titel.trim() && !notiz.text.trim()) { aenderung = false; stand(""); return laeuft; }
+      aenderung = false;
+      stand("Speichert …");
+      laeuft = laeuft.then(async () => {
+        if (weg) return;
+        try {
+          const neu = await this._hass.callWS({ type: "planer/notiz_speichern", notiz: id ? { ...notiz, id } : notiz });
+          id = neu.id; geaendert = true;
+          $("n-loeschen").hidden = false;
+          stand(aenderung ? "" : "Gespeichert");
+        } catch (err) { aenderung = true; stand(""); $("n-fehler").textContent = err.message || "Speichern hat nicht geklappt."; }
+      });
+      return laeuft;
+    };
+    const merken = (sofort = false) => {
+      aenderung = true; stand(""); $("n-fehler").textContent = "";
+      clearTimeout(zeitgeber);
+      if (sofort) autoSpeichern(); else zeitgeber = setTimeout(autoSpeichern, 300);
+    };
+    const form = $("nform");
+    form.addEventListener("input", (e) => merken(e.target.tagName === "SELECT"));
+    form.addEventListener("change", () => merken(true));
+    form.addEventListener("focusout", () => { if (aenderung) autoSpeichern(); });
+    $("n-titel").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); feld.focus(); } });
+    $("n-pin").addEventListener("click", () => {
+      angeheftet = !angeheftet;
+      $("n-pin").setAttribute("aria-pressed", String(angeheftet));
+      $("n-pin-t").textContent = angeheftet ? "Angeheftet" : "Nicht angeheftet";
+      this._sagen(angeheftet ? "Notiz angeheftet" : "Anheften aufgehoben");
+      merken(true);
+    });
+    // Beim Wegklicken/Schließen sofort sichern, nicht erst nach der Animation; ebenso wenn die App verlassen wird
+    dlg._vorZu = () => autoSpeichern();
+    const weglegen = () => { if (document.visibilityState === "hidden" && dlg.open) dlg._vorZu?.(); };
+    document.addEventListener("visibilitychange", weglegen);
+    window.addEventListener("pagehide", weglegen);
+    dlg.addEventListener("close", () => { document.removeEventListener("visibilitychange", weglegen); window.removeEventListener("pagehide", weglegen); }, { once: true });
+    dlg.onclose = async () => {
+      dlg._vorZu = null;
+      if (weg) return;
+      await autoSpeichern();
+      if (geaendert) { geaendert = false; await this._lesen(); }
+    };
+    $("n-loeschen").addEventListener("click", async () => {
+      if (!sicher) { sicher = true; $("n-loeschen").textContent = "Wirklich löschen?"; $("n-loeschen").focus(); return; }
+      weg = true; clearTimeout(zeitgeber);
+      await laeuft;
+      const kopie = sammeln();
+      const titel = this._notizTitel(kopie);
+      if (id) {
+        try { await this._ws({ type: "planer/notiz_loeschen", notiz_id: id }); } catch (err) { weg = false; return; }
+      }
+      this._zu(dlg);
+      this._sagen(`Gelöscht: ${titel}`);
+      if (id) this._hinweis(`Gelöscht: ${titel}`, () => this._ws({ type: "planer/notiz_speichern", notiz: kopie }));
+      await this._lesen();
+    });
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      clearTimeout(zeitgeber);
+      await autoSpeichern();
+      if ($("n-fehler").textContent) return;
+      this._zu(dlg);
+    });
+    this._wischZu(dlg);
+    dlg.showModal();
+    wachsen();
+    // Nur bei neuen Notizen direkt ins Textfeld (öffnet die Tastatur); bestehende öffnen ohne Tastatur.
+    if (fokusText || !id) feld.focus({ preventScroll: true });
+    else { $("blatt-titel").setAttribute("tabindex", "-1"); $("blatt-titel").focus({ preventScroll: true }); }
   }
 
   _teilHtml(t, i) {
