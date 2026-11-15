@@ -23,6 +23,7 @@ from homeassistant.helpers import config_validation as cv
 from .const import DOMAIN, GEMEINSAM, PANEL_PFAD, URL_BASIS
 from .daten import Planer
 from .erinnerung import Erinnerungen
+from .schichtkalender import Schichtkalender
 from .ws import async_registrieren
 
 ORDNER = Path(__file__).parent / "frontend"
@@ -56,6 +57,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     erinnerungen = Erinnerungen(hass, planer)
     await erinnerungen.async_start()
     daten["erinnerungen"] = erinnerungen
+    daten["schichtkalender"] = Schichtkalender(hass, planer)
 
     if not daten.get("pfad"):
         await hass.http.async_register_static_paths([StaticPathConfig(URL_BASIS, str(ORDNER), False)])
@@ -101,5 +103,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     frontend.async_remove_panel(hass, PANEL_PFAD, warn_if_unknown=False)
     if erinnerungen := hass.data.get(DOMAIN, {}).pop("erinnerungen", None):
         erinnerungen.async_stop()
+    if sk := hass.data.get(DOMAIN, {}).pop("schichtkalender", None):
+        sk.stoppen()
     hass.services.async_remove(DOMAIN, "hinzufuegen")
     return await hass.config_entries.async_unload_platforms(entry, PLATTFORMEN)

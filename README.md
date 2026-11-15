@@ -10,7 +10,7 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
 3. Einstellungen › Geräte & Dienste › Integration hinzufügen › **Planer**.
 4. In der Seitenleiste erscheint „Planer“.
 
-## Was es gibt (v0.8.1)
+## Was es gibt (v0.9.0)
 
 - **Heute** mit Top 3 (je Rang 1–3, nie mehr als drei), weiteren Aufgaben, Überfälligem und „Heute erledigt“.
 - **Demnächst** (nach Tagen gruppiert) und **Eingang** (alles ohne Datum).
@@ -83,10 +83,22 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
 - **Zeitleiste** (v0.8.1): Datumsköpfe blenden die Einträge beim Scrollen weich aus. Unter Einstellungen pro Person
   in der Spalte „Zeitleiste“ wählen, welche Kalender dort erscheinen.
 - **Aufgaben farbig** (v0.8.1): Aufgaben im Kalender sind in der Farbe ihres Bereichs hinterlegt (sonst blau) und haben einen kleinen Kreis.
+- **Notizen** (v0.9): eigener Tab wie Apple Notizen. Erste Zeile = Titel, Checklisten zum Abhaken, Liste nach Datum
+  gruppiert (Angeheftet, Heute, Gestern, …), am Handy nach links wischen zum Anheften/Löschen. Speichert automatisch.
+- **Schichtplan** (v0.9): Kalender › Schichten. Eigene Schichten anlegen (Name, Kürzel, Farbe, Zeiten, Pause), dann
+  Tage per Stempel antippen. „Wiederholen“ trägt einen Rhythmus (z. B. `F F S S X X`) oder einen schon geplanten
+  Zeitraum fortlaufend ein. Plan pro Person: oben „Ich“/„Linda“ wählt, wessen Plan bearbeitet wird, „Alle“ zeigt beide.
+  Schichten erscheinen in Zeitleiste, Woche, Monat und Tages-Pop-up und werden automatisch in den Kalender
+  „<Vorname> Arbeit“ übertragen (oder einen anderen, unter „Kalender & Erinnerung“). Dort auch die Push-Erinnerung
+  pro Person: am Vorabend zu einer Uhrzeit oder 30 Min. bis 3 Std. vor Schichtbeginn.
+- **Schneller speichern** (v0.9): Änderungen an Aufgaben werden nach 300 ms gesichert, sofort beim Verlassen eines Feldes,
+  beim Schließen und wenn die App in den Hintergrund geht.
+- **Handy** (v0.9): größere Tippflächen, Verschieben-Knopf in jeder Zeile, Plus-Knopf weicht beim Scrollen aus,
+  deckende Tab-Leiste, kompakter Tages-Dialog, Einstellungen speichern beim Schließen automatisch.
 
 ## Daten
 
-Gespeichert in `.storage/planer.daten` (im HA-Backup enthalten).
+Gespeichert in `.storage/planer.daten` (im HA-Backup enthalten), inklusive Notizen und Schichtplänen.
 
 ## Geplant
 

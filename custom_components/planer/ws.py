@@ -12,6 +12,7 @@ from homeassistant.exceptions import HomeAssistantError
 from homeassistant.util import dt as dt_util
 
 from . import einkauf, kalender
+from .schichtkalender import ist_schicht_termin, ziel_kalender
 
 from .const import DOMAIN
 from .daten import Planer
@@ -42,8 +43,8 @@ def async_registrieren(hass: HomeAssistant) -> None:
         return
     for befehl in (
         ws_lesen, ws_abonnieren, ws_speichern, ws_erledigen, ws_loeschen, ws_einstellung,
-        ws_termine, ws_kalender_anzeige, ws_termin_anlegen, ws_termin_loeschen, ws_woche, ws_allgemein,
-        ws_einkauf, ws_einkauf_aktion,
+        ws_termine, ws_kalender_anzeige, ws_schicht_arten, ws_schicht_tage, ws_schicht_einstellung, ws_termin_anlegen, ws_termin_loeschen, ws_woche, ws_allgemein,
+        ws_einkauf, ws_einkauf_aktion, ws_notiz_speichern, ws_notiz_loeschen,
     ):
         websocket_api.async_register_command(hass, befehl)
     daten["ws"] = True
@@ -68,12 +69,25 @@ async def ws_lesen(hass: HomeAssistant, connection: websocket_api.ActiveConnecti
             "personen": personen,
             "andere_sehen": p.sieht_andere(user.id),
             "einst": p.einst(user.id),
+            "schichten": {x["id"]: p.schichtplan(x["id"]) for x in personen if x["id"] == user.id or p.sieht_andere(user.id)},
+            "schicht_einst": {
+                x["id"]: {
+                    "kalender": ziel_kalender(hass, p, x["id"]),
+                    "wahl": p.einst(x["id"])["schicht_kalender"],
+                    "push": p.einst(x["id"])["schicht_push"],
+                    "push_uhr": p.einst(x["id"])["schicht_push_uhr"],
+                }
+                for x in personen
+                if x["id"] == user.id or p.sieht_andere(user.id)
+            },
+            "schicht_kalender_wahl": [{"id": k["id"], "name": k["name"]} for k in kalender.liste(hass) if k["anlegen"] and k["loeschen"]],
             "einstellungen": {x["id"]: p.einst(x["id"]) for x in personen} if user.is_admin else {},
             "alle_benutzer": p.alle_benutzer if user.is_admin else [],
             "alle_kalender": kalender.liste(hass) if user.is_admin else [],
             "handys": hass.data[DOMAIN]["erinnerungen"].handys() if user.is_admin else [],
             "kalender": _kalender_fuer(hass, user.id),
             "aufgaben": p.fuer(user.id),
+            "notizen": p.notizen_fuer(user.id),
             "wochen": p.wochen.get(user.id, {}),
             "gemeinsam_kalender": p.allgemein.get("gemeinsam_kalender"),
             "farben": p.allgemein.get("farben", {}),
@@ -159,7 +173,67 @@ async def ws_termine(hass: HomeAssistant, connection: websocket_api.ActiveConnec
         connection.send_error(msg["id"], "invalid", "Datum ungültig")
         return
     ids = [k["id"] for k in _kalender_fuer(hass, connection.user.id) if k["angezeigt"]]
-    connection.send_result(msg["id"], await kalender.termine(hass, ids, start, ende))
+    # Schicht-Termine, die der Planer selbst eingetragen hat, zeigt er schon als Schicht an
+    connection.send_result(msg["id"], [t for t in await kalender.termine(hass, ids, start, ende) if not ist_schicht_termin(t)])
+
+
+def _darf_plan(hass: HomeAssistant, benutzer_id: str, person: str) -> bool:
+    return person == benutzer_id or _planer(hass).sieht_andere(benutzer_id)
+
+
+@websocket_api.websocket_command(
+    {vol.Required("type"): f"{DOMAIN}/schicht_arten", vol.Required("person"): ID, vol.Required("arten"): [dict]}
+)
+@websocket_api.async_response
+async def ws_schicht_arten(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    if not _darf_plan(hass, connection.user.id, msg["person"]):
+        connection.send_error(msg["id"], "unauthorized", "Kein Zugriff auf diesen Schichtplan")
+        return
+    ergebnis = await _planer(hass).schicht_arten(msg["person"], msg["arten"])
+    _schicht_abgleich(hass, msg["person"])
+    connection.send_result(msg["id"], ergebnis)
+
+
+@websocket_api.websocket_command(
+    {vol.Required("type"): f"{DOMAIN}/schicht_tage", vol.Required("person"): ID, vol.Required("tage"): dict}
+)
+@websocket_api.async_response
+async def ws_schicht_tage(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    """Tage setzen: {"2026-11-16": "frueh", "2026-11-17": null} (null = Schicht entfernen)."""
+    if not _darf_plan(hass, connection.user.id, msg["person"]):
+        connection.send_error(msg["id"], "unauthorized", "Kein Zugriff auf diesen Schichtplan")
+        return
+    ergebnis = await _planer(hass).schicht_tage(msg["person"], msg["tage"])
+    _schicht_abgleich(hass, msg["person"])
+    connection.send_result(msg["id"], ergebnis)
+
+
+def _schicht_abgleich(hass: HomeAssistant, person: str) -> None:
+    if sk := hass.data.get(DOMAIN, {}).get("schichtkalender"):
+        sk.vormerken(person)
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): f"{DOMAIN}/schicht_einstellung",
+        vol.Required("person"): ID,
+        vol.Required("werte"): {
+            vol.Optional("schicht_kalender"): vol.Any(None, str),
+            vol.Optional("schicht_push"): vol.Any(None, str),
+            vol.Optional("schicht_push_uhr"): str,
+        },
+    }
+)
+@websocket_api.async_response
+async def ws_schicht_einstellung(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    """Jede Person stellt Kalender und Erinnerung für ihre Schichten selbst ein (Admins für alle)."""
+    if msg["person"] != connection.user.id and not connection.user.is_admin:
+        connection.send_error(msg["id"], "unauthorized", "Das darf nur die Person selbst einstellen")
+        return
+    await _planer(hass).einstellung(msg["person"], msg["werte"])
+    if "schicht_kalender" in msg["werte"]:
+        _schicht_abgleich(hass, msg["person"])
+    connection.send_result(msg["id"], {"ok": True, "kalender": ziel_kalender(hass, _planer(hass), msg["person"])})
 
 
 @websocket_api.websocket_command(
@@ -277,3 +351,25 @@ async def ws_einkauf_aktion(hass: HomeAssistant, connection: websocket_api.Activ
         connection.send_result(msg["id"], {"ok": True})
     except (PermissionError, KeyError, ValueError, HomeAssistantError) as err:
         _fehler(connection, msg["id"], err)
+
+
+@websocket_api.websocket_command({vol.Required("type"): f"{DOMAIN}/notiz_speichern", vol.Required("notiz"): dict})
+@websocket_api.async_response
+async def ws_notiz_speichern(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    try:
+        n = await _planer(hass).notiz_speichern(msg["notiz"], connection.user.id)
+    except (ValueError, PermissionError) as err:
+        _fehler(connection, msg["id"], err)
+        return
+    connection.send_result(msg["id"], n)
+
+
+@websocket_api.websocket_command({vol.Required("type"): f"{DOMAIN}/notiz_loeschen", vol.Required("notiz_id"): ID})
+@websocket_api.async_response
+async def ws_notiz_loeschen(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    try:
+        await _planer(hass).notiz_loeschen(msg["notiz_id"], connection.user.id)
+    except PermissionError as err:
+        _fehler(connection, msg["id"], err)
+        return
+    connection.send_result(msg["id"], {"ok": True})

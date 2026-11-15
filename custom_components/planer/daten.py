@@ -17,7 +17,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
 
-from .const import GEMEINSAM, MAX_AUFGABEN, SPEICHER_SCHLUESSEL, SPEICHER_VERSION
+from .const import GEMEINSAM, MAX_AUFGABEN, MAX_NOTIZEN, SPEICHER_SCHLUESSEL, SPEICHER_VERSION
 from .wiederholung import fortschreiben, gueltig
 
 STANDARD_ERINNERUNGEN = [30, 180, 1440]
@@ -45,9 +45,11 @@ class Planer:
         self.hass = hass
         self._store: Store = Store(hass, SPEICHER_VERSION, SPEICHER_SCHLUESSEL)
         self.aufgaben: dict[str, dict[str, Any]] = {}
+        self.notizen: dict[str, dict[str, Any]] = {}
         self.einstellungen: dict[str, dict[str, Any]] = {}
         self.wochen: dict[str, dict[str, dict[str, Any]]] = {}  # Person → Kalenderwoche (2026-W47) → Ziele, Notiz
         self.allgemein: dict[str, Any] = {}
+        self.schichten: dict[str, dict[str, Any]] = {}  # Person → {"arten": [...], "tage": {Datum: Art-ID}}
         self._zuhoerer: list[Callable[[], None]] = []
         self.personen: list[dict[str, str]] = []
         self.alle_benutzer: list[dict[str, Any]] = []
@@ -55,9 +57,11 @@ class Planer:
     async def async_laden(self) -> None:
         daten = await self._store.async_load() or {}
         self.aufgaben = daten.get("aufgaben", {})
+        self.notizen = daten.get("notizen", {})
         self.einstellungen = daten.get("einstellungen", {})
         self.wochen = daten.get("wochen", {})
         self.allgemein = daten.get("allgemein", {})
+        self.schichten = daten.get("schichten", {})
         await self.async_personen()
 
     async def async_personen(self) -> list[dict[str, str]]:
@@ -116,6 +120,11 @@ class Planer:
             "erinnerungen": e.get("erinnerungen", STANDARD_ERINNERUNGEN),
             "tag_von": e.get("tag_von", 7),
             "tag_bis": e.get("tag_bis", 22),
+            # Schichten: None = Kalender „<Vorname> Arbeit“ automatisch, "" = nicht übertragen
+            "schicht_kalender": e.get("schicht_kalender"),
+            # "" = keine Erinnerung, "vorabend" = am Vortag zur Uhrzeit schicht_push_uhr, Zahl = Minuten vor Beginn
+            "schicht_push": e.get("schicht_push", ""),
+            "schicht_push_uhr": e.get("schicht_push_uhr", "20:00"),
         }
 
     def sichtbar(self, aufgabe: dict[str, Any], benutzer_id: str | None) -> bool:
@@ -127,6 +136,9 @@ class Planer:
     def fuer(self, benutzer_id: str | None) -> list[dict[str, Any]]:
         return [a for a in self.aufgaben.values() if self.sichtbar(a, benutzer_id)]
 
+    def notizen_fuer(self, benutzer_id: str | None) -> list[dict[str, Any]]:
+        return [n for n in self.notizen.values() if self.sichtbar(n, benutzer_id)]
+
     # --- Ändern -------------------------------------------------------------------------------
 
     @callback
@@ -136,7 +148,8 @@ class Planer:
 
     async def _sichern(self) -> None:
         await self._store.async_save(
-            {"aufgaben": self.aufgaben, "einstellungen": self.einstellungen, "wochen": self.wochen, "allgemein": self.allgemein}
+            {"aufgaben": self.aufgaben, "notizen": self.notizen, "einstellungen": self.einstellungen, "wochen": self.wochen, "allgemein": self.allgemein,
+             "schichten": self.schichten}
         )
         for fn in list(self._zuhoerer):
             fn()
@@ -295,6 +308,44 @@ class Planer:
         del self.aufgaben[aufgabe_id]
         await self._sichern()
 
+    async def notiz_speichern(self, roh: dict[str, Any], benutzer_id: str | None) -> dict[str, Any]:
+        alt = self.notizen.get(str(roh.get("id") or ""))
+        if alt is None and len(self.notizen) >= MAX_NOTIZEN:
+            raise ValueError("Zu viele Notizen gespeichert. Bitte alte löschen.")
+        if alt is not None and not self.sichtbar(alt, benutzer_id):
+            raise PermissionError("Diese Notiz gehört einer anderen Person.")
+        n: dict[str, Any] = dict(alt or {})
+        jetzt = dt_util.now().isoformat(timespec="seconds")
+        if "titel" in roh:
+            n["titel"] = _text(roh["titel"], 200)
+        if "text" in roh:
+            # Zeilenumbrüche und Einrückung bleiben erhalten, nur Ränder werden gekürzt
+            n["text"] = str(roh["text"] or "").strip()[:20000]
+        if "person" in roh:
+            p = roh["person"]
+            n["person"] = p if p == GEMEINSAM or any(x["id"] == p for x in self.personen) else (benutzer_id or GEMEINSAM)
+        if "angeheftet" in roh:
+            n["angeheftet"] = bool(roh["angeheftet"])
+        if not alt:
+            n.setdefault("titel", "")
+            n.setdefault("text", "")
+            n.setdefault("person", benutzer_id or GEMEINSAM)
+            n.setdefault("angeheftet", False)
+            n.update(id=uuid.uuid4().hex[:12], erstellt=jetzt, erstellt_von=benutzer_id)
+        n["geaendert"] = jetzt
+        self.notizen[n["id"]] = n
+        await self._sichern()
+        return n
+
+    async def notiz_loeschen(self, notiz_id: str, benutzer_id: str | None) -> None:
+        n = self.notizen.get(notiz_id)
+        if n is None:
+            return
+        if not self.sichtbar(n, benutzer_id):
+            raise PermissionError("Diese Notiz gehört einer anderen Person.")
+        del self.notizen[notiz_id]
+        await self._sichern()
+
     async def woche(self, person: str, kw: str, ziele: list[dict[str, Any]], notiz: str) -> dict[str, Any]:
         if not re.match(r"^\d{4}-W\d{2}$", kw):
             raise ValueError("Kalenderwoche ungültig")
@@ -307,6 +358,54 @@ class Planer:
         self.wochen.setdefault(person, {})[kw] = eintrag
         await self._sichern()
         return eintrag
+
+    # ---------- Schichtplan (wie Supershift) ----------
+    def schichtplan(self, person: str) -> dict[str, Any]:
+        e = self.schichten.get(person) or {}
+        return {"arten": e.get("arten") or [], "tage": e.get("tage", {})}
+
+    async def schicht_arten(self, person: str, arten: list[dict[str, Any]]) -> dict[str, Any]:
+        sauber, ids = [], set()
+        for x in arten[:20]:
+            if not isinstance(x, dict) or not _text(x.get("name"), 40):
+                continue
+            aid = _text(x.get("id"), 12) or uuid.uuid4().hex[:8]
+            if aid in ids:
+                continue
+            ids.add(aid)
+            zeit = lambda v: str(v) if v and re.match(r"^\d{2}:\d{2}$", str(v)) else None  # noqa: E731
+            sauber.append({
+                "id": aid,
+                "name": _text(x.get("name"), 40),
+                "kurz": _text(x.get("kurz"), 3) or _text(x.get("name"), 1).upper(),
+                "farbe": str(x.get("farbe")) if re.match(r"^#[0-9a-fA-F]{6}$", str(x.get("farbe"))) else "#8e8e93",
+                "von": zeit(x.get("von")),
+                "bis": zeit(x.get("bis")),
+                "pause": max(0, min(240, int(x.get("pause") or 0))) if str(x.get("pause") or 0).isdigit() else 0,
+                # Frei/Urlaub (ohne Uhrzeit) standardmäßig nicht in den Arbeitskalender
+                "kalender": bool(x["kalender"]) if "kalender" in x else bool(zeit(x.get("von")) and zeit(x.get("bis"))),
+            })
+        plan = self.schichten.setdefault(person, {})
+        plan["arten"] = sauber
+        # Tage mit gelöschten Arten aufräumen
+        plan["tage"] = {t: a for t, a in plan.get("tage", {}).items() if a in ids}
+        await self._sichern()
+        return self.schichtplan(person)
+
+    async def schicht_tage(self, person: str, tage: dict[str, Any]) -> dict[str, Any]:
+        plan = self.schichten.setdefault(person, {})
+        plan.setdefault("arten", [])
+        ids = {a["id"] for a in plan["arten"]}
+        ziel = plan.setdefault("tage", {})
+        for tag, art in list(tage.items())[:800]:
+            if not re.match(r"^\d{4}-\d{2}-\d{2}$", str(tag)):
+                continue
+            if art and art in ids:
+                ziel[tag] = art
+            else:
+                ziel.pop(tag, None)
+        await self._sichern()
+        return self.schichtplan(person)
 
     async def allgemein_setzen(self, werte: dict[str, Any]) -> None:
         if "farben" in werte and isinstance(werte["farben"], dict):
@@ -343,6 +442,14 @@ class Planer:
                 e[feld] = min(hi, max(lo, int(werte[feld])))
         if e.get("tag_bis", 22) <= e.get("tag_von", 7):
             e["tag_bis"] = min(24, e.get("tag_von", 7) + 1)
+        if "schicht_kalender" in werte:
+            v = werte["schicht_kalender"]
+            e["schicht_kalender"] = None if v is None else (str(v) if str(v).startswith("calendar.") else "")
+        if "schicht_push" in werte:
+            v = str(werte["schicht_push"] or "")
+            e["schicht_push"] = v if v == "vorabend" or (v.isdigit() and int(v) <= 1440) else ""
+        if "schicht_push_uhr" in werte and UHRZEIT.match(str(werte["schicht_push_uhr"])):
+            e["schicht_push_uhr"] = str(werte["schicht_push_uhr"])
         if "erinnerungen" in werte:
             e["erinnerungen"] = sorted({int(m) for m in werte["erinnerungen"] or [] if str(m).isdigit() and int(m) <= 43200})
         await self._sichern()
