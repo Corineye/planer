@@ -1440,7 +1440,7 @@ class PlanerPanel extends HTMLElement {
             aria-label="${esc(`${dd.getDate()}. ${MONATE[dd.getMonth()]}: ${l.map(({ p, a }) => `${vorname(p)} ${a ? a.name : "keine Schicht"}`).join(", ")}`)}">
             <span class="mnr">${dd.getDate()}</span><span class="sbeide">${l.map(({ p, a }) => a
               ? `<span class="sb" style="--k:${a.farbe}" title="${esc(`${vorname(p)}: ${a.name} ${this._schichtZeit(a)}`)}"><i>${esc(vorname(p)[0])}</i>${esc(a.kurz)}</span>`
-              : `<span class="sb leer"><i>${esc(vorname(p)[0])}</i>–</span>`).join("")}</span></div>`;
+              : "").join("")}</span></div>`;
         }).join("")}
       </div></div>
       <div class="schicht-fuss"><div class="schicht-summe">${summe}</div></div>
