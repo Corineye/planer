@@ -906,6 +906,20 @@ input[role=switch]:focus-visible{outline:2px solid var(--accent);outline-offset:
 .sfarbe[aria-checked="true"]{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--k)}
 .knopf.gefahr{color:var(--rot)}
 .knopf.breit{width:100%;justify-content:center}
+/* Aufgeräumt (v0.9.1) */
+.wer-pille{display:inline-flex;align-items:center;gap:2px;margin-left:8px;padding:2px 8px 2px 10px;min-height:28px;border:0;border-radius:var(--r-voll);background:var(--fill);color:var(--fg);font:inherit;font-size:var(--t-sub);font-weight:600;cursor:pointer;vertical-align:middle;position:relative}
+.wer-pille::before{content:"";position:absolute;inset:-8px -4px}
+.wer-pille svg{width:14px;height:14px}
+.schmal header .datum{overflow:visible}
+.stempel-hinweis:empty{display:none}
+.schmal .kalleiste{flex-wrap:nowrap}
+.schmal .kalleiste .seg{flex:1;min-width:0}
+.schmal .kalwahl{flex:none;width:44px;min-height:44px;padding:0;justify-content:center;position:relative}
+.schmal .kalwahl .kw-text{display:none}
+.schmal .kalwahl .zahl{position:absolute;top:-4px;right:-4px;font-size:10px;line-height:16px;padding:0 4px;border-radius:8px;background:var(--fill);color:var(--muted)}
+.schmal .schicht-knoepfe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.schmal .schicht-knoepfe .knopf{flex-direction:column;gap:2px;min-height:56px;padding:var(--s1);font-size:var(--t-klein)}
+.schmal .schicht-summe{font-size:var(--t-klein)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media (forced-colors:active){.haken[aria-checked="true"]::before{forced-color-adjust:none;background:Highlight}.seg button[aria-pressed="true"],nav.tabs button[aria-current="page"]{outline:2px solid Highlight}}
 `;
@@ -1129,23 +1143,25 @@ class PlanerPanel extends HTMLElement {
             .map(([k, t]) => `<button type="button" data-filter="${esc(k)}" data-fokus="f-${esc(k)}" aria-pressed="${this._filter === k}">${esc(t)}</button>`).join("")}
         </div>` : "";
 
+    const werText = this._filter === "alle" ? "Alle" : this._filter === GEMEINSAM ? "Gemeinsam" : !this._filter || this._filter === "ich" ? "Ich" : (this._name(this._filter) || "").split(" ")[0];
     const tabName = (tabs.find(([k]) => k === this._ansicht) || tabs[0])[1];
     const einkauf = this._ansicht === "einkauf";
     const notizen = this._ansicht === "notizen";
     const bListe = [...new Set(d.aufgaben.filter((a) => a.status === "offen").flatMap((a) => [a.bereich, ...(a.tags || [])]).filter(Boolean))].sort();
     if (this._bereich && !bListe.includes(this._bereich)) bListe.push(this._bereich);
     const gross = (x) => x[0].toUpperCase() + x.slice(1);
-    const bereichChips = !schmal && bListe.length && !einkauf && !notizen
+    const mitBereich = this._ansicht === "heute" || this._ansicht === "demnaechst";
+    const bereichChips = !schmal && bListe.length && mitBereich
       ? `<div class="bereiche" role="group" aria-label="Nach Bereich filtern">
           <button type="button" data-bereich="" data-fokus="b-alle" aria-pressed="${!this._bereich}">Alle Bereiche</button>
           ${bListe.map((x) => `<button type="button" data-bereich="${esc(x)}" data-fokus="b-${esc(x)}" aria-pressed="${this._bereich === x}" style="--b:${bereichFarbe(x, d.farben)}"><span class="punkt" aria-hidden="true"></span>${esc(gross(x))}</button>`).join("")}
         </div>` : "";
-    const bereichWahl = schmal && bListe.length && !einkauf && !notizen
+    const bereichWahl = schmal && bListe.length && mitBereich
       ? `<span class="rund ${this._bereich ? "aktiv" : ""}" title="Nach Bereich filtern">${ICON.filter}
           <label class="sr" for="bwahl">Nach Bereich filtern</label>
           <select id="bwahl" data-fokus="bwahl"><option value="">Alle Bereiche</option>${bListe.map((x) => `<option value="${esc(x)}" ${this._bereich === x ? "selected" : ""}>${esc(gross(x))}</option>`).join("")}</select>
         </span>` : "";
-    const aktivFilter = schmal && this._bereich && !einkauf && !notizen
+    const aktivFilter = schmal && this._bereich && mitBereich
       ? `<div class="aktivfilter"><span>Nur</span><button type="button" data-bereich="" data-fokus="b-weg" aria-label="Filter ${esc(gross(this._bereich))} aufheben"><span class="punkt" style="--b:${bereichFarbe(this._bereich, d.farben)}" aria-hidden="true"></span>${esc(gross(this._bereich))}${ICON.zu}</button></div>` : "";
     const eingabeSichtbar = !schmal || this._eingabeOffen;
     const kannTermin = (d.kalender || []).some((k) => k.schreiben);
@@ -1159,7 +1175,7 @@ class PlanerPanel extends HTMLElement {
         ${this._menuKnopf()}
         <div class="titel-block">
           <h1>${esc(tabName)}</h1>
-          <span class="datum">${schmal ? WT_KURZ[wt(heuteD)] + "." : WOCHENTAGE[wt(heuteD)]}, ${heuteD.getDate()}. ${MONATE[heuteD.getMonth()]}</span>
+          <span class="datum">${schmal ? WT_KURZ[wt(heuteD)] + "." : WOCHENTAGE[wt(heuteD)]}, ${heuteD.getDate()}. ${MONATE[heuteD.getMonth()]}${schmal && filterKnoepfe ? `<button type="button" class="wer-pille" data-aktion="wer-wahl" data-fokus="wer" aria-haspopup="dialog" aria-label="Wessen Einträge: ${esc(werText)}. Ändern">${esc(werText)}<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>` : ""}</span>
         </div>
         <div class="rechts">
           ${schmal ? "" : filterKnoepfe}
@@ -1168,7 +1184,6 @@ class PlanerPanel extends HTMLElement {
           ${d.admin ? `<button type="button" class="rund" data-aktion="einstellungen" data-fokus="einst" aria-label="Einstellungen" title="Einstellungen">${ICON.einstellungen}</button>` : ""}
         </div>
       </header>
-      ${schmal && filterKnoepfe ? `<div class="filterzeile">${filterKnoepfe}</div>` : ""}
       ${aktivFilter}
 
       <form class="schnell" id="schnellform" autocomplete="off" ${eingabeSichtbar ? "" : "hidden"}>
@@ -1444,7 +1459,7 @@ class PlanerPanel extends HTMLElement {
       anzahl[a.id] = (anzahl[a.id] || 0) + 1;
     }
     const stempel = this._stempel;
-    const wer = ` · ${esc(person === d.ich ? "Meine Schichten" : this._name(person).split(" ")[0])}`;
+    const wer = this._narrow ? "" : ` · ${esc(person === d.ich ? "Meine Schichten" : this._name(person).split(" ")[0])}`;
     const se = (d.schicht_einst || {})[person] || {};
     const kalName = se.kalender ? ((d.schicht_kalender_wahl || []).find((k) => k.id === se.kalender)?.name || se.kalender) : "";
     const pushText = !se.push ? "" : se.push === "vorabend" ? `Erinnerung am Vorabend ${se.push_uhr || "20:00"}` : `Erinnerung ${minText(+se.push)}`;
@@ -1458,7 +1473,7 @@ class PlanerPanel extends HTMLElement {
           <span class="skurz">${esc(a.kurz)}</span><span class="sname">${esc(a.name)}</span></button>`).join("")}
         <button type="button" class="stempel radierer" data-stempel="leer" aria-pressed="${stempel === "leer"}" title="Schicht entfernen"><span class="skurz">${ICON.zu}</span><span class="sname">Entfernen</span></button>
       </div>
-      <p class="hinweis" role="status">${stempel ? `${stempel === "leer" ? "Entfernen" : esc(plan.arten.find((a) => a.id === stempel)?.name || "")} aktiv: Tage antippen. Nochmal auf den Knopf tippen beendet das Eintragen.` : "Schicht oben wählen und dann Tage antippen. Ohne Auswahl öffnet ein Tag die Auswahl."}</p>`}
+      <p class="hinweis stempel-hinweis" role="status">${stempel ? `${stempel === "leer" ? "Entfernen" : esc(plan.arten.find((a) => a.id === stempel)?.name || "")}: Tage antippen` : ""}</p>`}
       <div class="woche-wrap"><div class="monat schichtmonat" role="grid" aria-labelledby="s-titel">
         ${["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((n) => `<div class="mkopf" role="columnheader">${n}</div>`).join("")}
         ${tage.slice(0, zeilen).map((t) => {
@@ -1474,10 +1489,9 @@ class PlanerPanel extends HTMLElement {
           ${plan.arten.filter((a) => anzahl[a.id]).map((a) => `<span class="chip" style="--b:${a.farbe}"><span class="punkt" aria-hidden="true"></span> ${anzahl[a.id]}× ${esc(a.name)}</span>`).join("")}</div>
         <div class="schicht-knoepfe">
           <button type="button" class="knopf" data-aktion="schicht-rhythmus">${ICON.wdh}Wiederholen</button>
-          <button type="button" class="knopf" data-aktion="schicht-arten">${ICON.regler}Schichten bearbeiten</button>
-          <button type="button" class="knopf" data-aktion="schicht-einst">${ICON.woche}Kalender &amp; Erinnerung</button>
+          <button type="button" class="knopf" data-aktion="schicht-arten">${ICON.regler}${this._narrow ? "Schichten" : "Schichten bearbeiten"}</button>
+          <button type="button" class="knopf" data-aktion="schicht-einst" title="${esc(`${kalName ? `Kalender: ${kalName}` : "Kein Kalender"}${pushText ? ` · ${pushText}` : ""}`)}">${ICON.woche}${this._narrow ? "Kalender" : "Kalender &amp; Erinnerung"}</button>
         </div>
-        <p class="hinweis">${kalName ? `Wird automatisch in „${esc(kalName)}“ eingetragen.` : "Wird in keinen Kalender übertragen."}${pushText ? ` ${esc(pushText)}.` : ""}</p>
       </div>
     </section>`;
   }
@@ -1501,8 +1515,7 @@ class PlanerPanel extends HTMLElement {
     }).join("");
     return `<section class="gruppe" aria-labelledby="s-titel">
       ${this._kalenderUmschalter()}
-      <div class="wkopf"><h2 id="s-titel">${MONATE[monat]} ${jahr} · Beide</h2>${this._kalNavi("schicht", "Heute", monat === jetzt.getMonth() && jahr === jetzt.getFullYear(), "Monat wechseln")}</div>
-      <p class="hinweis">Zum Eintragen oben eine Person wählen. Tippe auf einen Namen, um direkt zu ihrem Plan zu wechseln.</p>
+      <div class="wkopf"><h2 id="s-titel">${MONATE[monat]} ${jahr}${this._narrow ? "" : " · Beide"}</h2>${this._kalNavi("schicht", "Heute", monat === jetzt.getMonth() && jahr === jetzt.getFullYear(), "Monat wechseln")}</div>
       <div class="schicht-wer">${pers.map((p) => `<button type="button" class="knopf klein" data-filter="${esc(p === d.ich ? "ich" : p)}">${esc(vorname(p))} bearbeiten</button>`).join("")}</div>
       <div class="woche-wrap"><div class="monat schichtmonat beide" role="grid" aria-labelledby="s-titel">
         ${["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((n) => `<div class="mkopf" role="columnheader">${n}</div>`).join("")}
@@ -1602,6 +1615,25 @@ class PlanerPanel extends HTMLElement {
       try { await this._ws({ type: "planer/schicht_tage", person, tage }); }
       catch (e) { await this._lesen(); }
     }
+  }
+
+  _werWahl() {
+    const d = this._daten;
+    const dlg = this.shadowRoot.getElementById("wahldlg");
+    const wahl = [["ich", "Ich"], ...d.personen.filter((p) => p.id !== d.ich).map((p) => [p.id, p.name.split(" ")[0]]), [GEMEINSAM, "Gemeinsam"], ["alle", "Alle"]];
+    const jetzt = this._filter || "ich";
+    dlg.innerHTML = `<form method="dialog" class="wahl-blatt">
+      <div class="blatt-kopf">${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}<span class="l"></span><h2 id="wahl-titel">Wessen Einträge</h2><button type="submit" class="knopf text fett r">Fertig</button></div>
+      <div class="wahlliste">${wahl.map(([k, t]) => `<button type="button" class="wahlzeile ${jetzt === k ? "aktiv" : ""}" data-wer="${esc(k)}" aria-pressed="${jetzt === k}"><span>${esc(t)}</span>${jetzt === k ? ICON.haken || "✓" : ""}</button>`).join("")}</div>
+    </form>`;
+    dlg.querySelectorAll("[data-wer]").forEach((b) => b.addEventListener("click", () => {
+      this._filter = b.dataset.wer;
+      try { localStorage.setItem("planer.filter", this._filter); } catch (e) { /* egal */ }
+      this._zu(dlg);
+      this._zeichnen();
+    }));
+    this._wischZu(dlg);
+    dlg.showModal();
   }
 
   _schichtWahl(tag, person) {
@@ -1855,7 +1887,7 @@ class PlanerPanel extends HTMLElement {
       <button type="button" data-kal-ansicht="woche" data-fokus="ka-w" aria-pressed="${v === "woche"}">Woche</button>
       <button type="button" data-kal-ansicht="schichten" data-fokus="ka-s" aria-pressed="${v === "schichten"}">Schichten</button>
     </div>
-    ${kal.length && v !== "schichten" ? `<button type="button" class="knopf kalwahl" data-aktion="kal-wahl" data-fokus="kal-wahl" aria-haspopup="dialog">${ICON.woche}<span>Kalender</span><span class="zahl">${an}/${kal.length}</span></button>` : ""}</div>`;
+    ${kal.length && v !== "schichten" ? `<button type="button" class="knopf kalwahl" data-aktion="kal-wahl" data-fokus="kal-wahl" aria-haspopup="dialog">${ICON.woche}<span class="kw-text">Kalender</span><span class="zahl">${an}/${kal.length}</span></button>` : ""}</div>`;
   }
   _kalNavi(art, heuteText, istJetzt, label) {
     return `<div class="navi" role="group" aria-label="${label}">
@@ -1900,7 +1932,6 @@ class PlanerPanel extends HTMLElement {
         }).join("")}
       </div></div>
       ${termine === null ? `<p class="hinweis" role="status">Termine werden geladen …</p>` : ""}
-      <p class="hinweis">Tippe auf einen Tag, um ihn mit allen Uhrzeiten zu öffnen.</p>
     </section>`;
   }
 
@@ -1960,7 +1991,6 @@ class PlanerPanel extends HTMLElement {
     ${termine === null ? `<p class="hinweis" role="status">Termine werden geladen …</p>` : ""}
     ${eingang.length ? `<section class="gruppe" aria-labelledby="ab-titel">
       <h2 id="ab-titel">Aus dem Eingang einplanen</h2>
-      <p class="hinweis">${this._narrow ? "Aufgabe antippen und ein Datum wählen." : "Auf einen Tag ziehen oder öffnen und ein Datum wählen."}</p>
       <div class="ablage">${eingang.map((a) => `<button type="button" class="wpunkt a" style="--k:${bereichFarbe(a.bereich, this._daten.farben) || "var(--accent)"}" draggable="true" data-ziehen="${a.id}" data-aktion="oeffnen" data-id="${a.id}">${esc(a.titel)}</button>`).join("")}</div>
     </section>` : ""}`;
   }
@@ -2559,6 +2589,7 @@ class PlanerPanel extends HTMLElement {
     if (art === "schicht-rhythmus") return this._schichtRhythmus();
     if (art === "schicht-einst") return this._schichtEinstellung();
     if (art === "schicht-neu") return this._schichtForm(null);
+    if (art === "wer-wahl") return this._werWahl();
     if (art === "erweitert") return this._erweitert();
     if (art === "neu" && this._ansicht === "notizen") {
       const person = this._filter !== "ich" && this._filter !== "alle" ? this._filter : this._daten.ich;
@@ -3063,7 +3094,7 @@ class PlanerPanel extends HTMLElement {
       else { const m = new Date(n.geaendert); dazu(m.getFullYear() === jahr ? MONATE[m.getMonth()] : `${MONATE[m.getMonth()]} ${m.getFullYear()}`, n); }
     }
     let i = 0;
-    return hinweis + [...gruppen].map(([name, liste]) => { const id = `n-g${i++}`; return `<section class="ngruppe" aria-labelledby="${id}">
+    return [...gruppen].map(([name, liste]) => { const id = `n-g${i++}`; return `<section class="ngruppe" aria-labelledby="${id}">
       <h2 id="${id}">${esc(name)}</h2>
       <ul class="nliste">${liste.map((n) => this._notizZeile(n)).join("")}</ul>
     </section>`; }).join("");
