@@ -3398,7 +3398,7 @@ class PlanerPanel extends HTMLElement {
         ${tagListe.map((t) => `<button type="button" data-ntag="${esc(t)}" data-fokus="nf-t-${esc(t)}" aria-pressed="${this._nTag === t}">#${esc(t)}</button>`).join("")}
       </div>` : "";
     const suche = `<div class="suchfeld nsuche">${ICON.suche}<label class="sr" for="n-suche">Notizen durchsuchen</label><input id="n-suche" type="search" data-fokus="n-suche" placeholder="Notizen durchsuchen" value="${esc(this._nSuche || "")}" enterkeyhint="search" autocomplete="off"></div>`;
-    return `${hinweis}${suche}${filter}<div id="n-listen">${this._notizenListeHtml()}</div>`;
+    return `${suche}${filter}<div id="n-listen">${this._notizenListeHtml()}</div>`;
   }
   _notizenListeHtml() {
     const alle = [...this._notizenGefiltert()].sort((a, b) => (b.geaendert || "").localeCompare(a.geaendert || ""));
