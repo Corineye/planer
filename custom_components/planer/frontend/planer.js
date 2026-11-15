@@ -172,6 +172,7 @@ function erinnLesen(dlg, p) {
 
 const KAL_FARBEN = ["#5ff2b8", "#7fb4ff", "#ffb37a", "#f59ad6", "#c3a6ff", "#9be36b"];
 const uhr = (s) => s.slice(11, 16);
+const datumKurz = (t) => { const d = ausIso(t); return `${d.getDate()}. ${MONATE[d.getMonth()]}`; };
 const hhmm = (m) => `${String(Math.floor(m / 60) % 24).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -684,6 +685,10 @@ dialog::backdrop{transition:background-color .25s ease,overlay .25s allow-discre
 @starting-style{.schmal dialog[open]{transform:translateY(100%);opacity:1}}
 dialog.schliesst{opacity:0;transform:translateY(12px) scale(.98)}
 .schmal dialog.schliesst{opacity:1;transform:translateY(100%)}
+/* Geschlossener Zustand = Ende der Ausblend-Animation, damit nichts noch einmal aufblitzt */
+dialog:not([open]){opacity:0;transform:translateY(12px) scale(.98)}
+.schmal dialog:not([open]){opacity:1;transform:translateY(100%)}
+dialog:not([open])::backdrop{background:rgba(0,0,0,0)}
 dialog.schliesst::backdrop{background:rgba(0,0,0,0)}
 main.einblenden{animation:einblenden .28s var(--bewegung)}
 @keyframes einblenden{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -721,6 +726,17 @@ dialog.pop form{display:grid;gap:var(--s3);padding:var(--s3) var(--s5) var(--s5)
 .q-zeiten{display:flex;align-items:center;gap:var(--s2);margin-top:var(--s1);flex-wrap:wrap}
 .q-zeiten input{width:auto;min-width:0}
 .q-fuss{display:flex;justify-content:flex-end;gap:var(--s2);align-items:center;margin-top:var(--s2)}
+.tl-scroll{max-height:calc(100dvh - 300px);min-height:240px;overflow-y:auto;overscroll-behavior:contain;padding-right:var(--s1);display:grid;gap:var(--s4);align-content:start}
+.schmal .tl-scroll{max-height:380px;min-height:0}
+.tl-tag{display:grid;gap:var(--s2)}
+.tl-kopf{margin:0;font-size:var(--t-fuss);font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0;background:var(--card);padding:var(--s1) 0;z-index:1}
+.tl-scroll:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:var(--s2)}
+.kalleiste{display:flex;align-items:center;gap:var(--s2);flex-wrap:wrap}
+.kalwahl .zahl{font-size:var(--t-klein);color:var(--muted);font-variant-numeric:tabular-nums}
+.kalzeile{display:grid;grid-template-columns:12px minmax(0,1fr) auto;align-items:center;gap:var(--s3);cursor:pointer}
+.kalzeile .punkt{width:12px;height:12px;border-radius:50%;background:var(--b)}
+.kalzeile .n{overflow-wrap:anywhere;color:var(--fg);font-weight:500}
+.kalzeile .schalter{width:22px;height:22px;accent-color:var(--accent-fill);margin:0}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media (forced-colors:active){.haken[aria-checked="true"]::before{forced-color-adjust:none;background:Highlight}.seg button[aria-pressed="true"],nav.tabs button[aria-current="page"]{outline:2px solid Highlight}}
 `;
@@ -910,13 +926,14 @@ class PlanerPanel extends HTMLElement {
     const alle = this._sichtbar();
     const offen = alle.filter((a) => a.status === "offen");
     const zaehler = {
-      heute: offen.filter((a) => a.datum && a.datum <= h).length,
+      heute: offen.filter((a) => !a.datum || a.datum <= h).length,
       demnaechst: offen.filter((a) => a.datum && a.datum > h).length,
       eingang: offen.length,
       woche: offen.filter((a) => a.datum && a.datum >= iso(montag(new Date())) && a.datum <= iso(plusTage(montag(new Date()), 6))).length,
       einkauf: (this._eArtikel?.liste === this._eListeId() ? this._eArtikel.items.filter((x) => !x.erledigt).length : 0),
     };
-    const tabs = [["heute", "Heute"], ["woche", "Kalender"], ["demnaechst", "Demnächst"], ["eingang", "Aufgaben"]];
+    const tabs = [["heute", "Heute"], ["woche", "Kalender"], ["demnaechst", "Demnächst"]];
+    if (this._ansicht === "eingang") this._ansicht = "heute";
     if ((d.einkauf_listen || []).length) tabs.push(["einkauf", "Einkauf"]);
     if (this._ansicht === "einkauf" && !(d.einkauf_listen || []).length) this._ansicht = "heute";
     const heuteD = new Date();
@@ -1065,7 +1082,6 @@ class PlanerPanel extends HTMLElement {
   _ansichtHtml(alle, offen) {
     const h = this._tag;
     if (this._ansicht === "einkauf") return this._einkaufHtml();
-    if (this._ansicht === "eingang") return this._aufgabenHtml(offen);
     if (this._ansicht === "woche") return this._kalAnsicht === "monat" ? this._monatHtml(alle) : this._wocheHtml(alle);
     if (this._ansicht === "demnaechst") {
       const kommend = offen.filter((a) => a.datum && a.datum > h).sort((a, b) => a.datum.localeCompare(b.datum));
@@ -1090,19 +1106,22 @@ class PlanerPanel extends HTMLElement {
     const ueber = this._sortiert(offen.filter((a) => a.datum && a.datum < h));
     const heuteOffen = offen.filter((a) => a.datum === h);
     const top = heuteOffen.filter((a) => a.top).sort((a, b) => a.top - b.top);
-    const rest = this._sortiert(heuteOffen.filter((a) => !a.top && !a.uhrzeit));
+    // Heute: alles von heute (auch mit Uhrzeit) plus Aufgaben ohne Datum
+    const rest = [...this._sortiert(heuteOffen.filter((a) => !a.top)), ...this._sortiert(offen.filter((a) => !a.datum))];
+    const spaeter = offen.filter((a) => a.datum && a.datum > h).sort((a, b) => a.datum.localeCompare(b.datum) || (a.uhrzeit || "99").localeCompare(b.uhrzeit || "99"));
     const fertig = alle.filter((a) => a.status === "erledigt" && (a.erledigt_am || "").slice(0, 10) === h);
     const wiederHeute = alle.filter((a) => a.wiederholung && (a.verlauf || []).includes(h) && a.status === "offen");
     let html = "";
     const jetztUhr = new Date().toTimeString().slice(0, 5);
     const naechste = ueber[0] || this._sortiert(heuteOffen.filter((a) => a.uhrzeit && a.uhrzeit >= jetztUhr))[0] || top[0] || rest[0];
     this._naechste = naechste ? naechste.id : null;
-    const kal = this._zeitleiste(heuteOffen);
+    const kal = this._zeitleiste(offen);
     if (ueber.length) html += this._gruppe("Überfällig", ueber, "", "rot");
     const freie = 3 - top.length;
     if (top.length) html += this._gruppe("Top 3", top, "", "", freie > 0 ? `${freie} ${freie === 1 ? "Platz" : "Plätze"} frei` : "");
     if (this._narrow) html += kal;
-    html += this._gruppe("Weitere Aufgaben heute", rest, "Sonst steht heute nichts ohne Uhrzeit an.");
+    html += this._gruppe(top.length ? "Weitere Aufgaben heute" : "Aufgaben heute", rest, "Für heute ist nichts offen.");
+    if (spaeter.length) html += this._gruppe("Demnächst", spaeter);
     const erledigtHeute = [...fertig, ...wiederHeute];
     if (erledigtHeute.length) {
       html += `<details class="zu"><summary>Heute erledigt (${erledigtHeute.length})</summary>
@@ -1184,10 +1203,13 @@ class PlanerPanel extends HTMLElement {
 
   _kalenderUmschalter() {
     const m = this._kalAnsicht === "monat";
-    return `<div class="seg kalumschalter" role="group" aria-label="Kalenderansicht">
+    const kal = this._daten.kalender || [];
+    const an = kal.filter((k) => k.angezeigt !== false).length;
+    return `<div class="kalleiste"><div class="seg kalumschalter" role="group" aria-label="Kalenderansicht">
       <button type="button" data-kal-ansicht="monat" data-fokus="ka-m" aria-pressed="${m}">Monat</button>
       <button type="button" data-kal-ansicht="woche" data-fokus="ka-w" aria-pressed="${!m}">Woche</button>
-    </div>`;
+    </div>
+    ${kal.length ? `<button type="button" class="knopf kalwahl" data-aktion="kal-wahl" data-fokus="kal-wahl" aria-haspopup="dialog">${ICON.woche}<span>Kalender</span><span class="zahl">${an}/${kal.length}</span></button>` : ""}</div>`;
   }
   _kalNavi(art, heuteText, istJetzt, label) {
     return `<div class="navi" role="group" aria-label="${label}">
@@ -1573,52 +1595,69 @@ class PlanerPanel extends HTMLElement {
   }
 
   // Heute als Zeitleiste: Termine und Aufgaben mit Uhrzeit, Linie „Jetzt“, freie Zeit bis Tagesende
-  _zeitleiste(heuteOffen) {
+  // Zeitleiste: heute mit Jetzt-Markierung, dazu die nächsten Tage; scrollt in sich
+  _zeitleiste(offen) {
     const h = this._tag;
-    const termine = this._termineAm(h);
-    const ganz = termine.filter((t) => t.ganztag);
     const zeit = (x) => +x.slice(0, 2) * 60 + +x.slice(3, 5);
     const jetzt = new Date();
     const jetztMin = jetzt.getHours() * 60 + jetzt.getMinutes();
     const bisStd = this._daten.einst?.tag_bis ?? 22;
-    const eintraege = [
-      ...termine.filter((t) => !t.ganztag).map((t) => {
-        const s0 = t.start.slice(0, 10) < h ? 0 : zeit(uhr(t.start));
-        const e0 = t.ende.slice(0, 10) > h ? 1440 : zeit(uhr(t.ende));
-        return { s: s0, e: e0, html: this._terminZeile(t, h) };
-      }),
-      ...heuteOffen.filter((a) => a.uhrzeit).map((a) => {
-        const s0 = zeit(a.uhrzeit);
-        const e0 = s0 + (a.dauer || 0);
-        const bis = a.dauer ? ` – ${String(Math.floor(e0 / 60) % 24).padStart(2, "0")}:${String(e0 % 60).padStart(2, "0")}` : "";
-        return { s: s0, e: Math.max(e0, s0 + 1), html: `<li class="tl-aufgabe ${a.top ? "top" : ""}" data-id="${a.id}">
-          <button type="button" class="haken" role="checkbox" aria-checked="false" data-aktion="haken" data-id="${a.id}" data-fokus="th-${a.id}" aria-label="${esc(a.titel)} erledigt"></button>
-          <button type="button" class="inhalt" data-aktion="oeffnen" data-id="${a.id}" data-fokus="to-${a.id}">
-            <span class="zeit">${a.uhrzeit}${bis}</span><span class="titel">${esc(a.titel)}</span>
-            <span class="unter">Aufgabe${a.top ? ` · Top ${a.top}` : ""}${a.bereich ? ` · ${esc(a.bereich)}` : ""}</span></button></li>` };
-      }),
-    ].sort((x, y) => x.s - y.s);
+    const tagDaten = (tag) => {
+      const termine = this._termineAm(tag);
+      const eintraege = [
+        ...termine.filter((t) => !t.ganztag).map((t) => {
+          const s0 = t.start.slice(0, 10) < tag ? 0 : zeit(uhr(t.start));
+          const e0 = t.ende.slice(0, 10) > tag ? 1440 : zeit(uhr(t.ende));
+          return { s: s0, e: e0, html: this._terminZeile(t, tag) };
+        }),
+        ...offen.filter((a) => a.datum === tag && a.uhrzeit).map((a) => {
+          const s0 = zeit(a.uhrzeit);
+          const e0 = s0 + (a.dauer || 0);
+          const bis = a.dauer ? ` – ${hhmm(e0)}` : "";
+          return { s: s0, e: Math.max(e0, s0 + 1), html: `<li class="tl-aufgabe ${a.top ? "top" : ""}" data-id="${a.id}">
+            <button type="button" class="haken" role="checkbox" aria-checked="false" data-aktion="haken" data-id="${a.id}" aria-label="${esc(a.titel)} erledigt"></button>
+            <button type="button" class="inhalt" data-aktion="oeffnen" data-id="${a.id}">
+              <span class="zeit">${a.uhrzeit}${bis}</span><span class="titel">${esc(a.titel)}</span>
+              <span class="unter">Aufgabe${a.top ? ` · Top ${a.top}` : ""}${a.bereich ? ` · ${esc(a.bereich)}` : ""}</span></button></li>` };
+        }),
+      ].sort((x, y) => x.s - y.s);
+      return { ganz: termine.filter((t) => t.ganztag), eintraege };
+    };
+    // Heute
+    const heuteD = tagDaten(h);
     let html = "", jetztGesetzt = false;
-    for (const x of eintraege) {
-      if (!jetztGesetzt && x.s >= jetztMin) { html += `<li class="jetzt" aria-label="Jetzt, ${uhr(jetzt.toISOString())}"><span>Jetzt ${String(jetzt.getHours()).padStart(2, "0")}:${String(jetzt.getMinutes()).padStart(2, "0")}</span></li>`; jetztGesetzt = true; }
+    for (const x of heuteD.eintraege) {
+      if (!jetztGesetzt && x.s >= jetztMin) { html += `<li class="jetzt"><span>Jetzt ${hhmm(jetztMin)}</span></li>`; jetztGesetzt = true; }
       html += x.e <= jetztMin ? x.html.replace(/^<li( class="([^"]*)")?/, (m, _k, k) => `<li class="${k || ""} vorbei"`) : x.html;
     }
-    if (eintraege.length && !jetztGesetzt) html += `<li class="jetzt"><span>Jetzt</span></li>`;
+    if (heuteD.eintraege.length && !jetztGesetzt) html += `<li class="jetzt"><span>Jetzt ${hhmm(jetztMin)}</span></li>`;
     // freie Zeit von jetzt (frühestens Tagesbeginn) bis Tagesende
     const von = Math.max((this._daten.einst?.tag_von ?? 7) * 60, jetztMin);
     const bis = bisStd * 60;
-    const belegt = eintraege.map((x) => [Math.max(x.s, von), Math.min(x.e, bis)]).filter(([a, b]) => b > a).sort((x, y) => x[0] - y[0]);
+    const belegt = heuteD.eintraege.map((x) => [Math.max(x.s, von), Math.min(x.e, bis)]).filter(([a, b]) => b > a).sort((x, y) => x[0] - y[0]);
     let frei = Math.max(0, bis - von), ende = von;
     for (const [a, b] of belegt) { const a2 = Math.max(a, ende); if (b > a2) { frei -= b - a2; ende = b; } }
     const freiText = frei <= 0 ? `Heute ist bis ${bisStd} Uhr nichts mehr frei.` : `Frei bis ${bisStd} Uhr: ${Math.floor(frei / 60) ? `${Math.floor(frei / 60)} Std. ` : ""}${frei % 60 ? `${frei % 60} Min.` : ""}`.trim();
     const keineKal = !(this._daten.kalender || []).length;
+    const tagBlock = (tag, titel, inhalt, ganz) => `<div class="tl-tag" aria-label="${esc(titel)}">
+        <h3 class="tl-kopf">${esc(titel)}</h3>
+        ${ganz.length ? `<ul class="termine ganztag" aria-label="Ganztägig">${ganz.map((t) => this._terminZeile(t, tag)).join("")}</ul>` : ""}
+        ${inhalt}
+      </div>`;
+    let tageHtml = tagBlock(h, `Heute, ${datumKurz(h)}`, heuteD.eintraege.length ? `<ul class="zeitleiste">${html}</ul>`
+      : `<p class="leer">${keineKal ? "Noch kein Kalender sichtbar. In HA eingebundene Kalender erscheinen hier automatisch." : "Heute nichts mit Uhrzeit."}</p>`, heuteD.ganz)
+      + `<p class="frei">${esc(freiText)}</p>`;
+    for (let i = 1; i <= 14; i++) {
+      const tag = iso(plusTage(ausIso(h), i));
+      const d = tagDaten(tag);
+      if (!d.ganz.length && !d.eintraege.length) continue;
+      const name = i === 1 ? "Morgen" : WOCHENTAGE[wt(ausIso(tag))];
+      tageHtml += tagBlock(tag, `${name}, ${datumKurz(tag)}`, d.eintraege.length ? `<ul class="zeitleiste">${d.eintraege.map((x) => x.html).join("")}</ul>` : "", d.ganz);
+    }
     return `<section class="kal gruppe" aria-labelledby="g-kal">
-      <h2 id="g-kal">Zeitleiste</h2>
-      ${ganz.length ? `<ul class="termine ganztag" aria-label="Ganztägig">${ganz.map((t) => this._terminZeile(t, h)).join("")}</ul>` : ""}
-      ${eintraege.length ? `<ul class="zeitleiste">${html}</ul>`
-        : `<p class="leer">${keineKal ? "Noch kein Kalender sichtbar. In HA eingebundene Kalender erscheinen hier automatisch." : "Heute nichts mit Uhrzeit."}</p>`}
+      <h2 id="g-kal">Zeitleiste <span class="zahl">14 Tage</span></h2>
       ${this._kalFehler ? `<p class="fehler">${esc(this._kalFehler)}</p>` : ""}
-      <p class="frei">${esc(freiText)}</p>
+      <div class="tl-scroll" tabindex="0" aria-label="Zeitleiste, scrollbar">${tageHtml}</div>
     </section>`;
   }
 
@@ -1630,22 +1669,6 @@ class PlanerPanel extends HTMLElement {
       <div class="gkopf"><h2 id="${id}">${esc(titel)} ${titel === "Top 3" ? "" : `<span class="zahl">${liste.length || ""}</span>`}${zusatz ? ` <span class="chip">${esc(zusatz)}</span>` : ""}</h2>${knopf}</div>
       ${liste.length ? `<ul class="liste">${liste.map((a) => this._zeile(a)).join("")}</ul>` : leer ? `<p class="leer">${esc(leer)}</p>` : ""}
     </section>`;
-  }
-
-  // Alle offenen Aufgaben, nach Datum gruppiert
-  _aufgabenHtml(offen) {
-    const h = this._tag;
-    const ueber = this._sortiert(offen.filter((a) => a.datum && a.datum < h));
-    const heuteL = this._sortiert(offen.filter((a) => a.datum === h));
-    const spaeter = offen.filter((a) => a.datum && a.datum > h).sort((a, b) => a.datum.localeCompare(b.datum) || (a.uhrzeit || "99").localeCompare(b.uhrzeit || "99"));
-    const ohne = this._sortiert(offen.filter((a) => !a.datum));
-    if (!offen.length) return `<p class="leer">Keine offenen Aufgaben. Neue legst du oben an.</p>`;
-    let html = "";
-    if (ueber.length) html += this._gruppe("Überfällig", ueber, "", "rot");
-    html += this._gruppe("Heute", heuteL, "Für heute ist nichts offen.");
-    if (spaeter.length) html += this._gruppe("Demnächst", spaeter);
-    html += this._gruppe("Ohne Datum", ohne, "Nichts ohne Datum. Alles, was du per Sprache oder in der HA-App zur Planer-Liste hinzufügst, landet hier.");
-    return html;
   }
 
   _zeile(a, wiederErledigt = false) {
@@ -1859,6 +1882,7 @@ class PlanerPanel extends HTMLElement {
     const a = id ? this._finde(id) : null;
     if (art === "einstellungen") return this._einstellungen();
     if (art === "termin") return this._terminNeu();
+    if (art === "kal-wahl") return this._kalenderWahl();
     if (art === "erweitert") return this._erweitert();
     if (art === "neu" || art === "eingabe-zu") {
       this._eingabeOffen = art === "neu";
@@ -1903,6 +1927,32 @@ class PlanerPanel extends HTMLElement {
   }
 
   // Auswahl „Verschieben“ als kleines Blatt
+  // Welche Kalender angezeigt werden – jede Person für sich
+  _kalenderWahl() {
+    const dlg = this.shadowRoot.getElementById("wahldlg");
+    const kal = this._daten.kalender || [];
+    dlg.innerHTML = `<form method="dialog" class="wahl-blatt">
+      <div class="blatt-kopf">${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}<span class="l"></span><h2 id="wahl-titel">Kalender anzeigen</h2><button type="submit" class="knopf text fett r">Fertig</button></div>
+      <p class="hinweis">Gilt nur für dich. Ausgeblendete Kalender erscheinen nirgends im Planer, auch nicht in der Zeitleiste.</p>
+      <div class="wahlliste kalliste">${kal.map((k) => `<label class="wahlzeile kalzeile"><span class="punkt" style="--b:${this._farbe(k.id)}" aria-hidden="true"></span><span class="n">${esc(k.name)}</span>
+        <input type="checkbox" class="schalter" value="${esc(k.id)}" ${k.angezeigt !== false ? "checked" : ""}></label>`).join("")}</div>
+      <p class="fehler" role="alert" id="kw-fehler"></p>
+    </form>`;
+    dlg.querySelectorAll("input[type=checkbox]").forEach((c) => c.addEventListener("change", async () => {
+      const aus = [...dlg.querySelectorAll("input[type=checkbox]:not(:checked)")].map((x) => x.value);
+      try {
+        await this._hass.callWS({ type: "planer/kalender_anzeige", aus });
+        dlg.querySelector("#kw-fehler").textContent = "";
+      } catch (e) { dlg.querySelector("#kw-fehler").textContent = e.message || "Speichern hat nicht geklappt."; c.checked = !c.checked; return; }
+      kal.forEach((k) => { k.angezeigt = !aus.includes(k.id); });
+      this._sagen(`${c.closest("label").textContent.trim()} ${c.checked ? "eingeblendet" : "ausgeblendet"}`);
+      await this._termineNeu();
+      this._lesen();
+    }));
+    this._wischZu(dlg);
+    dlg.showModal();
+  }
+
   _verschiebenWahl(a) {
     const dlg = this.shadowRoot.getElementById("wahldlg");
     const basis = new Date();
@@ -1912,7 +1962,7 @@ class PlanerPanel extends HTMLElement {
       ["Übermorgen", iso(plusTage(basis, 2))],
       [`Nächsten Montag (${mo.getDate()}.${mo.getMonth() + 1}.)`, iso(mo)],
       ["In einer Woche", iso(plusTage(basis, 7))],
-      ["Ohne Datum (Eingang)", ""],
+      ["Ohne Datum (steht unter Heute)", ""],
     ];
     dlg.innerHTML = `<form method="dialog" class="wahl-blatt">
       <div class="blatt-kopf">${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}<span class="l"></span><h2 id="wahl-titel">Verschieben</h2><button type="submit" class="knopf text fett r">Abbrechen</button></div>
@@ -1992,7 +2042,7 @@ class PlanerPanel extends HTMLElement {
     if (!dlg.open) return;
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) { dlg.close(); return; }
     dlg.classList.add("schliesst");
-    setTimeout(() => { dlg.classList.remove("schliesst"); dlg.close(); }, 200);
+    setTimeout(() => { dlg.close(); dlg.classList.remove("schliesst"); }, 200);
   }
 
   _abhakAnimation(id) {
@@ -2064,7 +2114,7 @@ class PlanerPanel extends HTMLElement {
           <button type="button" class="knopf klein" data-tag="0">Heute</button>
           <button type="button" class="knopf klein" data-tag="1">Morgen</button>
           <button type="button" class="knopf klein" data-tag="7">In einer Woche</button>
-          <button type="button" class="knopf klein" data-tag="eingang">Eingang</button>
+          <button type="button" class="knopf klein" data-tag="eingang">Ohne Datum</button>
         </div>
       </div>
       <div class="reihe">
@@ -2115,7 +2165,7 @@ class PlanerPanel extends HTMLElement {
     dlg.querySelectorAll("[data-tag]").forEach((b) => b.addEventListener("click", () => {
       $("b-datum").value = wannZiel(b);
       wannZeigen();
-      this._sagen(b.dataset.tag === "eingang" ? "Datum entfernt, Aufgabe kommt in den Eingang" : `Datum ${datumText($("b-datum").value)}`);
+      this._sagen(b.dataset.tag === "eingang" ? "Datum entfernt, Aufgabe steht unter Heute" : `Datum ${datumText($("b-datum").value)}`);
     }));
     $("b-datum").addEventListener("input", wannZeigen);
     $("b-datum").addEventListener("change", wannZeigen);
@@ -2124,6 +2174,22 @@ class PlanerPanel extends HTMLElement {
     let sicher = false;
     // Automatisch speichern (nur bestehende Aufgaben): kurz nach jeder Änderung und beim Schließen.
     let uhr = null, aenderung = false, geaendert = false, weg = false, laeuft = Promise.resolve();
+    // #hashtags im Titel wie bei der Schnelleingabe übernehmen: erstes = Bereich (wenn leer), weitere = Hashtags
+    const hashtagsAusTitel = () => {
+      const t = $("b-titel").value;
+      const funde = [...t.matchAll(/(^|\s)#([\wäöüß-]+)/gi)].map((x) => x[2].toLowerCase());
+      if (!funde.length) return false;
+      const rest = t.replace(/(^|\s)#[\wäöüß-]+/gi, " ").replace(/\s+/g, " ").trim();
+      if (!rest) return false;
+      $("b-titel").value = rest;
+      if (!$("b-bereich").value.trim()) $("b-bereich").value = funde.shift();
+      const vorhanden = $("b-tags").value.split(/[\s,]+/).map((x) => x.replace(/^#/, "").toLowerCase()).filter(Boolean);
+      $("b-tags").value = [...new Set([...vorhanden, ...funde])].map((x) => "#" + x).join(" ");
+      aenderung = true;
+      this._sagen(`Hashtags übernommen: ${$("b-tags").value || $("b-bereich").value}`);
+      return true;
+    };
+    $("b-titel").addEventListener("change", hashtagsAusTitel);
     const sammeln = () => {
       const wiederholung = wdhLesen(dlg, "b");
       const lis = [...$("b-teile").children];
@@ -2171,6 +2237,7 @@ class PlanerPanel extends HTMLElement {
     }
     dlg.onclose = async () => {
       if (!a.id || weg) return;
+      hashtagsAusTitel();
       await autoSpeichern();
       if (geaendert) { geaendert = false; await this._lesen(); }
     };
@@ -2192,6 +2259,7 @@ class PlanerPanel extends HTMLElement {
       const titel = $("b-titel").value.trim();
       if (!titel) { $("b-fehler").textContent = "Bitte einen Titel eingeben."; $("b-titel").focus(); return; }
       if ($("b-teil-neu").value.trim()) { teilNeu(); aenderung = true; }
+      hashtagsAusTitel();
       if (a.id) {
         // Bestehende Aufgabe: „Fertig“ speichert den letzten Stand und schließt.
         await autoSpeichern();

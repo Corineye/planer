@@ -31,7 +31,7 @@ def _kalender_fuer(hass: HomeAssistant, benutzer_id: str) -> list[dict[str, Any]
         if e["kalender_sehen"] is not None and k["id"] not in e["kalender_sehen"]:
             continue
         darf = k["anlegen"] and (e["kalender_schreiben"] is None or k["id"] in e["kalender_schreiben"])
-        raus.append({**k, "schreiben": darf, "loeschen": k["loeschen"] and darf})
+        raus.append({**k, "schreiben": darf, "loeschen": k["loeschen"] and darf, "angezeigt": k["id"] not in (e["kalender_aus"] or [])})
     return raus
 
 
@@ -42,7 +42,7 @@ def async_registrieren(hass: HomeAssistant) -> None:
         return
     for befehl in (
         ws_lesen, ws_abonnieren, ws_speichern, ws_erledigen, ws_loeschen, ws_einstellung,
-        ws_termine, ws_termin_anlegen, ws_termin_loeschen, ws_woche, ws_allgemein,
+        ws_termine, ws_kalender_anzeige, ws_termin_anlegen, ws_termin_loeschen, ws_woche, ws_allgemein,
         ws_einkauf, ws_einkauf_aktion,
     ):
         websocket_api.async_register_command(hass, befehl)
@@ -158,8 +158,18 @@ async def ws_termine(hass: HomeAssistant, connection: websocket_api.ActiveConnec
     except (TypeError, ValueError):
         connection.send_error(msg["id"], "invalid", "Datum ungültig")
         return
-    ids = [k["id"] for k in _kalender_fuer(hass, connection.user.id)]
+    ids = [k["id"] for k in _kalender_fuer(hass, connection.user.id) if k["angezeigt"]]
     connection.send_result(msg["id"], await kalender.termine(hass, ids, start, ende))
+
+
+@websocket_api.websocket_command(
+    {vol.Required("type"): f"{DOMAIN}/kalender_anzeige", vol.Required("aus"): [str]}
+)
+@websocket_api.async_response
+async def ws_kalender_anzeige(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    """Jede Person wählt selbst, welche ihrer Kalender angezeigt werden (gilt nur für sie)."""
+    await _planer(hass).einstellung(connection.user.id, {"kalender_aus": msg["aus"]})
+    connection.send_result(msg["id"], {"ok": True})
 
 
 def _darf(hass: HomeAssistant, benutzer_id: str, kid: str, art: str) -> bool:
