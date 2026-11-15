@@ -784,6 +784,8 @@ dialog.pop form{display:grid;gap:var(--s3);padding:var(--s3) var(--s5) var(--s5)
 .schmal .sart .sa-pause{grid-column:1 / -1}
 .rh-vorschau{display:flex;flex-wrap:wrap;gap:6px}
 .rh-tag{display:grid;justify-items:center;min-width:44px;padding:4px 6px;border-radius:10px;background:color-mix(in srgb,var(--k,var(--muted)) 16%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--k,var(--muted)) 40%,transparent)}
+.rh-modus{margin-bottom:var(--s3)}
+.rh-info{flex-basis:100%;color:var(--muted);font-size:var(--t-klein)}
 .rh-tag small{font-size:10px;color:var(--muted)}
 .rh-tag b{color:var(--k,var(--muted))}
 /* ---------- Notizen ---------- */
@@ -1084,7 +1086,7 @@ class PlanerPanel extends HTMLElement {
 
       <main id="inhalt">${this._ansichtHtml(alle, offen)}</main>
     </div>
-    ${schmal && !this._eingabeOffen ? `<button type="button" class="fab" data-aktion="neu" data-fokus="fab" aria-label="${einkauf ? "Artikel hinzufügen" : notizen ? "Neue Notiz" : "Neue Aufgabe"}">${ICON.plus}</button>` : ""}`;
+    ${schmal && !this._eingabeOffen && !(this._ansicht === "woche" && this._kalAnsicht === "schichten") ? `<button type="button" class="fab" data-aktion="neu" data-fokus="fab" aria-label="${einkauf ? "Artikel hinzufügen" : notizen ? "Neue Notiz" : "Neue Aufgabe"}">${ICON.plus}</button>` : ""}`;
     if (neueAnsicht) this._app.querySelector("main")?.classList.add("einblenden");
 
     const s = root.getElementById("schnell");
@@ -1345,7 +1347,7 @@ class PlanerPanel extends HTMLElement {
         <div class="schicht-summe"><b>${Math.floor(minuten / 60)} Std.${minuten % 60 ? ` ${minuten % 60} Min.` : ""}</b> im ${MONATE[monat]}
           ${plan.arten.filter((a) => anzahl[a.id]).map((a) => `<span class="chip" style="--b:${a.farbe}"><span class="punkt" aria-hidden="true"></span> ${anzahl[a.id]}× ${esc(a.name)}</span>`).join("")}</div>
         <div class="schicht-knoepfe">
-          <button type="button" class="knopf" data-aktion="schicht-rhythmus">${ICON.wdh}Rhythmus eintragen</button>
+          <button type="button" class="knopf" data-aktion="schicht-rhythmus">${ICON.wdh}Wiederholen</button>
           <button type="button" class="knopf" data-aktion="schicht-arten">${ICON.regler}Schichtarten</button>
         </div>
       </div>
@@ -1465,12 +1467,25 @@ class PlanerPanel extends HTMLElement {
     const start = this._sStart && this._sStart > jetzt ? iso(this._sStart) : heute();
     dlg.innerHTML = `<form method="dialog" id="rhform" novalidate>
       <div class="blatt-kopf">${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
-        <button type="button" class="knopf text l" id="rh-abbrechen">Abbrechen</button><h2 id="blatt-titel">Rhythmus eintragen</h2><button type="submit" class="knopf text fett r">Eintragen</button></div>
+        <button type="button" class="knopf text l" id="rh-abbrechen">Abbrechen</button><h2 id="blatt-titel">Schichten wiederholen</h2><button type="submit" class="knopf text fett r">Eintragen</button></div>
+      <div class="seg rh-modus" role="group" aria-label="Art der Wiederholung">
+        <button type="button" data-rhmodus="muster" aria-pressed="${this._rhModus !== "kopie"}">Rhythmus</button>
+        <button type="button" data-rhmodus="kopie" aria-pressed="${this._rhModus === "kopie"}">Zeitraum wiederholen</button>
+      </div>
+      <div id="rh-m" ${this._rhModus === "kopie" ? "hidden" : ""}>
       <p class="hinweis">Kürzel der Reihe nach, mit Leerzeichen getrennt. „-“ heißt keine Schicht. Der Rhythmus wiederholt sich bis zum Enddatum.</p>
       <div class="schnellwahl">${plan.arten.map((a) => `<button type="button" class="knopf klein" data-rh="${esc(a.kurz)}" style="--k:${a.farbe}">${esc(a.kurz)} · ${esc(a.name)}</button>`).join("")}<button type="button" class="knopf klein" data-rh="-">– frei lassen</button><button type="button" class="knopf klein" data-rh="zurueck">⌫</button></div>
       <div class="feld"><label for="rh-muster">Rhythmus</label><input id="rh-muster" value="${esc(this._rhMuster || "")}" placeholder="z. B. F F S S N N X X" autocomplete="off" autocapitalize="characters"></div>
+      </div>
+      <div id="rh-k" ${this._rhModus === "kopie" ? "" : "hidden"}>
+      <p class="hinweis">Wähle einen schon geplanten Zeitraum als Vorlage. Er wird ab dem Startdatum immer wieder hintereinander eingetragen, bis zum Enddatum.</p>
       <div class="reihe">
-        <div class="feld"><label for="rh-von">Ab</label><input id="rh-von" type="date" value="${start}"></div>
+        <div class="feld"><label for="rh-qvon">Vorlage von</label><input id="rh-qvon" type="date" value="${this._rhQ?.[0] || start}"></div>
+        <div class="feld"><label for="rh-qbis">Vorlage bis</label><input id="rh-qbis" type="date" value="${this._rhQ?.[1] || iso(plusTage(ausIso(start), 13))}"></div>
+      </div>
+      </div>
+      <div class="reihe">
+        <div class="feld"><label for="rh-von">Eintragen ab</label><input id="rh-von" type="date" value="${this._rhModus === "kopie" ? iso(plusTage(ausIso(this._rhQ?.[1] || iso(plusTage(ausIso(start), 13))), 1)) : start}"></div>
         <div class="feld"><label for="rh-bis">Bis</label><input id="rh-bis" type="date" value="${iso(plusTage(ausIso(start), 90))}"></div>
       </div>
       <label class="check"><input type="checkbox" id="rh-ueber" checked> Bestehende Schichten überschreiben</label>
@@ -1480,7 +1495,29 @@ class PlanerPanel extends HTMLElement {
     const $ = (id) => dlg.querySelector(`#${id}`);
     const lesen = () => $("rh-muster").value.trim().split(/[\s,;]+/).filter(Boolean);
     const nachKurz = (k) => plan.arten.find((a) => a.kurz.toLowerCase() === k.toLowerCase());
+    const nachId = (id) => plan.arten.find((a) => a.id === id);
+    const kopie = () => this._rhModus === "kopie";
+    // Folge der Art-IDs (null = keine Schicht), die wiederholt wird
+    const folge = () => {
+      if (!kopie()) return lesen().map((k) => nachKurz(k)?.id || null);
+      const qv = $("rh-qvon").value, qb = $("rh-qbis").value;
+      if (!qv || !qb || qb < qv) return [];
+      const f = [];
+      for (let t = ausIso(qv); iso(t) <= qb && f.length < 366; t = plusTage(t, 1)) f.push(plan.tage[iso(t)] || null);
+      return f;
+    };
     const vorschau = () => {
+      if (kopie()) {
+        const f = folge();
+        $("rh-fehler").textContent = !f.length ? "„Vorlage bis“ muss nach „Vorlage von“ liegen." : !f.some(Boolean) ? "In der Vorlage sind noch keine Schichten eingetragen." : "";
+        const v = ausIso($("rh-von").value || heute());
+        $("rh-vorschau").innerHTML = f.length ? `<small class="rh-info">Vorlage: ${f.length} Tage</small>` + [...Array(14)].map((_, i) => {
+          const a = nachId(f[i % f.length]);
+          const t = plusTage(v, i);
+          return `<span class="rh-tag" ${a ? `style="--k:${a.farbe}"` : ""}><small>${WT_KURZ[wt(t)]} ${t.getDate()}.</small><b>${a ? esc(a.kurz) : "–"}</b></span>`;
+        }).join("") : "";
+        return;
+      }
       const m = lesen();
       const falsch = m.filter((k) => k !== "-" && !nachKurz(k));
       $("rh-fehler").textContent = falsch.length ? `Unbekannt: ${falsch.join(", ")}` : "";
@@ -1498,14 +1535,31 @@ class PlanerPanel extends HTMLElement {
       $("rh-muster").value = m.join(" ");
       vorschau();
     }));
-    ["rh-muster", "rh-von"].forEach((id) => $(id).addEventListener("input", vorschau));
+    ["rh-muster", "rh-von", "rh-qvon"].forEach((id) => $(id).addEventListener("input", vorschau));
+    $("rh-qbis").addEventListener("input", () => {
+      // Ziel beginnt standardmäßig direkt nach der Vorlage
+      if ($("rh-qbis").value) $("rh-von").value = iso(plusTage(ausIso($("rh-qbis").value), 1));
+      vorschau();
+    });
+    dlg.querySelectorAll("[data-rhmodus]").forEach((b) => b.addEventListener("click", () => {
+      this._rhModus = b.dataset.rhmodus;
+      dlg.querySelectorAll("[data-rhmodus]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      $("rh-m").hidden = kopie(); $("rh-k").hidden = !kopie();
+      if (kopie() && $("rh-qbis").value) $("rh-von").value = iso(plusTage(ausIso($("rh-qbis").value), 1));
+      vorschau();
+    }));
     vorschau();
     $("rh-abbrechen").addEventListener("click", () => this._zu(dlg));
     $("rhform").addEventListener("submit", (e) => {
       e.preventDefault();
       const m = lesen();
-      if (!m.length) { $("rh-fehler").textContent = "Bitte einen Rhythmus eingeben."; return; }
-      if (m.some((k) => k !== "-" && !nachKurz(k))) return;
+      if (kopie()) {
+        if (!folge().some(Boolean)) { vorschau(); return; }
+      } else {
+        if (!m.length) { $("rh-fehler").textContent = "Bitte einen Rhythmus eingeben."; return; }
+        if (m.some((k) => k !== "-" && !nachKurz(k))) return;
+      }
+      const f = folge();
       const v = $("rh-von").value, b = $("rh-bis").value;
       if (!v || !b || b < v) { $("rh-fehler").textContent = "„Bis“ muss nach „Ab“ liegen."; return; }
       const ueber = $("rh-ueber").checked;
@@ -1513,14 +1567,13 @@ class PlanerPanel extends HTMLElement {
       let i = 0;
       for (let t = ausIso(v); iso(t) <= b && i < 800; t = plusTage(t, 1), i++) {
         const tag = iso(t);
-        const a = nachKurz(m[i % m.length]);
         if (!ueber && plan.tage[tag]) continue;
-        aenderungen[tag] = a ? a.id : null;
+        aenderungen[tag] = f[i % f.length] || null;
       }
-      this._rhMuster = m.join(" ");
+      if (kopie()) this._rhQ = [$("rh-qvon").value, $("rh-qbis").value]; else this._rhMuster = m.join(" ");
       this._zu(dlg);
       this._schichtSetzen(person, aenderungen);
-      this._sagen(`Rhythmus eingetragen: ${Object.keys(aenderungen).length} Tage`);
+      this._sagen(`${kopie() ? "Zeitraum wiederholt" : "Rhythmus eingetragen"}: ${Object.keys(aenderungen).length} Tage`);
     });
     this._wischZu(dlg);
     dlg.showModal();
@@ -1535,7 +1588,7 @@ class PlanerPanel extends HTMLElement {
       <button type="button" data-kal-ansicht="woche" data-fokus="ka-w" aria-pressed="${v === "woche"}">Woche</button>
       <button type="button" data-kal-ansicht="schichten" data-fokus="ka-s" aria-pressed="${v === "schichten"}">Schichten</button>
     </div>
-    ${kal.length ? `<button type="button" class="knopf kalwahl" data-aktion="kal-wahl" data-fokus="kal-wahl" aria-haspopup="dialog">${ICON.woche}<span>Kalender</span><span class="zahl">${an}/${kal.length}</span></button>` : ""}</div>`;
+    ${kal.length && v !== "schichten" ? `<button type="button" class="knopf kalwahl" data-aktion="kal-wahl" data-fokus="kal-wahl" aria-haspopup="dialog">${ICON.woche}<span>Kalender</span><span class="zahl">${an}/${kal.length}</span></button>` : ""}</div>`;
   }
   _kalNavi(art, heuteText, istJetzt, label) {
     return `<div class="navi" role="group" aria-label="${label}">
