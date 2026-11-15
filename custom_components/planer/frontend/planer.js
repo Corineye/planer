@@ -489,7 +489,8 @@ aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);positio
 .mtag:hover{box-shadow:inset 0 0 0 1.5px var(--line2)}
 .mtag.fremd{background:transparent;box-shadow:none;color:var(--muted)}
 .mnr{font-weight:600;font-size:var(--t-sub);font-variant-numeric:tabular-nums;width:26px;height:26px;display:grid;place-items:center;border-radius:50%;margin-bottom:2px}
-.mtag.heute .mnr{background:#d70015;color:#fff;font-weight:700}
+.mtag.heute .mnr,.schichtmonat .stag.heute .mnr{background:var(--rot);color:#fff;font-weight:700}
+.mtag.heute,.schichtmonat .stag.heute,.wtag.heute{box-shadow:inset 0 0 0 2.5px var(--rot),var(--karte-schatten)}
 .mpunkt{display:block;font-size:var(--t-klein);line-height:1.35;padding:1px 5px;border-radius:4px;background:color-mix(in srgb,var(--k,var(--accent)) 16%,transparent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mpunkt.aufg{background:var(--fill);color:var(--fg)}
 .mmehr{font-size:var(--t-klein);color:var(--muted);padding-left:5px}
@@ -506,7 +507,7 @@ aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);positio
 .schmal .woche{grid-template-columns:minmax(0,1fr);min-width:0}
 .wtag{background:var(--card);border-radius:var(--r-karte);padding:var(--s2);display:grid;gap:6px;align-content:start;min-height:180px;min-width:0;box-shadow:var(--karte-schatten)}
 .schmal .wtag{min-height:0;padding:var(--s3)}
-.wtag.heute{box-shadow:inset 0 0 0 2px var(--accent),var(--karte-schatten)}
+
 .wtag.ziel-drop{outline:2px dashed var(--accent);outline-offset:2px}
 .wtag h3{margin:0 0 2px;font-size:var(--t-sub);font-weight:700;display:flex;justify-content:space-between;gap:6px}
 .wtag h3 .d{color:var(--muted);font-weight:500;font-variant-numeric:tabular-nums}
@@ -754,7 +755,7 @@ dialog.pop form{display:grid;gap:var(--s3);padding:var(--s3) var(--s5) var(--s5)
 .schichtmonat .stag{display:grid;grid-template-rows:auto 1fr auto;justify-items:center;align-items:center;gap:2px;min-height:72px;padding:6px 2px;border:0;border-radius:12px;background:var(--card);color:var(--fg);cursor:pointer;font:inherit}
 .schmal .schichtmonat .stag{min-height:58px}
 .schichtmonat .stag .mnr{font-size:var(--t-fuss);font-weight:600;color:var(--muted)}
-.schichtmonat .stag.heute .mnr{color:var(--rot)}
+.schichtmonat .stag .mnr{width:26px;height:26px;display:grid;place-items:center;border-radius:50%}
 .schichtmonat .stag.fremd{opacity:.4}
 .schichtmonat .stag.belegt{background:color-mix(in srgb,var(--k) 16%,var(--card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--k) 55%,transparent)}
 .schichtmonat .stag .skurz{display:inline-grid;place-items:center;min-width:30px;height:30px;padding:0 4px;border-radius:9px;background:var(--k);color:#fff;font-weight:800;font-size:var(--t-sub)}
@@ -828,8 +829,9 @@ dialog.pop form{display:grid;gap:var(--s3);padding:var(--s3) var(--s5) var(--s5)
 .nrow-zeit{flex:none;color:var(--fg);opacity:.75;font-variant-numeric:tabular-nums}
 .nrow-vor{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .nrow-vor .fort{font-variant-numeric:tabular-nums}
-.nz-leiste{display:flex;gap:var(--s2);padding:var(--s1) 0 var(--s2);border-bottom:1px solid var(--line);margin-bottom:var(--s2);position:sticky;top:0;background:var(--card);z-index:2}
-.nz-leiste .knopf{background:var(--fill)}
+.nz-leiste{display:flex;gap:var(--s2);padding:var(--s2) 0;margin-bottom:var(--s1);background:transparent}
+.nz-leiste .knopf{font:inherit;font-size:var(--t-sub);font-weight:600;min-height:40px;gap:6px;background:var(--fill);border:0;box-shadow:none;color:var(--fg)}
+.nz-leiste .knopf svg{width:20px;height:20px;color:var(--accent)}
 .nz-leiste .knopf[aria-pressed="true"]{color:var(--accent)}
 .nz-liste{display:flex;flex-direction:column;min-height:40vh;padding-bottom:var(--s4)}
 .nz{display:flex;gap:var(--s2);align-items:flex-start;min-width:0}
@@ -870,6 +872,40 @@ dialog.pop form{display:grid;gap:var(--s3);padding:var(--s3) var(--s5) var(--s5)
 .t-zeiten{flex-wrap:wrap}
 .t-zeiten .t-datum-f{flex-basis:100%}
 .t-zeiten #t-von-f,.t-zeiten #t-bis-f{flex:1 1 0;min-width:0}
+/* Schicht-Formular (iOS-Stil) */
+.sliste{list-style:none;margin:0;padding:0;border-radius:var(--r-karte);background:var(--card);overflow:hidden}
+.sliste li+li{border-top:1px solid var(--line)}
+.szeile{display:flex;align-items:center;gap:var(--s3);width:100%;min-height:60px;padding:var(--s2) var(--s4);border:0;background:none;color:var(--fg);font:inherit;text-align:left;cursor:pointer}
+.szeile:active{background:var(--fill)}
+.szeile .skurz{flex:none;display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--k);color:#fff;font-weight:800}
+.szeile.neu .skurz{background:var(--fill);color:var(--accent)}
+.szeile.neu b{color:var(--accent)}
+.szeile svg{width:18px;height:18px;color:var(--muted);flex:none}
+.szeile .skurz svg{color:inherit}
+.sz-text{flex:1;min-width:0;display:grid;gap:2px}
+.sz-text small{color:var(--muted);font-size:var(--t-sub)}
+.sform{display:grid;gap:var(--s4);padding-top:var(--s2)}
+.svorschau{display:flex;align-items:center;justify-content:center;gap:var(--s3);padding:var(--s3);font-size:var(--t-titel,20px);font-weight:700}
+.svorschau .skurz{display:inline-grid;place-items:center;width:52px;height:52px;border-radius:50%;background:var(--k);color:#fff;font-size:22px;font-weight:800;box-shadow:0 4px 14px color-mix(in srgb,var(--k) 45%,transparent)}
+.sgruppe{border-radius:var(--r-karte);background:var(--card);overflow:hidden}
+.sgruppe .szeile-feld+.szeile-feld,.sgruppe > * + *,#sf-zeiten .szeile-feld{border-top:1px solid var(--line)}
+.szeile-feld{display:flex;align-items:center;gap:var(--s3);min-height:52px;padding:0 var(--s4);font-size:var(--t-text)}
+.szeile-feld > span{flex:none;min-width:90px}
+.szeile-feld input:not([type=checkbox]),.szeile-feld select{flex:1;min-width:0;min-height:44px;border:0;background:transparent;color:var(--fg);font:inherit;font-size:max(16px,var(--t-text));text-align:right;padding:0;outline:none}
+.szeile-feld input::placeholder{color:var(--muted)}
+.szeile-feld input[type=time]{justify-content:flex-end}
+.schalter-zeile{justify-content:space-between}
+.schalter-zeile > span{flex:1}
+input[role=switch]{appearance:none;-webkit-appearance:none;flex:none;width:51px;height:31px;border-radius:16px;background:var(--fill);position:relative;cursor:pointer;transition:background .2s ease;margin:0}
+input[role=switch]::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.25);transition:transform .2s var(--bewegung)}
+input[role=switch]:checked{background:#34c759}
+input[role=switch]:checked::after{transform:translateX(20px)}
+input[role=switch]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sfarben{flex:1;display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;padding:var(--s2) 0}
+.sfarbe{width:30px;height:30px;border-radius:50%;border:0;background:var(--k);cursor:pointer;position:relative}
+.sfarbe[aria-checked="true"]{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--k)}
+.knopf.gefahr{color:var(--rot)}
+.knopf.breit{width:100%;justify-content:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media (forced-colors:active){.haken[aria-checked="true"]::before{forced-color-adjust:none;background:Highlight}.seg button[aria-pressed="true"],nav.tabs button[aria-current="page"]{outline:2px solid Highlight}}
 `;
@@ -1416,12 +1452,11 @@ class PlanerPanel extends HTMLElement {
       ${this._kalenderUmschalter()}
       <div class="wkopf"><h2 id="s-titel">${MONATE[monat]} ${jahr}${wer}</h2>${this._kalNavi("schicht", "Heute", monat === jetzt.getMonth() && jahr === jetzt.getFullYear(), "Monat wechseln")}</div>
       ${!plan.arten.length ? `<div class="schicht-start"><p><b>Noch keine Schichten angelegt.</b><br>Lege deine Schichten einmal an, zum Beispiel Frühdienst 06:00–14:15. Sie bleiben gespeichert und stehen dann hier zum Eintragen bereit.</p>
-        <button type="button" class="knopf primaer" data-aktion="schicht-arten">${ICON.plus}Schicht anlegen</button></div>` : `
+        <button type="button" class="knopf primaer" data-aktion="schicht-neu">${ICON.plus}Schicht anlegen</button></div>` : `
       <div class="stempelleiste" role="group" aria-label="Schicht zum Eintragen wählen">
         ${plan.arten.map((a) => `<button type="button" class="stempel" data-stempel="${esc(a.id)}" aria-pressed="${stempel === a.id}" style="--k:${a.farbe}" title="${esc(a.name)} ${esc(this._schichtZeit(a))}">
           <span class="skurz">${esc(a.kurz)}</span><span class="sname">${esc(a.name)}</span></button>`).join("")}
         <button type="button" class="stempel radierer" data-stempel="leer" aria-pressed="${stempel === "leer"}" title="Schicht entfernen"><span class="skurz">${ICON.zu}</span><span class="sname">Entfernen</span></button>
-        <button type="button" class="stempel neu" data-aktion="schicht-arten" title="Schichten anlegen oder ändern"><span class="skurz">${ICON.plus}</span><span class="sname">Neue Schicht</span></button>
       </div>
       <p class="hinweis" role="status">${stempel ? `${stempel === "leer" ? "Entfernen" : esc(plan.arten.find((a) => a.id === stempel)?.name || "")} aktiv: Tage antippen. Nochmal auf den Knopf tippen beendet das Eintragen.` : "Schicht oben wählen und dann Tage antippen. Ohne Auswahl öffnet ein Tag die Auswahl."}</p>`}
       <div class="woche-wrap"><div class="monat schichtmonat" role="grid" aria-labelledby="s-titel">
@@ -1588,48 +1623,105 @@ class PlanerPanel extends HTMLElement {
     dlg.showModal();
   }
 
+  // Liste der eigenen Schichten; Tippen öffnet das Formular für genau eine Schicht
   _schichtArten() {
-    const person = this._schichtPerson();
+    const person = this._schichtPerson() || this._daten.ich;
+    const arten = this._plan(person).arten;
+    if (!arten.length) return this._schichtForm(null);
     const dlg = this.shadowRoot.getElementById("blatt");
     dlg.onclose = null; dlg._vorZu = null;
-    const zeile = (a) => `<li class="sart" data-id="${esc(a.id || "")}">
-      <input type="color" value="${esc(a.farbe || "#8e8e93")}" aria-label="Farbe">
-      <input class="sa-name" value="${esc(a.name || "")}" placeholder="Name, z. B. Frühschicht" aria-label="Name">
-      <input class="sa-kurz" value="${esc(a.kurz || "")}" maxlength="3" placeholder="F" aria-label="Kürzel">
-      <input class="sa-von" type="time" value="${esc(a.von || "")}" aria-label="Beginn">
-      <input class="sa-bis" type="time" value="${esc(a.bis || "")}" aria-label="Ende">
-      <input class="sa-pause" type="number" min="0" max="240" step="5" inputmode="numeric" value="${esc(a.pause || 0)}" aria-label="Pause in Minuten">
-      <label class="sa-kal" title="In den Arbeitskalender übertragen"><input type="checkbox" class="sa-kal-box" ${(a.kalender ?? !!(a.von && a.bis)) || !a.name ? "checked" : ""}><span>Kalender</span></label>
-      <button type="button" class="rund weg" aria-label="Schichtart entfernen">${ICON.zu}</button></li>`;
-    dlg.innerHTML = `<form method="dialog" id="saform" novalidate>
+    dlg.innerHTML = `<form method="dialog" id="slform" novalidate>
       <div class="blatt-kopf">${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
-        <button type="button" class="knopf text l" id="sa-abbrechen">Abbrechen</button><h2 id="blatt-titel">Schichten</h2><button type="submit" class="knopf text fett r">Sichern</button></div>
-      <p class="hinweis">Farbe, Name, Kürzel (1–3 Zeichen), Beginn, Ende und Pause in Minuten. Ohne Uhrzeit (z. B. Frei, Urlaub) zählt die Schicht nicht als Arbeitszeit.</p>
-      <div class="sart-kopf" aria-hidden="true"><span></span><span>Name</span><span>Kürzel</span><span>Beginn</span><span>Ende</span><span>Pause</span><span>Kalender</span><span></span></div>
-      <ul class="sarten" id="sa-liste">${this._plan(person).arten.map(zeile).join("")}</ul>
-      <button type="button" class="knopf" id="sa-neu">${ICON.plus}Schicht hinzufügen</button>
-      <p class="fehler" id="sa-fehler" role="alert"></p>
+        <span class="l"></span><h2 id="blatt-titel">Schichten</h2><button type="submit" class="knopf text fett r">Fertig</button></div>
+      <ul class="sliste" role="list">${arten.map((a) => `<li><button type="button" class="szeile" data-sart="${esc(a.id)}" style="--k:${a.farbe}">
+          <span class="skurz">${esc(a.kurz)}</span><span class="sz-text"><b>${esc(a.name)}</b><small>${a.von && a.bis ? `${esc(a.von)}–${esc(a.bis)}${a.pause ? ` · ${a.pause} Min. Pause` : ""}` : "ohne Uhrzeit"}</small></span>${ICON.vor}</button></li>`).join("")}
+        <li><button type="button" class="szeile neu" data-sart=""><span class="skurz">${ICON.plus}</span><span class="sz-text"><b>Neue Schicht</b></span></button></li>
+      </ul>
+    </form>`;
+    dlg.querySelectorAll("[data-sart]").forEach((b) => b.addEventListener("click", () => this._schichtForm(arten.find((a) => a.id === b.dataset.sart) || null, true)));
+    this._wischZu(dlg);
+    if (!dlg.open) dlg.showModal();
+  }
+
+  _schichtForm(art, ausListe = false) {
+    const person = this._schichtPerson() || this._daten.ich;
+    const arten = this._plan(person).arten;
+    const dlg = this.shadowRoot.getElementById("blatt");
+    dlg.onclose = null; dlg._vorZu = null;
+    const FARBEN = ["#ff9f0a", "#ff453a", "#ff375f", "#bf5af2", "#5e5ce6", "#0a84ff", "#30b0c7", "#34c759", "#a2845e", "#8e8e93"];
+    const a = art || { name: "", kurz: "", farbe: FARBEN[arten.length % FARBEN.length], von: "", bis: "", pause: 0 };
+    const mitZeit = art ? !!(a.von && a.bis) : true;
+    const imKal = a.kalender ?? mitZeit;
+    dlg.innerHTML = `<form method="dialog" id="sfform" novalidate>
+      <div class="blatt-kopf">${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
+        <button type="button" class="knopf text l" id="sf-zurueck">${ausListe ? "Zurück" : "Abbrechen"}</button><h2 id="blatt-titel">${art ? "Schicht bearbeiten" : "Neue Schicht"}</h2><button type="submit" class="knopf text fett r">Sichern</button></div>
+      <div class="sform">
+        <div class="svorschau" id="sf-vorschau" style="--k:${a.farbe}"><span class="skurz" id="sf-vk">${esc(a.kurz || "?")}</span><span id="sf-vn">${esc(a.name || "Neue Schicht")}</span></div>
+        <div class="sgruppe">
+          <label class="szeile-feld"><span>Name</span><input id="sf-name" value="${esc(a.name)}" placeholder="z. B. Frühdienst" autocomplete="off" maxlength="40"></label>
+          <label class="szeile-feld"><span>Kürzel</span><input id="sf-kurz" value="${esc(a.kurz)}" placeholder="F" maxlength="3" autocomplete="off" autocapitalize="characters"></label>
+        </div>
+        <div class="sgruppe">
+          <div class="szeile-feld"><span>Farbe</span><div class="sfarben" role="radiogroup" aria-label="Farbe">${FARBEN.map((f) => `<button type="button" role="radio" class="sfarbe" data-farbe="${f}" style="--k:${f}" aria-checked="${f.toLowerCase() === (a.farbe || "").toLowerCase()}" aria-label="Farbe ${f}"></button>`).join("")}</div></div>
+        </div>
+        <div class="sgruppe">
+          <label class="szeile-feld schalter-zeile"><span>Mit Uhrzeit</span><input type="checkbox" role="switch" id="sf-zeit" ${mitZeit ? "checked" : ""}></label>
+          <div id="sf-zeiten" ${mitZeit ? "" : "hidden"}>
+            <label class="szeile-feld"><span>Beginn</span><input id="sf-von" type="time" value="${esc(a.von || "06:00")}"></label>
+            <label class="szeile-feld"><span>Ende</span><input id="sf-bis" type="time" value="${esc(a.bis || "14:00")}"></label>
+            <label class="szeile-feld"><span>Pause</span><select id="sf-pause">${[0, 15, 30, 45, 60, 90].map((m) => `<option value="${m}" ${(+a.pause || 0) === m ? "selected" : ""}>${m ? `${m} Min.` : "keine"}</option>`).join("")}</select></label>
+          </div>
+        </div>
+        <div class="sgruppe">
+          <label class="szeile-feld schalter-zeile"><span>In Arbeitskalender eintragen</span><input type="checkbox" role="switch" id="sf-kal" ${imKal ? "checked" : ""}></label>
+        </div>
+        ${art ? `<button type="button" class="knopf gefahr breit" id="sf-weg">Schicht löschen</button>` : ""}
+        <p class="fehler" id="sf-fehler" role="alert"></p>
+      </div>
     </form>`;
     const $ = (id) => dlg.querySelector(`#${id}`);
-    $("sa-neu").addEventListener("click", () => { $("sa-liste").insertAdjacentHTML("beforeend", zeile({ farbe: KAL_FARBEN[$("sa-liste").children.length % KAL_FARBEN.length] })); $("sa-liste").lastElementChild.querySelector(".sa-name").focus(); });
-    $("sa-liste").addEventListener("click", (e) => { const w = e.target.closest(".weg"); if (w) w.closest("li").remove(); });
-    $("sa-abbrechen").addEventListener("click", () => this._zu(dlg));
-    $("saform").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const arten = [...$("sa-liste").children].map((li) => ({
-        id: li.dataset.id, farbe: li.querySelector('input[type="color"]').value, name: li.querySelector(".sa-name").value.trim(),
-        kurz: li.querySelector(".sa-kurz").value.trim(), von: li.querySelector(".sa-von").value || null, bis: li.querySelector(".sa-bis").value || null,
-        pause: +li.querySelector(".sa-pause").value || 0, kalender: li.querySelector(".sa-kal-box").checked,
-      })).filter((a) => a.name);
-      if (!arten.length && this._plan(person).arten.length === 0) { this._zu(dlg); return; }
-      try { await this._ws({ type: "planer/schicht_arten", person, arten }); }
-      catch (err) { $("sa-fehler").textContent = err.message || "Speichern hat nicht geklappt."; return; }
-      this._zu(dlg);
-      this._stempel = null;
+    let farbe = a.farbe;
+    const vorschau = () => {
+      $("sf-vorschau").style.setProperty("--k", farbe);
+      $("sf-vk").textContent = $("sf-kurz").value.trim() || ($("sf-name").value.trim()[0] || "?").toUpperCase();
+      $("sf-vn").textContent = $("sf-name").value.trim() || "Neue Schicht";
+    };
+    $("sf-name").addEventListener("input", vorschau);
+    $("sf-kurz").addEventListener("input", vorschau);
+    dlg.querySelectorAll("[data-farbe]").forEach((b) => b.addEventListener("click", () => {
+      farbe = b.dataset.farbe;
+      dlg.querySelectorAll("[data-farbe]").forEach((x) => x.setAttribute("aria-checked", String(x === b)));
+      vorschau();
+    }));
+    $("sf-zeit").addEventListener("change", () => { $("sf-zeiten").hidden = !$("sf-zeit").checked; if (!$("sf-zeit").checked) $("sf-kal").checked = false; });
+    const zurueck = () => (ausListe ? this._schichtArten() : this._zu(dlg));
+    $("sf-zurueck").addEventListener("click", zurueck);
+    const senden = async (liste, text) => {
+      try { await this._ws({ type: "planer/schicht_arten", person, arten: liste }); }
+      catch (err) { $("sf-fehler").textContent = err.message || "Speichern hat nicht geklappt."; return false; }
       await this._lesen();
+      this._sagen(text);
+      return true;
+    };
+    $("sf-weg")?.addEventListener("click", async () => {
+      const tage = Object.values(this._plan(person).tage).filter((x) => x === art.id).length;
+      if (tage && !$("sf-weg").dataset.sicher) { $("sf-weg").dataset.sicher = "1"; $("sf-weg").textContent = `Wirklich löschen? ${tage} eingetragene Tage gehen mit weg`; return; }
+      if (await senden(arten.filter((x) => x.id !== art.id), `${art.name} gelöscht`)) { if (this._stempel === art.id) this._stempel = null; zurueck(); }
+    });
+    $("sfform").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = $("sf-name").value.trim();
+      if (!name) { $("sf-fehler").textContent = "Bitte einen Namen eingeben."; $("sf-name").focus(); return; }
+      const mz = $("sf-zeit").checked;
+      const neu = { id: art?.id, name, kurz: $("sf-kurz").value.trim() || name[0].toUpperCase(), farbe,
+        von: mz ? $("sf-von").value || null : null, bis: mz ? $("sf-bis").value || null : null,
+        pause: mz ? +$("sf-pause").value || 0 : 0, kalender: $("sf-kal").checked };
+      const liste = art ? arten.map((x) => (x.id === art.id ? neu : x)) : [...arten, neu];
+      if (await senden(liste, `${name} gespeichert`)) zurueck();
     });
     this._wischZu(dlg);
-    dlg.showModal();
+    if (!dlg.open) dlg.showModal();
+    if (!art && !this._narrow) $("sf-name").focus();
   }
 
   // Rhythmus wie in Supershift: Folge von Kürzeln wiederholen (z. B. F F S S N N X X)
@@ -2466,6 +2558,7 @@ class PlanerPanel extends HTMLElement {
     if (art === "schicht-arten") return this._schichtArten();
     if (art === "schicht-rhythmus") return this._schichtRhythmus();
     if (art === "schicht-einst") return this._schichtEinstellung();
+    if (art === "schicht-neu") return this._schichtForm(null);
     if (art === "erweitert") return this._erweitert();
     if (art === "neu" && this._ansicht === "notizen") {
       const person = this._filter !== "ich" && this._filter !== "alle" ? this._filter : this._daten.ich;
@@ -3043,7 +3136,7 @@ class PlanerPanel extends HTMLElement {
         <h2 id="blatt-titel">Notiz</h2>
         <button type="submit" class="knopf text fett r">Fertig</button>
       </div>
-      <div class="nz-leiste" role="toolbar" aria-label="Formatierung"><button type="button" class="knopf klein" id="n-check">☑ Checkliste</button></div>
+      <div class="nz-leiste" role="toolbar" aria-label="Formatierung"><button type="button" class="knopf klein" id="n-check"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="7" r="2.5"/><path d="M5 7l.8.8L7.3 6.3"/><circle cx="6" cy="17" r="2.5"/><path d="M11 7h9M11 17h9"/></svg>Checkliste</button></div>
       <div class="nz-liste" id="n-zeilen" role="group" aria-label="Notiztext. Die erste Zeile ist der Titel."></div>
       <div class="reihe">
         <div class="feld"><label for="n-person">Für</label><select id="n-person">${personen.map(([pid, name]) => `<option value="${esc(pid)}" ${n.person === pid ? "selected" : ""}>${esc(name)}</option>`).join("")}</select></div>
