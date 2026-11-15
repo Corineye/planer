@@ -1554,7 +1554,8 @@ class PlanerPanel extends HTMLElement {
     const d = this._daten, v = this._ansicht;
     const termin = (d.kalender || []).some((k) => k.schreiben) ? { text: "Neuer Termin", icon: ICON.termin, aktion: () => this._terminNeu() } : null;
     let e = [];
-    if (v === "heute" || v === "demnaechst") e = [{ text: "Neue Aufgabe mit allen Optionen", icon: ICON.regler, aktion: () => this._erweitert() }, termin];
+    // Am PC stehen „Erweitert“ und „Termin“ schon neben der Eingabezeile, deshalb nur am Handy hier.
+    if ((v === "heute" || v === "demnaechst") && this._narrow) e = [{ text: "Neue Aufgabe mit allen Optionen", icon: ICON.regler, aktion: () => this._erweitert() }, termin];
     else if (v === "woche" && this._kalAnsicht === "schichten") {
       const aus = !this._schichtPerson();
       e = [
