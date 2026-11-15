@@ -150,6 +150,41 @@ class Erinnerungen:
                             )
         return raus
 
+    def _schichten_faellig(self, von: datetime, bis: datetime) -> list[dict[str, Any]]:
+        """Erinnerung an die eigene Schicht: am Vorabend zu einer Uhrzeit oder X Minuten vor Beginn."""
+        tz = dt_util.get_default_time_zone()
+        raus = []
+        for p in self.planer.personen:
+            e = self.planer.einst(p["id"])
+            art_push = e.get("schicht_push") or ""
+            if not e["handy"] or not art_push:
+                continue
+            plan = self.planer.schichtplan(p["id"])
+            arten = {a["id"]: a for a in plan["arten"]}
+            for tage in range(-1, 3):
+                d = bis.date() + timedelta(days=tage)
+                a = arten.get(plan["tage"].get(d.isoformat()))
+                if not a or not a.get("von"):
+                    continue
+                beginn = datetime.combine(d, time.fromisoformat(a["von"]), tz)
+                if art_push == "vorabend":
+                    zeit = datetime.combine(d - timedelta(days=1), time.fromisoformat(e.get("schicht_push_uhr") or "20:00"), tz)
+                    text = f"Morgen {a['von']}–{a['bis']} Uhr"
+                else:
+                    zeit = beginn - timedelta(minutes=int(art_push))
+                    text = f"Beginnt {abstand_text(int(art_push))} · {a['von']}–{a['bis']} Uhr"
+                if von < zeit <= bis:
+                    raus.append(
+                        {
+                            "schluessel": f"s|{p['id']}|{d.isoformat()}|{a['id']}|{art_push}",
+                            "titel": a["name"],
+                            "text": text,
+                            "handys": [e["handy"]],
+                            "aufgabe": None,
+                        }
+                    )
+        return raus
+
     async def _lauf(self, jetzt: datetime) -> None:
         jetzt = dt_util.as_local(jetzt)
         try:
@@ -158,7 +193,7 @@ class Erinnerungen:
             letzter = jetzt - timedelta(minutes=1)
         von = max(letzter, jetzt - NACHHOLEN)
         await self._termine_laden(jetzt)
-        faellig = self._aufgaben_faellig(von, jetzt) + self._termine_faellig(von, jetzt)
+        faellig = self._aufgaben_faellig(von, jetzt) + self._termine_faellig(von, jetzt) + self._schichten_faellig(von, jetzt)
         # zurückgestellte Erinnerungen
         bleiben = []
         for s in self._zustand["spaeter"]:

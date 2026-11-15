@@ -773,7 +773,7 @@ dialog.pop form{display:grid;gap:var(--s3);padding:var(--s3) var(--s5) var(--s5)
 .schichtzeile .szeit{color:var(--muted);font-variant-numeric:tabular-nums}
 .schichtzeile.aktiv{background:color-mix(in srgb,var(--k) 14%,transparent)}
 .sarten{list-style:none;margin:0;padding:0;display:grid;gap:var(--s2)}
-.sart,.sart-kopf{display:grid;grid-template-columns:44px minmax(0,2fr) 56px minmax(0,1fr) minmax(0,1fr) 64px 44px;gap:var(--s2);align-items:center}
+.sart,.sart-kopf{display:grid;grid-template-columns:44px minmax(0,2fr) 56px minmax(0,1fr) minmax(0,1fr) 64px 76px 44px;gap:var(--s2);align-items:center}
 .sart-kopf{font-size:var(--t-klein);color:var(--muted);font-weight:600}
 .sart input[type=color]{width:40px;height:40px;padding:0;border:0;border-radius:10px;background:none}
 .schmal .sart-kopf{display:none}
@@ -781,7 +781,22 @@ dialog.pop form{display:grid;gap:var(--s3);padding:var(--s3) var(--s5) var(--s5)
 .schmal .sart .sa-von,.schmal .sart .sa-bis{grid-column:span 1}
 .schmal .sart .sa-von{grid-column:1 / span 2}
 .schmal .sart .sa-bis{grid-column:3 / span 2}
-.schmal .sart .sa-pause{grid-column:1 / -1}
+.schmal .sart .sa-pause{grid-column:1 / span 2}
+.schmal .sart .sa-kal{grid-column:3 / span 2}
+.sa-kal{display:inline-flex;align-items:center;gap:6px;min-height:44px;font-size:var(--t-klein);color:var(--muted)}
+.sa-kal input{width:20px;height:20px}
+.schicht-start{display:grid;gap:var(--s3);justify-items:start;padding:var(--s4);border-radius:var(--r-karte);background:var(--card);margin-bottom:var(--s3)}
+.schicht-start p{margin:0;line-height:1.45}
+.stempel.neu{border-style:dashed}
+.stempel.neu .skurz{background:var(--fill);color:var(--fg)}
+.stempel.neu svg{width:16px;height:16px}
+.schicht-wer{display:flex;flex-wrap:wrap;gap:var(--s2);margin-bottom:var(--s3)}
+.schichtmonat.beide .stag{cursor:default;grid-template-rows:auto 1fr}
+.sbeide{display:grid;gap:3px;justify-items:center;width:100%}
+.sb{display:inline-flex;align-items:center;gap:3px;min-width:0;max-width:100%;padding:1px 6px 1px 2px;border-radius:7px;background:var(--k);color:#fff;font-weight:800;font-size:var(--t-klein)}
+.sb i{font-style:normal;display:inline-grid;place-items:center;width:16px;height:16px;border-radius:5px;background:rgb(255 255 255 / .28);font-size:10px}
+.sb.leer{background:var(--fill);color:var(--muted)}
+.sb.leer i{background:transparent}
 .rh-vorschau{display:flex;flex-wrap:wrap;gap:6px}
 .rh-tag{display:grid;justify-items:center;min-width:44px;padding:4px 6px;border-radius:10px;background:color-mix(in srgb,var(--k,var(--muted)) 16%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--k,var(--muted)) 40%,transparent)}
 .rh-modus{margin-bottom:var(--s3)}
@@ -1282,10 +1297,21 @@ class PlanerPanel extends HTMLElement {
 
 
   // ---------- Schichtplan (wie Supershift) ----------
+  // Wessen Plan bearbeitet wird: oben gewählte Person. „Alle“/„Gemeinsam“ = beide zusammen (null).
   _schichtPerson() {
     const d = this._daten, s = d.schichten || {};
-    if (this._filter && this._filter !== "ich" && this._filter !== "alle" && s[this._filter]) return this._filter;
-    return d.ich;
+    if (!this._filter || this._filter === "ich") return d.ich;
+    if (this._filter === "alle" || this._filter === GEMEINSAM) return Object.keys(s).length > 1 ? null : d.ich;
+    return s[this._filter] ? this._filter : d.ich;
+  }
+  _schichtPersonen() {
+    const p = this._schichtPerson();
+    return p ? [p] : (this._daten.personen || []).map((x) => x.id).filter((id) => (this._daten.schichten || {})[id]);
+  }
+  // Schichten an einem Tag für alle gerade gezeigten Personen; bei mehreren mit Namenskürzel
+  _schichtenAm(tag) {
+    const pers = this._schichtPersonen();
+    return pers.map((p) => ({ a: this._schichtAm(tag, p), p, wer: pers.length > 1 ? (this._name(p) || "?").split(" ")[0] : "" })).filter((x) => x.a);
   }
   _plan(person) { return (this._daten.schichten || {})[person] || { arten: [], tage: {} }; }
   _schichtAm(tag, person) {
@@ -1305,6 +1331,7 @@ class PlanerPanel extends HTMLElement {
   _schichtHtml() {
     const d = this._daten;
     const person = this._schichtPerson();
+    if (!person) return this._schichtBeideHtml();
     const plan = this._plan(person);
     const jetzt = new Date();
     const erster = this._sStart || new Date(jetzt.getFullYear(), jetzt.getMonth(), 1);
@@ -1323,16 +1350,22 @@ class PlanerPanel extends HTMLElement {
       anzahl[a.id] = (anzahl[a.id] || 0) + 1;
     }
     const stempel = this._stempel;
-    const wer = person === d.ich ? "" : ` · ${esc(this._name(person))}`;
+    const wer = ` · ${esc(person === d.ich ? "Meine Schichten" : this._name(person).split(" ")[0])}`;
+    const se = (d.schicht_einst || {})[person] || {};
+    const kalName = se.kalender ? ((d.schicht_kalender_wahl || []).find((k) => k.id === se.kalender)?.name || se.kalender) : "";
+    const pushText = !se.push ? "" : se.push === "vorabend" ? `Erinnerung am Vorabend ${se.push_uhr || "20:00"}` : `Erinnerung ${minText(+se.push)}`;
     return `<section class="gruppe" aria-labelledby="s-titel">
       ${this._kalenderUmschalter()}
       <div class="wkopf"><h2 id="s-titel">${MONATE[monat]} ${jahr}${wer}</h2>${this._kalNavi("schicht", "Heute", monat === jetzt.getMonth() && jahr === jetzt.getFullYear(), "Monat wechseln")}</div>
+      ${!plan.arten.length ? `<div class="schicht-start"><p><b>Noch keine Schichten angelegt.</b><br>Lege deine Schichten einmal an, zum Beispiel Frühdienst 06:00–14:15. Sie bleiben gespeichert und stehen dann hier zum Eintragen bereit.</p>
+        <button type="button" class="knopf primaer" data-aktion="schicht-arten">${ICON.plus}Schicht anlegen</button></div>` : `
       <div class="stempelleiste" role="group" aria-label="Schicht zum Eintragen wählen">
         ${plan.arten.map((a) => `<button type="button" class="stempel" data-stempel="${esc(a.id)}" aria-pressed="${stempel === a.id}" style="--k:${a.farbe}" title="${esc(a.name)} ${esc(this._schichtZeit(a))}">
           <span class="skurz">${esc(a.kurz)}</span><span class="sname">${esc(a.name)}</span></button>`).join("")}
         <button type="button" class="stempel radierer" data-stempel="leer" aria-pressed="${stempel === "leer"}" title="Schicht entfernen"><span class="skurz">${ICON.zu}</span><span class="sname">Entfernen</span></button>
+        <button type="button" class="stempel neu" data-aktion="schicht-arten" title="Schichten anlegen oder ändern"><span class="skurz">${ICON.plus}</span><span class="sname">Neue Schicht</span></button>
       </div>
-      <p class="hinweis" role="status">${stempel ? `${stempel === "leer" ? "Entfernen" : esc(plan.arten.find((a) => a.id === stempel)?.name || "")} aktiv: Tage antippen. Nochmal auf den Knopf tippen beendet das Eintragen.` : "Schicht oben wählen und dann Tage antippen. Ohne Auswahl öffnet ein Tag die Auswahl."}</p>
+      <p class="hinweis" role="status">${stempel ? `${stempel === "leer" ? "Entfernen" : esc(plan.arten.find((a) => a.id === stempel)?.name || "")} aktiv: Tage antippen. Nochmal auf den Knopf tippen beendet das Eintragen.` : "Schicht oben wählen und dann Tage antippen. Ohne Auswahl öffnet ein Tag die Auswahl."}</p>`}
       <div class="woche-wrap"><div class="monat schichtmonat" role="grid" aria-labelledby="s-titel">
         ${["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((n) => `<div class="mkopf" role="columnheader">${n}</div>`).join("")}
         ${tage.slice(0, zeilen).map((t) => {
@@ -1348,10 +1381,93 @@ class PlanerPanel extends HTMLElement {
           ${plan.arten.filter((a) => anzahl[a.id]).map((a) => `<span class="chip" style="--b:${a.farbe}"><span class="punkt" aria-hidden="true"></span> ${anzahl[a.id]}× ${esc(a.name)}</span>`).join("")}</div>
         <div class="schicht-knoepfe">
           <button type="button" class="knopf" data-aktion="schicht-rhythmus">${ICON.wdh}Wiederholen</button>
-          <button type="button" class="knopf" data-aktion="schicht-arten">${ICON.regler}Schichtarten</button>
+          <button type="button" class="knopf" data-aktion="schicht-arten">${ICON.regler}Schichten bearbeiten</button>
+          <button type="button" class="knopf" data-aktion="schicht-einst">${ICON.woche}Kalender &amp; Erinnerung</button>
         </div>
+        <p class="hinweis">${kalName ? `Wird automatisch in „${esc(kalName)}“ eingetragen.` : "Wird in keinen Kalender übertragen."}${pushText ? ` ${esc(pushText)}.` : ""}</p>
       </div>
     </section>`;
+  }
+
+  // Beide Pläne nebeneinander (nur ansehen); eintragen über die Auswahl oben
+  _schichtBeideHtml() {
+    const d = this._daten;
+    const pers = this._schichtPersonen();
+    const jetzt = new Date();
+    const erster = this._sStart || new Date(jetzt.getFullYear(), jetzt.getMonth(), 1);
+    const von = montag(erster);
+    const monat = erster.getMonth(), jahr = erster.getFullYear();
+    const tage = [...Array(42)].map((_, i) => iso(plusTage(von, i)));
+    const zeilen = tage.slice(35).every((t) => ausIso(t).getMonth() !== monat) ? 35 : 42;
+    const heuteIso = iso(jetzt);
+    const vorname = (p) => (this._name(p) || "?").split(" ")[0];
+    const summe = pers.map((p) => {
+      let m = 0;
+      for (const t of tage) if (ausIso(t).getMonth() === monat) m += this._schichtMinuten(this._schichtAm(t, p));
+      return `<span class="chip"><b>${esc(vorname(p))}</b> ${Math.floor(m / 60)} Std.${m % 60 ? ` ${m % 60} Min.` : ""}</span>`;
+    }).join("");
+    return `<section class="gruppe" aria-labelledby="s-titel">
+      ${this._kalenderUmschalter()}
+      <div class="wkopf"><h2 id="s-titel">${MONATE[monat]} ${jahr} · Beide</h2>${this._kalNavi("schicht", "Heute", monat === jetzt.getMonth() && jahr === jetzt.getFullYear(), "Monat wechseln")}</div>
+      <p class="hinweis">Zum Eintragen oben eine Person wählen. Tippe auf einen Namen, um direkt zu ihrem Plan zu wechseln.</p>
+      <div class="schicht-wer">${pers.map((p) => `<button type="button" class="knopf klein" data-filter="${esc(p === d.ich ? "ich" : p)}">${esc(vorname(p))} bearbeiten</button>`).join("")}</div>
+      <div class="woche-wrap"><div class="monat schichtmonat beide" role="grid" aria-labelledby="s-titel">
+        ${["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((n) => `<div class="mkopf" role="columnheader">${n}</div>`).join("")}
+        ${tage.slice(0, zeilen).map((t) => {
+          const dd = ausIso(t);
+          const l = pers.map((p) => ({ p, a: this._schichtAm(t, p) }));
+          return `<div role="gridcell" class="stag ${dd.getMonth() !== monat ? "fremd" : ""} ${t === heuteIso ? "heute" : ""}"
+            aria-label="${esc(`${dd.getDate()}. ${MONATE[dd.getMonth()]}: ${l.map(({ p, a }) => `${vorname(p)} ${a ? a.name : "keine Schicht"}`).join(", ")}`)}">
+            <span class="mnr">${dd.getDate()}</span><span class="sbeide">${l.map(({ p, a }) => a
+              ? `<span class="sb" style="--k:${a.farbe}" title="${esc(`${vorname(p)}: ${a.name} ${this._schichtZeit(a)}`)}"><i>${esc(vorname(p)[0])}</i>${esc(a.kurz)}</span>`
+              : `<span class="sb leer"><i>${esc(vorname(p)[0])}</i>–</span>`).join("")}</span></div>`;
+        }).join("")}
+      </div></div>
+      <div class="schicht-fuss"><div class="schicht-summe">${summe}</div></div>
+    </section>`;
+  }
+
+  _schichtEinstellung() {
+    const d = this._daten;
+    const person = this._schichtPerson() || d.ich;
+    const se = (d.schicht_einst || {})[person] || {};
+    const dlg = this.shadowRoot.getElementById("blatt");
+    dlg.onclose = null; dlg._vorZu = null;
+    const kal = d.schicht_kalender_wahl || [];
+    const push = se.push || "";
+    dlg.innerHTML = `<form method="dialog" id="seform" novalidate>
+      <div class="blatt-kopf">${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
+        <button type="button" class="knopf text l" id="se-abbrechen">Abbrechen</button><h2 id="blatt-titel">Schichten von ${esc((this._name(person) || "").split(" ")[0])}</h2><button type="submit" class="knopf text fett r">Sichern</button></div>
+      <div class="feld"><label for="se-kal">In Kalender eintragen</label>
+        <select id="se-kal"><option value="auto" ${se.wahl == null ? "selected" : ""}>Automatisch (Kalender „Vorname Arbeit“)</option>
+          <option value="" ${se.wahl === "" ? "selected" : ""}>Nicht übertragen</option>
+          ${kal.map((k) => `<option value="${esc(k.id)}" ${se.wahl === k.id ? "selected" : ""}>${esc(k.name)}</option>`).join("")}</select>
+        <span class="hinweis">Neue, geänderte und gelöschte Schichten werden dort nach ein paar Sekunden nachgezogen. Frei und Urlaub nur, wenn bei der Schicht „In Kalender“ angehakt ist.</span></div>
+      <div class="feld"><label for="se-push">Push-Erinnerung aufs Handy</label>
+        <select id="se-push">
+          <option value="" ${!push ? "selected" : ""}>Keine</option>
+          <option value="vorabend" ${push === "vorabend" ? "selected" : ""}>Am Vorabend</option>
+          ${[30, 60, 90, 120, 180].map((m) => `<option value="${m}" ${push === String(m) ? "selected" : ""}>${minText(m).replace(" vorher", "")} vor Schichtbeginn</option>`).join("")}
+        </select></div>
+      <div class="feld" id="se-uhr-feld" ${push === "vorabend" ? "" : "hidden"}><label for="se-uhr">Uhrzeit am Vorabend</label><input id="se-uhr" type="time" value="${esc(se.push_uhr || "20:00")}"></div>
+      <p class="hinweis">Die Erinnerung geht an das Handy, das in den Einstellungen für diese Person hinterlegt ist.</p>
+      <p class="fehler" id="se-fehler" role="alert"></p>
+    </form>`;
+    const $ = (id) => dlg.querySelector(`#${id}`);
+    $("se-push").addEventListener("change", () => { $("se-uhr-feld").hidden = $("se-push").value !== "vorabend"; });
+    $("se-abbrechen").addEventListener("click", () => this._zu(dlg));
+    $("seform").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const k = $("se-kal").value;
+      const werte = { schicht_kalender: k === "auto" ? null : k, schicht_push: $("se-push").value, schicht_push_uhr: $("se-uhr").value || "20:00" };
+      try { await this._ws({ type: "planer/schicht_einstellung", person, werte }); }
+      catch (err) { $("se-fehler").textContent = err.message || "Speichern hat nicht geklappt."; return; }
+      this._zu(dlg);
+      this._sagen("Gespeichert");
+      await this._lesen();
+    });
+    this._wischZu(dlg);
+    dlg.showModal();
   }
 
   _schichtBinden() {
@@ -1425,14 +1541,15 @@ class PlanerPanel extends HTMLElement {
       <input class="sa-von" type="time" value="${esc(a.von || "")}" aria-label="Beginn">
       <input class="sa-bis" type="time" value="${esc(a.bis || "")}" aria-label="Ende">
       <input class="sa-pause" type="number" min="0" max="240" step="5" inputmode="numeric" value="${esc(a.pause || 0)}" aria-label="Pause in Minuten">
+      <label class="sa-kal" title="In den Arbeitskalender übertragen"><input type="checkbox" class="sa-kal-box" ${(a.kalender ?? !!(a.von && a.bis)) || !a.name ? "checked" : ""}><span>Kalender</span></label>
       <button type="button" class="rund weg" aria-label="Schichtart entfernen">${ICON.zu}</button></li>`;
     dlg.innerHTML = `<form method="dialog" id="saform" novalidate>
       <div class="blatt-kopf">${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
-        <button type="button" class="knopf text l" id="sa-abbrechen">Abbrechen</button><h2 id="blatt-titel">Schichtarten</h2><button type="submit" class="knopf text fett r">Sichern</button></div>
+        <button type="button" class="knopf text l" id="sa-abbrechen">Abbrechen</button><h2 id="blatt-titel">Schichten</h2><button type="submit" class="knopf text fett r">Sichern</button></div>
       <p class="hinweis">Farbe, Name, Kürzel (1–3 Zeichen), Beginn, Ende und Pause in Minuten. Ohne Uhrzeit (z. B. Frei, Urlaub) zählt die Schicht nicht als Arbeitszeit.</p>
-      <div class="sart-kopf" aria-hidden="true"><span></span><span>Name</span><span>Kürzel</span><span>Beginn</span><span>Ende</span><span>Pause</span><span></span></div>
+      <div class="sart-kopf" aria-hidden="true"><span></span><span>Name</span><span>Kürzel</span><span>Beginn</span><span>Ende</span><span>Pause</span><span>Kalender</span><span></span></div>
       <ul class="sarten" id="sa-liste">${this._plan(person).arten.map(zeile).join("")}</ul>
-      <button type="button" class="knopf" id="sa-neu">${ICON.plus}Schichtart hinzufügen</button>
+      <button type="button" class="knopf" id="sa-neu">${ICON.plus}Schicht hinzufügen</button>
       <p class="fehler" id="sa-fehler" role="alert"></p>
     </form>`;
     const $ = (id) => dlg.querySelector(`#${id}`);
@@ -1444,9 +1561,9 @@ class PlanerPanel extends HTMLElement {
       const arten = [...$("sa-liste").children].map((li) => ({
         id: li.dataset.id, farbe: li.querySelector('input[type="color"]').value, name: li.querySelector(".sa-name").value.trim(),
         kurz: li.querySelector(".sa-kurz").value.trim(), von: li.querySelector(".sa-von").value || null, bis: li.querySelector(".sa-bis").value || null,
-        pause: +li.querySelector(".sa-pause").value || 0,
+        pause: +li.querySelector(".sa-pause").value || 0, kalender: li.querySelector(".sa-kal-box").checked,
       })).filter((a) => a.name);
-      if (!arten.length) { $("sa-fehler").textContent = "Mindestens eine Schichtart mit Namen anlegen."; return; }
+      if (!arten.length && this._plan(person).arten.length === 0) { this._zu(dlg); return; }
       try { await this._ws({ type: "planer/schicht_arten", person, arten }); }
       catch (err) { $("sa-fehler").textContent = err.message || "Speichern hat nicht geklappt."; return; }
       this._zu(dlg);
@@ -1629,7 +1746,7 @@ class PlanerPanel extends HTMLElement {
           const rest = items.length > 3 ? `<span class="mmehr">+${items.length - 3}${this._narrow ? "" : " weitere"}</span>` : "";
           return `<button type="button" role="gridcell" class="mtag ${d.getMonth() !== dieserMonat ? "fremd" : ""} ${t === heuteIso ? "heute" : ""}" data-mtag="${t}"
             aria-label="${esc(`${d.getDate()}. ${MONATE[d.getMonth()]}: ${ts.length} Termine, ${as.length} Aufgaben. Tag öffnen`)}">
-            <span class="mnr">${d.getDate()}${(() => { const sc = this._schichtAm(t); return sc ? `<span class="mschicht" style="--k:${sc.farbe}" title="${esc(sc.name)}">${esc(sc.kurz)}</span>` : ""; })()}</span>${sicht}${rest}</button>`;
+            <span class="mnr">${d.getDate()}${this._schichtenAm(t).map(({ a: sc, wer }) => `<span class="mschicht" style="--k:${sc.farbe}" title="${esc(`${wer ? wer + ": " : ""}${sc.name}`)}">${esc(wer ? wer[0] + sc.kurz : sc.kurz)}</span>`).join("")}</span>${sicht}${rest}</button>`;
         }).join("")}
       </div></div>
       ${termine === null ? `<p class="hinweis" role="status">Termine werden geladen …</p>` : ""}
@@ -1715,9 +1832,9 @@ class PlanerPanel extends HTMLElement {
         html: `<span class="wpunkt a ${a.status === "erledigt" ? "fertig" : ""}" draggable="${a.status === "offen"}" data-ziehen="${a.id}" style="--k:${bereichFarbe(a.bereich, this._daten.farben) || "var(--accent)"}"><span class="zt">${a.uhrzeit}</span>${esc(a.titel)}</span>` })),
     ].sort((x, y) => x.s.localeCompare(y.s));
     const ohne = as.filter((a) => !a.uhrzeit);
-    const sch = this._schichtAm(tag);
-    const schChip = sch ? `<span class="wpunkt s" style="--k:${sch.farbe}"><b>${esc(sch.kurz)}</b> ${esc(sch.name)}${sch.von ? ` <span class="zt">${sch.von}–${sch.bis}</span>` : ""}</span>` : "";
-    if (!ganz.length && !zeitlich.length && !ohne.length && !sch) return `<p class="wleer">Nichts geplant.</p>`;
+    const schs = this._schichtenAm(tag);
+    const schChip = schs.map(({ a: sch, wer }) => `<span class="wpunkt s" style="--k:${sch.farbe}"><b>${esc(sch.kurz)}</b> ${wer ? `${esc(wer)}: ` : ""}${esc(sch.name)}${sch.von ? ` <span class="zt">${sch.von}–${sch.bis}</span>` : ""}</span>`).join("");
+    if (!ganz.length && !zeitlich.length && !ohne.length && !schs.length) return `<p class="wleer">Nichts geplant.</p>`;
     return `<div class="chips">${schChip}
       ${ganz.map((t) => `<span class="wpunkt t" style="--k:${this._farbe(t.kalender)}">${esc(t.titel)}</span>`).join("")}
       ${zeitlich.map((x) => x.html).join("")}
@@ -1761,8 +1878,8 @@ class PlanerPanel extends HTMLElement {
     const jetzt = new Date();
     const jetztMin = jetzt.getHours() * 60 + jetzt.getMinutes();
     let html = "";
-    const tagSchicht = this._schichtAm(tag);
-    if (tagSchicht) html += `<div class="ganztags"><span class="wpunkt s" style="--k:${tagSchicht.farbe}"><b>${esc(tagSchicht.kurz)}</b> ${esc(tagSchicht.name)}${tagSchicht.von ? ` · ${tagSchicht.von}–${tagSchicht.bis}` : ""}</span></div>`;
+    const tagSchichten = this._schichtenAm(tag);
+    if (tagSchichten.length) html += `<div class="ganztags">${tagSchichten.map(({ a: ts, wer }) => `<span class="wpunkt s" style="--k:${ts.farbe}"><b>${esc(ts.kurz)}</b> ${wer ? `${esc(wer)}: ` : ""}${esc(ts.name)}${ts.von ? ` · ${ts.von}–${ts.bis}` : ""}</span>`).join("")}</div>`;
     if (ganz.length) html += `<div class="ganztags">${ganz.map((t) => `<button type="button" class="wpunkt t" style="--k:${this._farbe(t.kalender)}" data-termin="${esc(`${t.kalender}|${t.uid}|${t.start}`)}" aria-label="${esc(`${t.titel}, ganztägig`)}">${esc(t.titel)}</button>`).join("")}</div>`;
     if (ohne.length) html += `<div class="ohnezeit">${ohne.map((a) => `<button type="button" class="wpunkt a ${a.top ? "top" : ""} ${a.status === "erledigt" ? "fertig" : ""}" style="--k:${bereichFarbe(a.bereich, this._daten.farben) || "var(--accent)"}" data-aktion="oeffnen" data-id="${a.id}" draggable="${a.status === "offen"}" data-ziehen="${a.id}">${a.top ? `<span class="z">${a.top}</span>` : ""}${esc(a.titel)}</button>`).join("")}</div>`;
     if (aussen.length) html += `<div class="ohnezeit">${aussen.map((x) => x.html("", true).replace('class="block', 'class="wpunkt block-aussen')).join("")}</div>`;
@@ -2005,13 +2122,14 @@ class PlanerPanel extends HTMLElement {
               <span class="unter">Aufgabe${a.top ? ` · Top ${a.top}` : ""}${a.bereich ? ` · ${esc(a.bereich)}` : ""}</span></button></li>` };
         }),
       ];
-      const sch = this._schichtAm(tag);
-      if (sch && sch.von && sch.bis) {
+      const schs = this._schichtenAm(tag);
+      for (const { a: sch, wer } of schs) {
+        if (!sch.von || !sch.bis) continue;
         const s0 = zeit(sch.von); let e0 = zeit(sch.bis); if (e0 <= s0) e0 = 1440;
-        eintraege.push({ s: s0, e: e0, html: `<li><div class="termin schicht" style="--k:${sch.farbe}"><span class="zeit">${sch.von}–${sch.bis}</span><span class="was">${esc(sch.name)}</span><span class="wo">Schicht</span></div></li>` });
+        eintraege.push({ s: s0, e: e0, html: `<li><div class="termin schicht" style="--k:${sch.farbe}"><span class="zeit">${sch.von}–${sch.bis}</span><span class="was">${esc(sch.name)}</span><span class="wo">Schicht${wer ? ` · ${esc(wer)}` : ""}</span></div></li>` });
       }
       eintraege.sort((x, y) => x.s - y.s);
-      return { ganz: termine.filter((t) => t.ganztag), eintraege, schicht: sch };
+      return { ganz: termine.filter((t) => t.ganztag), eintraege, schicht: schs.length ? schs : null };
     };
     // Heute
     const heuteD = tagDaten(h);
@@ -2031,7 +2149,7 @@ class PlanerPanel extends HTMLElement {
     const keineKal = !(this._daten.kalender || []).length;
     const tagBlock = (tag, titel, inhalt, ganz) => `<div class="tl-tag" aria-label="${esc(titel)}">
         <h3 class="tl-kopf">${esc(titel)}</h3>
-        ${(() => { const sc = this._schichtAm(tag); return sc && !(sc.von && sc.bis) ? `<div class="ganztags"><span class="wpunkt s" style="--k:${sc.farbe}"><b>${esc(sc.kurz)}</b> ${esc(sc.name)}</span></div>` : ""; })()}
+        ${(() => { const l = this._schichtenAm(tag).filter(({ a }) => !(a.von && a.bis)); return l.length ? `<div class="ganztags">${l.map(({ a: sc, wer }) => `<span class="wpunkt s" style="--k:${sc.farbe}"><b>${esc(sc.kurz)}</b> ${wer ? `${esc(wer)}: ` : ""}${esc(sc.name)}</span>`).join("")}</div>` : ""; })()}
         ${ganz.length ? `<ul class="termine ganztag" aria-label="Ganztägig">${ganz.map((t) => this._terminZeile(t, tag)).join("")}</ul>` : ""}
         ${inhalt}
       </div>`;
@@ -2289,6 +2407,7 @@ class PlanerPanel extends HTMLElement {
     if (art === "kal-wahl") return this._kalenderWahl();
     if (art === "schicht-arten") return this._schichtArten();
     if (art === "schicht-rhythmus") return this._schichtRhythmus();
+    if (art === "schicht-einst") return this._schichtEinstellung();
     if (art === "erweitert") return this._erweitert();
     if (art === "neu" && this._ansicht === "notizen") {
       const person = this._filter !== "ich" && this._filter !== "alle" ? this._filter : this._daten.ich;

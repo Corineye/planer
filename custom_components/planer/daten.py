@@ -21,13 +21,6 @@ from .const import GEMEINSAM, MAX_AUFGABEN, MAX_NOTIZEN, SPEICHER_SCHLUESSEL, SP
 from .wiederholung import fortschreiben, gueltig
 
 STANDARD_ERINNERUNGEN = [30, 180, 1440]
-STANDARD_SCHICHTEN = [
-    {"id": "frueh", "name": "Frühschicht", "kurz": "F", "farbe": "#ff9f0a", "von": "06:00", "bis": "14:00", "pause": 30},
-    {"id": "spaet", "name": "Spätschicht", "kurz": "S", "farbe": "#0a84ff", "von": "14:00", "bis": "22:00", "pause": 30},
-    {"id": "nacht", "name": "Nachtschicht", "kurz": "N", "farbe": "#5e5ce6", "von": "22:00", "bis": "06:00", "pause": 30},
-    {"id": "frei", "name": "Frei", "kurz": "X", "farbe": "#34c759", "von": None, "bis": None, "pause": 0},
-    {"id": "urlaub", "name": "Urlaub", "kurz": "U", "farbe": "#30b0c7", "von": None, "bis": None, "pause": 0},
-]
 UHRZEIT = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
 MAX_VERLAUF = 60
 
@@ -127,6 +120,11 @@ class Planer:
             "erinnerungen": e.get("erinnerungen", STANDARD_ERINNERUNGEN),
             "tag_von": e.get("tag_von", 7),
             "tag_bis": e.get("tag_bis", 22),
+            # Schichten: None = Kalender „<Vorname> Arbeit“ automatisch, "" = nicht übertragen
+            "schicht_kalender": e.get("schicht_kalender"),
+            # "" = keine Erinnerung, "vorabend" = am Vortag zur Uhrzeit schicht_push_uhr, Zahl = Minuten vor Beginn
+            "schicht_push": e.get("schicht_push", ""),
+            "schicht_push_uhr": e.get("schicht_push_uhr", "20:00"),
         }
 
     def sichtbar(self, aufgabe: dict[str, Any], benutzer_id: str | None) -> bool:
@@ -364,7 +362,7 @@ class Planer:
     # ---------- Schichtplan (wie Supershift) ----------
     def schichtplan(self, person: str) -> dict[str, Any]:
         e = self.schichten.get(person) or {}
-        return {"arten": e.get("arten") or [dict(x) for x in STANDARD_SCHICHTEN], "tage": e.get("tage", {})}
+        return {"arten": e.get("arten") or [], "tage": e.get("tage", {})}
 
     async def schicht_arten(self, person: str, arten: list[dict[str, Any]]) -> dict[str, Any]:
         sauber, ids = [], set()
@@ -384,6 +382,8 @@ class Planer:
                 "von": zeit(x.get("von")),
                 "bis": zeit(x.get("bis")),
                 "pause": max(0, min(240, int(x.get("pause") or 0))) if str(x.get("pause") or 0).isdigit() else 0,
+                # Frei/Urlaub (ohne Uhrzeit) standardmäßig nicht in den Arbeitskalender
+                "kalender": bool(x["kalender"]) if "kalender" in x else bool(zeit(x.get("von")) and zeit(x.get("bis"))),
             })
         plan = self.schichten.setdefault(person, {})
         plan["arten"] = sauber
@@ -394,7 +394,7 @@ class Planer:
 
     async def schicht_tage(self, person: str, tage: dict[str, Any]) -> dict[str, Any]:
         plan = self.schichten.setdefault(person, {})
-        plan.setdefault("arten", [dict(x) for x in STANDARD_SCHICHTEN])
+        plan.setdefault("arten", [])
         ids = {a["id"] for a in plan["arten"]}
         ziel = plan.setdefault("tage", {})
         for tag, art in list(tage.items())[:800]:
@@ -442,6 +442,14 @@ class Planer:
                 e[feld] = min(hi, max(lo, int(werte[feld])))
         if e.get("tag_bis", 22) <= e.get("tag_von", 7):
             e["tag_bis"] = min(24, e.get("tag_von", 7) + 1)
+        if "schicht_kalender" in werte:
+            v = werte["schicht_kalender"]
+            e["schicht_kalender"] = None if v is None else (str(v) if str(v).startswith("calendar.") else "")
+        if "schicht_push" in werte:
+            v = str(werte["schicht_push"] or "")
+            e["schicht_push"] = v if v == "vorabend" or (v.isdigit() and int(v) <= 1440) else ""
+        if "schicht_push_uhr" in werte and UHRZEIT.match(str(werte["schicht_push_uhr"])):
+            e["schicht_push_uhr"] = str(werte["schicht_push_uhr"])
         if "erinnerungen" in werte:
             e["erinnerungen"] = sorted({int(m) for m in werte["erinnerungen"] or [] if str(m).isdigit() and int(m) <= 43200})
         await self._sichern()
