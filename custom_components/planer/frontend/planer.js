@@ -893,6 +893,9 @@ input[role=switch]:focus-visible{outline:2px solid var(--accent);outline-offset:
 .sfarben{flex:1;display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;padding:var(--s2) 0}
 .sfarbe{width:30px;height:30px;border-radius:50%;border:0;background:var(--k);cursor:pointer;position:relative}
 .sfarbe[aria-checked="true"]{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--k)}
+.sfarbe-eigen{overflow:hidden;background:conic-gradient(#ff3b30,#ffcc00,#34c759,#00c7be,#007aff,#af52de,#ff3b30)}
+.sfarbe-eigen input[type=color]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0}
+.sfarbe-eigen[aria-checked="true"]{background:var(--k)}
 .knopf.gefahr{color:var(--rot)}
 .knopf.breit{width:100%;justify-content:center}
 /* Aufgeräumt (v0.9.1) */
@@ -2163,6 +2166,8 @@ class PlanerPanel extends HTMLElement {
     const FARBEN = ["#ff9f0a", "#ff453a", "#ff375f", "#bf5af2", "#5e5ce6", "#0a84ff", "#30b0c7", "#34c759", "#a2845e", "#8e8e93"];
     const a = art || { name: "", kurz: "", farbe: FARBEN[arten.length % FARBEN.length], von: "", bis: "", pause: 0 };
     const mitZeit = art ? !!(a.von && a.bis) : true;
+    const eigenAktiv = /^#[0-9a-fA-F]{6}$/.test(a.farbe || "") && !FARBEN.some((f) => f.toLowerCase() === a.farbe.toLowerCase());
+    const eigen = eigenAktiv ? a.farbe : "#8e8e93";
     const imKal = a.kalender ?? mitZeit;
     dlg.innerHTML = `<form method="dialog" id="sfform" novalidate>
       <div class="blatt-kopf">${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
@@ -2174,7 +2179,7 @@ class PlanerPanel extends HTMLElement {
           <label class="szeile-feld"><span>Kürzel</span><input id="sf-kurz" value="${esc(a.kurz)}" placeholder="F" maxlength="3" autocomplete="off" autocapitalize="characters"></label>
         </div>
         <div class="sgruppe">
-          <div class="szeile-feld"><span>Farbe</span><div class="sfarben" role="radiogroup" aria-label="Farbe">${FARBEN.map((f) => `<button type="button" role="radio" class="sfarbe" data-farbe="${f}" style="--k:${f}" aria-checked="${f.toLowerCase() === (a.farbe || "").toLowerCase()}" aria-label="Farbe ${f}"></button>`).join("")}</div></div>
+          <div class="szeile-feld"><span>Farbe</span><div class="sfarben" role="radiogroup" aria-label="Farbe">${FARBEN.map((f) => `<button type="button" role="radio" class="sfarbe" data-farbe="${f}" style="--k:${f}" aria-checked="${f.toLowerCase() === (a.farbe || "").toLowerCase()}" aria-label="Farbe ${f}"></button>`).join("")}<label class="sfarbe sfarbe-eigen" role="radio" aria-checked="${eigenAktiv}" style="--k:${eigen}" title="Eigene Farbe"><input type="color" id="sf-eigen" value="${eigen}" aria-label="Eigene Farbe"></label></div></div>
         </div>
         <div class="sgruppe">
           <label class="szeile-feld schalter-zeile"><span>Mit Uhrzeit</span><input type="checkbox" role="switch" id="sf-zeit" ${mitZeit ? "checked" : ""}></label>
@@ -2203,8 +2208,17 @@ class PlanerPanel extends HTMLElement {
     dlg.querySelectorAll("[data-farbe]").forEach((b) => b.addEventListener("click", () => {
       farbe = b.dataset.farbe;
       dlg.querySelectorAll("[data-farbe]").forEach((x) => x.setAttribute("aria-checked", String(x === b)));
+      dlg.querySelector(".sfarbe-eigen").setAttribute("aria-checked", "false");
       vorschau();
     }));
+    $("sf-eigen").addEventListener("input", (ev) => {
+      farbe = ev.target.value;
+      dlg.querySelectorAll("[data-farbe]").forEach((x) => x.setAttribute("aria-checked", "false"));
+      const eig = dlg.querySelector(".sfarbe-eigen");
+      eig.setAttribute("aria-checked", "true");
+      eig.style.setProperty("--k", farbe);
+      vorschau();
+    });
     $("sf-zeit").addEventListener("change", () => { $("sf-zeiten").hidden = !$("sf-zeit").checked; if (!$("sf-zeit").checked) $("sf-kal").checked = false; });
     const zurueck = () => (ausListe ? this._schichtArten() : this._zu(dlg));
     $("sf-zurueck").addEventListener("click", zurueck);
