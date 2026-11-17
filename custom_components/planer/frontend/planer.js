@@ -347,6 +347,15 @@ header .titel-block{display:grid;min-width:0;flex:1}
 header h1{margin:0;font-size:var(--t-gross);font-weight:700;letter-spacing:-.02em;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 header .datum{font-size:var(--t-sub);color:var(--muted);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 header .rechts{margin-left:auto;display:flex;gap:var(--s2);align-items:center;flex:none}
+header{flex-wrap:wrap}
+header nav.tabs{flex:none;order:3;margin:0 auto 0 0}
+header .titel-block{flex:1 1 200px}
+header .rechts{order:2}
+header nav.tabs button{padding:0 var(--s3)}
+#rahmen:not(.schmal) .wrap{container-type:inline-size}
+@container (min-width:840px){header nav.tabs{order:2;margin:0 var(--s2)}header .titel-block{flex:0 1 170px;min-width:110px}header .rechts{order:3;margin-left:auto}header nav.tabs .zahl{display:none}}
+@container (min-width:990px){header nav.tabs .zahl:not(.null){display:inline}}
+@container (max-width:700px){header nav.tabs{max-width:100%}header nav.tabs button{padding:0 var(--s2);gap:4px;flex:1 1 auto;justify-content:center;min-width:0}header nav.tabs .zahl{display:none}}
 .schmal header{align-items:flex-start;padding-top:var(--s1)}
 .schmal header .titel-block{padding-top:2px}
 
@@ -471,6 +480,7 @@ aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);positio
 .wkopf h2{margin:0 auto 0 0;font-size:var(--t-titel);font-weight:700;display:flex;gap:var(--s2);align-items:baseline;flex-wrap:wrap}
 .wkopf h2 .zahl{font-size:var(--t-sub);color:var(--muted);font-weight:500}
 .kalumschalter{justify-self:start;margin-bottom:var(--s1)}
+.wkopf .kalumschalter{margin:0;justify-self:auto}
 .wkopf .navi .knopf{padding:0 var(--s3)}
 .wkopf .navi{display:flex;gap:var(--s2);align-items:center}
 .kalleiste{display:flex;gap:var(--s3);align-items:center;flex-wrap:wrap;justify-content:space-between}
@@ -1320,6 +1330,10 @@ class PlanerPanel extends HTMLElement {
     const eingabeSichtbar = !schmal || this._eingabeOffen;
     const kannTermin = (d.kalender || []).some((k) => k.schreiben);
 
+    // Am Desktop sitzen die Reiter in der Kopfzeile, am Handy unten als Leiste
+    const tabsHtml = `<nav class="tabs" aria-label="Ansichten">
+        ${tabs.map(([k, t]) => `<button type="button" data-ansicht="${k}" data-fokus="t-${k}" ${this._ansicht === k ? 'aria-current="page"' : ""}>${(k === "eingang" ? ICON.aufgaben : ICON[k]) || ""}<span>${t}</span><span class="zahl ${!zaehler[k] ? "null" : ""}" aria-label="${zaehler[k]} ${k === "notizen" ? (zaehler[k] === 1 ? "Notiz" : "Notizen") : "offen"}">${zaehler[k]}</span></button>`).join("")}
+      </nav>`;
     this._gerust(schmal);
     const neueAnsicht = this._zuletzt !== this._ansicht;
     this._zuletzt = this._ansicht;
@@ -1331,6 +1345,7 @@ class PlanerPanel extends HTMLElement {
           <h1>${esc(tabName)}</h1>
           <span class="datum">${schmal ? WT_KURZ[wt(heuteD)] + "." : WOCHENTAGE[wt(heuteD)]}, ${heuteD.getDate()}. ${MONATE[heuteD.getMonth()]}${eName ? ` · ${esc(eName)}` : ""}</span>
         </div>
+        ${schmal ? "" : tabsHtml}
         <div class="rechts">
           <button type="button" class="rund" data-aktion="suche" data-fokus="suche" aria-label="Suchen" title="Suchen (Taste /)">${ICON.suche}</button>
           ${this._kopfEintraege().length ? `<button type="button" class="rund" data-aktion="kopf-menue" data-fokus="kopf-menue" aria-haspopup="menu" aria-expanded="false" aria-label="Weitere Aktionen" title="Weitere Aktionen">${ICON.mehr}</button>` : ""}
@@ -1355,9 +1370,7 @@ class PlanerPanel extends HTMLElement {
         <span class="sr" id="tipp">${notizen ? "Titel der neuen Notiz eingeben. Danach öffnet sich der Editor. Taste N springt hierher." : ""}${einkauf ? "Menge nach dem Komma, zum Beispiel Milch, 2 Liter. Erscheint sofort auch in Bring!." : ""}Erkennt heute, morgen, Wochentage, Datum wie 24.12., Uhrzeit wie 15 Uhr, !1 bis !3 für Top 3, # für Bereich, @ für Person und Wiederholungen wie jeden Montag oder täglich. Taste N springt hierher.</span>
       </form>
 
-      <nav class="tabs" aria-label="Ansichten">
-        ${tabs.map(([k, t]) => `<button type="button" data-ansicht="${k}" data-fokus="t-${k}" ${this._ansicht === k ? 'aria-current="page"' : ""}>${(k === "eingang" ? ICON.aufgaben : ICON[k]) || ""}<span>${t}</span><span class="zahl ${!zaehler[k] ? "null" : ""}" aria-label="${zaehler[k]} ${k === "notizen" ? (zaehler[k] === 1 ? "Notiz" : "Notizen") : "offen"}">${zaehler[k]}</span></button>`).join("")}
-      </nav>
+      ${schmal ? tabsHtml : ""}
 
       <main id="inhalt">${this._ansichtHtml(alle, offen)}</main>
     </div>
@@ -1971,8 +1984,8 @@ class PlanerPanel extends HTMLElement {
     const stempel = this._stempel;
     const wer = this._narrow ? "" : ` · ${esc(person === d.ich ? "Meine Schichten" : this._name(person).split(" ")[0])}`;
     return `<section class="gruppe" aria-labelledby="s-titel">
-      ${this._kalenderUmschalter()}
-      <div class="wkopf"><h2 id="s-titel">${MONATE[monat]} ${jahr}${wer}</h2>${this._kalNavi("schicht", "Heute", monat === jetzt.getMonth() && jahr === jetzt.getFullYear(), "Monat wechseln")}</div>
+      ${this._narrow ? this._kalenderUmschalter() : ""}
+      <div class="wkopf"><h2 id="s-titel">${MONATE[monat]} ${jahr}${wer}</h2>${this._narrow ? "" : this._kalenderUmschalter(true)}${this._kalNavi("schicht", "Heute", monat === jetzt.getMonth() && jahr === jetzt.getFullYear(), "Monat wechseln")}</div>
       <div class="woche-wrap"><div class="monat schichtmonat" role="grid" aria-labelledby="s-titel">
         ${["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((n) => `<div class="mkopf" role="columnheader">${n}</div>`).join("")}
         ${tage.slice(0, zeilen).map((t) => {
@@ -2016,8 +2029,8 @@ class PlanerPanel extends HTMLElement {
       return `<span class="chip"><b>${esc(vorname(p))}</b> ${Math.floor(m / 60)} Std.${m % 60 ? ` ${m % 60} Min.` : ""}</span>`;
     }).join("");
     return `<section class="gruppe" aria-labelledby="s-titel">
-      ${this._kalenderUmschalter()}
-      <div class="wkopf"><h2 id="s-titel">${MONATE[monat]} ${jahr}${this._narrow ? "" : " · Beide"}</h2>${this._kalNavi("schicht", "Heute", monat === jetzt.getMonth() && jahr === jetzt.getFullYear(), "Monat wechseln")}</div>
+      ${this._narrow ? this._kalenderUmschalter() : ""}
+      <div class="wkopf"><h2 id="s-titel">${MONATE[monat]} ${jahr}${this._narrow ? "" : " · Beide"}</h2>${this._narrow ? "" : this._kalenderUmschalter(true)}${this._kalNavi("schicht", "Heute", monat === jetzt.getMonth() && jahr === jetzt.getFullYear(), "Monat wechseln")}</div>
       <div class="schicht-wer">${pers.map((p) => `<button type="button" class="knopf klein" data-filter="${esc(p === d.ich ? "ich" : p)}">${esc(vorname(p))} bearbeiten</button>`).join("")}</div>
       <div class="woche-wrap"><div class="monat schichtmonat beide" role="grid" aria-labelledby="s-titel">
         ${["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((n) => `<div class="mkopf" role="columnheader">${n}</div>`).join("")}
@@ -2372,13 +2385,13 @@ class PlanerPanel extends HTMLElement {
     dlg.showModal();
   }
 
-  _kalenderUmschalter() {
+  _kalenderUmschalter(inline) {
     const v = this._kalAnsicht;
-    return `<div class="kalleiste"><div class="seg kalumschalter" role="group" aria-label="Kalenderansicht">
+    return `${inline ? "" : '<div class="kalleiste">'}<div class="seg kalumschalter" role="group" aria-label="Kalenderansicht">
       <button type="button" data-kal-ansicht="monat" data-fokus="ka-m" aria-pressed="${v === "monat"}">Monat</button>
       <button type="button" data-kal-ansicht="woche" data-fokus="ka-w" aria-pressed="${v === "woche"}">Woche</button>
       <button type="button" data-kal-ansicht="schichten" data-fokus="ka-s" aria-pressed="${v === "schichten"}">Schichten</button>
-    </div></div>`;
+    </div>${inline ? "" : "</div>"}`;
   }
   _kalNavi(art, heuteText, istJetzt, label) {
     return `<div class="navi" role="group" aria-label="${label}">
@@ -2404,8 +2417,8 @@ class PlanerPanel extends HTMLElement {
     const dieserMonat = erster.getMonth(), dieserJahr = erster.getFullYear();
     const zeilen = tage.slice(35).every((t) => ausIso(t).getMonth() !== dieserMonat) ? 35 : 42;
     return `<section class="gruppe" aria-labelledby="m-titel">
-      ${this._kalenderUmschalter()}
-      <div class="wkopf"><h2 id="m-titel">${MONATE[dieserMonat]} ${dieserJahr}</h2>${this._kalNavi("monat", "Heute", dieserMonat === new Date().getMonth() && dieserJahr === new Date().getFullYear(), "Monat wechseln")}</div>
+      ${this._narrow ? this._kalenderUmschalter() : ""}
+      <div class="wkopf"><h2 id="m-titel">${MONATE[dieserMonat]} ${dieserJahr}</h2>${this._narrow ? "" : this._kalenderUmschalter(true)}${this._kalNavi("monat", "Heute", dieserMonat === new Date().getMonth() && dieserJahr === new Date().getFullYear(), "Monat wechseln")}</div>
       <div class="woche-wrap"><div class="monat" role="grid" aria-labelledby="m-titel">
         ${["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((n) => `<div class="mkopf" role="columnheader">${n}</div>`).join("")}
         ${tage.slice(0, zeilen).map((t) => {
@@ -2453,8 +2466,8 @@ class PlanerPanel extends HTMLElement {
     const spanne = `${d0.getDate()}. ${d0.getMonth() !== d7.getMonth() ? MONATE[d0.getMonth()] + " " : ""}– ${d7.getDate()}. ${MONATE[d7.getMonth()]}`;
     const eingang = this._sortiert(alle.filter((a) => a.status === "offen" && !a.datum));
     return `<section class="gruppe" aria-labelledby="w-titel">
-      ${this._kalenderUmschalter()}
-      <div class="wkopf"><h2 id="w-titel">${esc(spanne)}</h2>${this._kalNavi("woche", "Heute", !this._wStart || iso(start) === heute(), "Tage wechseln")}</div>
+      ${this._narrow ? this._kalenderUmschalter() : ""}
+      <div class="wkopf"><h2 id="w-titel">${esc(spanne)}</h2>${this._narrow ? "" : this._kalenderUmschalter(true)}${this._kalNavi("woche", "Heute", !this._wStart || iso(start) === heute(), "Tage wechseln")}</div>
     </section>
     <span class="sr" id="wt-h">Antippen zeigt den Tag mit Uhrzeiten</span>
     <div class="tagliste" role="list" aria-label="Die nächsten Tage">
