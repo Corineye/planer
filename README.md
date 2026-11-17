@@ -10,7 +10,7 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
 3. Einstellungen › Geräte & Dienste › Integration hinzufügen › **Planer**.
 4. In der Seitenleiste erscheint „Planer“.
 
-## Was es gibt (v0.9.1)
+## Was es gibt (v0.9.2)
 
 - **Heute** mit Top 3 (je Rang 1–3, nie mehr als drei), weiteren Aufgaben, Überfälligem und „Heute erledigt“.
 - **Demnächst** (nach Tagen gruppiert) und **Eingang** (alles ohne Datum).
@@ -94,6 +94,8 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
 - **Schneller speichern** (v0.9): Änderungen an Aufgaben werden nach 300 ms gesichert, sofort beim Verlassen eines Feldes,
   beim Schließen und wenn die App in den Hintergrund geht.
 - **Schichten anlegen** (v0.9.1): ein übersichtliches Formular pro Schicht (Name, Kürzel, Farbe, Uhrzeit, Pause, Kalender).
+- **Eigene Schichtfarbe** (v0.9.2): neben den Standardfarben gibt es einen Farbwähler mit beliebiger Farbe.
+- **Desktop-Kopfzeile** (v0.9.2): bei breitem Fenster sitzen die Reiter in der Kopfzeile, und Monat/Woche/Schichten stehen neben Heute und den Pfeilen.
   „Schichten bearbeiten“ zeigt die Liste, Tippen öffnet die Schicht. Der heutige Tag ist im Kalender und bei den Schichten rot umrandet.
 - **Handy** (v0.9): größere Tippflächen, Verschieben-Knopf in jeder Zeile, Plus-Knopf weicht beim Scrollen aus,
   deckende Tab-Leiste, kompakter Tages-Dialog, Einstellungen speichern beim Schließen automatisch.
