@@ -1268,7 +1268,8 @@ class PlanerPanel extends HTMLElement {
       if (b && (a.bereich || "") !== b && !(a.tags || []).includes(b)) return false;
       if (f === "alle") return true;
       if (f === "ich") return a.person === d.ich || a.person === GEMEINSAM;
-      return a.person === f;
+      // Gemeinsames steht auch in der Liste jeder einzelnen Person
+      return a.person === f || a.person === GEMEINSAM;
     });
   }
   _sagen(text) {

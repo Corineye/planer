@@ -97,6 +97,7 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
   „Schichten bearbeiten“ zeigt die Liste, Tippen öffnet die Schicht. Der heutige Tag ist im Kalender und bei den Schichten rot umrandet.
 - **Eigene Schichtfarbe** (v0.9.2): neben den Standardfarben gibt es einen Farbwähler mit beliebiger Farbe.
 - **Desktop-Kopfzeile** (v0.9.2): bei breitem Fenster sitzen die Reiter in der Kopfzeile, und Monat/Woche/Schichten stehen neben Heute und den Pfeilen.
+- **Gemeinsames überall** (v0.9.2): Aufgaben mit „Gemeinsam“ erscheinen auch dann, wenn oben eine bestimmte Person (z. B. Linda) gewählt ist, nicht nur bei „Ich“.
 - **Handy** (v0.9): größere Tippflächen, Verschieben-Knopf in jeder Zeile, Plus-Knopf weicht beim Scrollen aus,
   deckende Tab-Leiste, kompakter Tages-Dialog, Einstellungen speichern beim Schließen automatisch.
 
