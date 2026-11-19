@@ -22,6 +22,7 @@ from homeassistant.helpers import config_validation as cv
 
 from .const import DOMAIN, GEMEINSAM, PANEL_PFAD, URL_BASIS
 from .daten import Planer
+from .automatik import Automatik
 from .erinnerung import Erinnerungen
 from .schichtkalender import Schichtkalender
 from .sicherung import Sicherung
@@ -62,6 +63,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     sicherung = Sicherung(hass, planer)
     await sicherung.async_start()
     daten["sicherung"] = sicherung
+    automatik = Automatik(hass, planer)
+    automatik.neu_laden()
+    daten["automatik"] = automatik
 
     if not daten.get("pfad"):
         await hass.http.async_register_static_paths([StaticPathConfig(URL_BASIS, str(ORDNER), False)])
@@ -109,6 +113,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         erinnerungen.async_stop()
     if sich := hass.data.get(DOMAIN, {}).pop("sicherung", None):
         sich.async_stop()
+    if auto := hass.data.get(DOMAIN, {}).pop("automatik", None):
+        auto.stoppen()
     if sk := hass.data.get(DOMAIN, {}).pop("schichtkalender", None):
         sk.stoppen()
     hass.services.async_remove(DOMAIN, "hinzufuegen")

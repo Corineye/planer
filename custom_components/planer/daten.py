@@ -444,6 +444,25 @@ class Planer:
         if "einkauf_listen" in werte:
             v = werte["einkauf_listen"]
             self.allgemein["einkauf_listen"] = None if v is None else [str(x) for x in v if str(x).startswith("todo.")][:10]
+        if "wetter" in werte:
+            v = werte["wetter"]
+            self.allgemein["wetter"] = str(v) if v and (str(v).startswith("weather.") or v == "-") else None
+        if "regeln" in werte and isinstance(werte["regeln"], list):
+            sauber = []
+            for x in werte["regeln"][:30]:
+                if not isinstance(x, dict) or "." not in str(x.get("entitaet", "")) or not _text(x.get("titel"), 120) or not _text(x.get("zu"), 60):
+                    continue
+                sauber.append({
+                    "id": _text(x.get("id"), 12) or uuid.uuid4().hex[:8],
+                    "entitaet": _text(x.get("entitaet"), 120),
+                    "zu": _text(x.get("zu"), 60),
+                    "erledigen_bei": _text(x.get("erledigen_bei"), 60) or "",
+                    "titel": _text(x.get("titel"), 120),
+                    "person": _text(x.get("person"), 64) or GEMEINSAM,
+                    "bereich": _text(x.get("bereich"), 40).lower(),
+                    "aktiv": bool(x.get("aktiv", True)),
+                })
+            self.allgemein["regeln"] = sauber
         if "ausgeblendet" in werte and isinstance(werte["ausgeblendet"], list):
             self.allgemein["ausgeblendet"] = [str(x) for x in werte["ausgeblendet"]][:100]
             await self.async_personen()

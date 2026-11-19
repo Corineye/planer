@@ -795,6 +795,15 @@ li.angehoben{position:relative;z-index:5;transform:scale(1.03);box-shadow:0 12px
 #einst fieldset,#einst .person-einst{position:relative;margin-top:calc(var(--s5) + var(--s2))}
 #einst fieldset>*:not(legend)+*:not(legend),#einst .person-einst>*:not(h3)+*:not(h3){border-top:.5px solid var(--line2)}
 #einst fieldset>*:not(legend),#einst .person-einst>*:not(h3){padding-block:var(--s3);margin:0}
+#einst .regel-liste{list-style:none;margin:0;padding:0;display:grid}
+#einst .regel-liste li{display:flex;align-items:center;gap:var(--s2);padding:var(--s2) 0}
+#einst .regel-liste li+li{border-top:.5px solid var(--line2)}
+#einst .regel-text{flex:1;min-width:0;display:grid;gap:2px}
+#einst .regel-neu{display:grid;gap:var(--s3)}
+#einst .regel-neu[open]{padding-top:var(--s2)}
+#einst .regel-neu summary{list-style:none;width:max-content}
+#einst .regel-neu summary::-webkit-details-marker{display:none}
+#einst .regel-neu .feld input,#einst .regel-neu .feld select{background:var(--card2);border-color:transparent}
 #einst .check{min-height:44px;display:flex;align-items:center;gap:var(--s3)}
 #einst form>.hinweis{padding:0 var(--s4);margin:0 0 var(--s2)}
 @keyframes abhaken{50%{transform:scale(.98)}to{opacity:.4}}
@@ -3417,7 +3426,8 @@ class PlanerPanel extends HTMLElement {
   // ---------- Wetter (Tagesvorhersage aus der HA-Wetter-Entität) ----------
   _wetterEntitaet() {
     const st = this._hass?.states || {};
-    const wahl = this._konf?.wetter;
+    const wahl = this._daten?.wetter || this._konf?.wetter;
+    if (wahl === "-") return null;
     if (wahl && st[wahl]) return wahl;
     if (st["weather.forecast_home"]) return "weather.forecast_home";
     return Object.keys(st).find((k) => k.startsWith("weather.")) || null;
@@ -3441,6 +3451,72 @@ class PlanerPanel extends HTMLElement {
       abo.ab.catch?.(() => { this._wetterAbo = { id, ab: null }; });
     } catch (e) { /* ohne Wetter weiter */ }
   }
+  // Einstellungen: Wetter-Entität wählen und Regeln für automatische Aufgaben
+  _wetterRegelnHtml() {
+    const d = this._daten, st = this._hass?.states || {};
+    const name = (id) => st[id]?.attributes?.friendly_name || id;
+    const wetter = Object.keys(st).filter((k) => k.startsWith("weather.")).sort();
+    const regeln = d.regeln || [];
+    const personen = [...(d.personen || []).map((p) => [p.id, p.name]), [GEMEINSAM, "Gemeinsam"]];
+    const zText = (z) => ({ on: "An", off: "Aus", open: "Offen", closed: "Zu", home: "Zuhause", not_home: "Abwesend", unavailable: "Nicht verfügbar" }[z] || z);
+    return `<fieldset><legend>Wetter</legend>
+        <div class="feld"><label for="wetter-wahl">Wetter in den Tageskarten</label>
+          <select id="wetter-wahl"><option value="">Automatisch${this._wetterEntitaet() ? ` (${esc(name(this._wetterEntitaet()))})` : ""}</option><option value="-" ${d.wetter === "-" ? "selected" : ""}>Kein Wetter</option>
+          ${wetter.map((w) => `<option value="${esc(w)}" ${d.wetter === w ? "selected" : ""}>${esc(name(w))}</option>`).join("")}</select></div>
+      </fieldset>
+      <fieldset id="regeln"><legend>Automatische Aufgaben</legend>
+        <p class="hinweis">Wechselt ein Gerät oder Schalter in einen bestimmten Zustand, legt der Planer eine Aufgabe für heute an. Solange sie offen ist, kommt keine zweite dazu.</p>
+        ${regeln.length ? `<ul class="regel-liste">${regeln.map((x) => `<li data-regel="${esc(x.id)}">
+          <span class="regel-text"><b>${esc(x.titel)}</b><span class="hinweis">Wenn ${esc(name(x.entitaet))} → ${esc(zText(x.zu))}${x.erledigen_bei ? ` · erledigt bei ${esc(zText(x.erledigen_bei))}` : ""} · ${esc((personen.find(([id]) => id === x.person) || [, "Gemeinsam"])[1])}</span></span>
+          <label class="schalter" title="Regel an/aus"><input type="checkbox" data-regel-an="${esc(x.id)}" ${x.aktiv !== false ? "checked" : ""} aria-label="Regel ${esc(x.titel)} aktiv"></label>
+          <button type="button" class="knopf klein gefahr" data-regel-weg="${esc(x.id)}">Löschen</button></li>`).join("")}</ul>` : ""}
+        <details class="regel-neu"><summary class="knopf">Regel hinzufügen</summary>
+          <div class="feld"><label for="r-ent">Gerät oder Schalter</label><input id="r-ent" list="r-ent-liste" placeholder="z. B. Schalter Waschmaschine" autocomplete="off">
+            <datalist id="r-ent-liste">${Object.keys(st).filter((k) => /^(switch|binary_sensor|input_boolean|sensor|light|cover|lock|button|input_button|person|device_tracker|media_player|climate|fan|vacuum)\./.test(k)).sort().map((k) => `<option value="${esc(k)}">${esc(name(k))}</option>`).join("")}</datalist></div>
+          <div class="reihe"><div class="feld"><label for="r-zu">Wenn Zustand wird</label><input id="r-zu" list="r-zust" placeholder="on"></div>
+            <div class="feld"><label for="r-weg">Erledigen bei (optional)</label><input id="r-weg" list="r-zust" placeholder="off"></div></div>
+          <datalist id="r-zust"><option value="on">An</option><option value="off">Aus</option><option value="open">Offen</option><option value="closed">Zu</option><option value="home">Zuhause</option><option value="not_home">Abwesend</option></datalist>
+          <p class="hinweis" id="r-jetzt"></p>
+          <div class="feld"><label for="r-titel">Aufgabe</label><input id="r-titel" placeholder="z. B. Wäsche aufhängen"></div>
+          <div class="reihe"><div class="feld"><label for="r-wer">Für</label><select id="r-wer">${personen.map(([id, n]) => `<option value="${esc(id)}" ${id === d.ich ? "selected" : ""}>${esc(n)}</option>`).join("")}</select></div>
+            <div class="feld"><label for="r-ber">Bereich (optional)</label><input id="r-ber" placeholder="haushalt"></div></div>
+          <button type="button" class="knopf primaer" id="r-speichern">Regel speichern</button>
+          <p class="fehler" id="r-fehler" role="alert"></p>
+        </details>
+      </fieldset>`;
+  }
+  _regelnBinden(dlg) {
+    const d = this._daten, st = this._hass?.states || {};
+    const $ = (id) => dlg.querySelector(`#${id}`);
+    const speichern = async (regeln, text) => {
+      await this._ws({ type: "planer/allgemein", werte: { regeln } });
+      d.regeln = regeln;
+      this._sagen(text);
+      const offen = $("regeln")?.querySelector("details")?.open;
+      this._einstellungen();
+      if (offen) this.shadowRoot.getElementById("einst").querySelector("#regeln details")?.setAttribute("open", "");
+    };
+    $("wetter-wahl")?.addEventListener("change", async (e) => {
+      await this._ws({ type: "planer/allgemein", werte: { wetter: e.target.value || null } });
+      d.wetter = e.target.value === "-" ? "-" : e.target.value || null;
+      this._wetterAbo = null; this._wetter = null; this._wetterStart();
+      this._sagen("Wetter gespeichert");
+    });
+    $("r-ent")?.addEventListener("input", (e) => {
+      const s0 = st[e.target.value];
+      $("r-jetzt").textContent = s0 ? `Gerade: ${s0.state}` : "";
+    });
+    $("r-speichern")?.addEventListener("click", async () => {
+      const ent = $("r-ent").value.trim(), zu = $("r-zu").value.trim(), titel = $("r-titel").value.trim();
+      if (!st[ent]) { $("r-fehler").textContent = "Dieses Gerät gibt es in Home Assistant nicht."; return; }
+      if (!zu || !titel) { $("r-fehler").textContent = "Bitte Zustand und Aufgabe ausfüllen."; return; }
+      const neu = { entitaet: ent, zu, erledigen_bei: $("r-weg").value.trim(), titel, person: $("r-wer").value, bereich: $("r-ber").value.trim().replace(/^#/, ""), aktiv: true };
+      await speichern([...(d.regeln || []), neu], `Regel „${titel}“ gespeichert`);
+    });
+    dlg.querySelectorAll("[data-regel-weg]").forEach((b) => b.addEventListener("click", () => speichern((d.regeln || []).filter((x) => x.id !== b.dataset.regelWeg), "Regel gelöscht")));
+    dlg.querySelectorAll("[data-regel-an]").forEach((c) => c.addEventListener("change", () => speichern((d.regeln || []).map((x) => (x.id === c.dataset.regelAn ? { ...x, aktiv: c.checked } : x)), c.checked ? "Regel an" : "Regel aus")));
+  }
+
   _wetterHtml(tag) {
     const w = (this._wetter || {})[tag];
     if (!w) return "";
@@ -5227,6 +5303,7 @@ class PlanerPanel extends HTMLElement {
           <div class="farben">${namen.map((x) => `<label><input type="color" data-farbe="${esc(x)}" value="${bereichFarbe(x, d.farben)}"> ${esc(x[0].toUpperCase() + x.slice(1))}</label>`).join("")}</div>
         </fieldset>`;
       })()}
+      ${d.admin ? this._wetterRegelnHtml() : ""}
       <fieldset id="sich"><legend>Sicherung</legend>
         <p class="hinweis">Der Planer sichert seine Daten jede Nacht um 03:30 in den Ordner planer_sicherungen (die letzten 14 bleiben).</p>
         <div class="sich-kopf"><button type="button" class="knopf" id="sich-jetzt">Jetzt sichern</button></div>
@@ -5284,6 +5361,7 @@ class PlanerPanel extends HTMLElement {
       await this._ws({ type: "planer/allgemein", werte: { ausgeblendet: aus } });
       this._sagen("Gespeichert. Die Liste aktualisiert sich beim Schließen.");
     }));
+    this._regelnBinden(dlg);
     dlg.querySelector("#gk")?.addEventListener("change", async (e) => {
       await this._ws({ type: "planer/allgemein", werte: { gemeinsam_kalender: e.target.value || null } });
       this._sagen("Kalender für gemeinsame Termine gespeichert");
