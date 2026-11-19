@@ -844,6 +844,13 @@ dialog .schnellwahl .knopf:not(.primaer):not(.text)[aria-pressed="true"]{backgro
 .wspalte.vorbei>*,.wkg.vorbei>*{filter:grayscale(1);opacity:.6}
 .mtag.vorbei,.mtag.vorbei.mschichttag,.mtag.fremd.vorbei.mschichttag{background:color-mix(in srgb,var(--fg) 6%,var(--card))}
 .mtag.vorbei>*{filter:grayscale(1);opacity:.55}
+.schichtmonat .stag.vorbei,.schichtmonat .stag.vorbei.belegt{background:color-mix(in srgb,var(--fg) 6%,var(--card));box-shadow:none}
+.schichtmonat .stag.vorbei>*{filter:grayscale(1);opacity:.55}
+/* Formulare in Blättern: lose Felder als Karten wie gruppierte iOS-Listen, Eingaben ohne Rahmen */
+dialog:not(.pop) form>.feld,dialog:not(.pop) form>.reihe,dialog:not(.pop) form>label.check{background:var(--card);border-radius:var(--r-karte);padding:var(--s3) var(--s4);margin:0}
+dialog:not(.pop) form>label.check{min-height:44px;display:flex;align-items:center;gap:var(--s3)}
+dialog:not(.pop) form>.feld input,dialog:not(.pop) form>.feld select,dialog:not(.pop) form>.feld textarea,dialog:not(.pop) form>.reihe .feld input,dialog:not(.pop) form>.reihe .feld select{background:var(--card2);border-color:transparent}
+dialog:not(.pop) form>.feld input:focus,dialog:not(.pop) form>.reihe .feld input:focus,dialog:not(.pop) form>.feld textarea:focus{border-color:var(--accent)}
 .mtag.vorbei .mnr{color:var(--muted)}
 .wspalte.ziel-drop,.wkg.ziel-drop{outline:2px dashed var(--accent);outline-offset:-2px}
 .wband{position:absolute;z-index:1;box-sizing:border-box;pointer-events:none;overflow:hidden;background:color-mix(in srgb,var(--k) 26%,transparent);border-left:3px solid var(--k);padding:2px 3px;font-size:10px;font-weight:600;line-height:1.15;color:var(--fg)}
@@ -2348,7 +2355,7 @@ class PlanerPanel extends HTMLElement {
         ${tage.slice(0, zeilen).map((t) => {
           const dd = ausIso(t);
           const a = this._schichtAm(t, person);
-          return `<button type="button" role="gridcell" class="stag ${dd.getMonth() !== monat ? "fremd" : ""} ${t === heuteIso ? "heute" : ""} ${a ? "belegt" : ""}" data-stag="${t}" ${a ? `style="--k:${a.farbe}"` : ""}
+          return `<button type="button" role="gridcell" class="stag ${dd.getMonth() !== monat ? "fremd" : ""} ${t === heuteIso ? "heute" : ""} ${t < heuteIso ? "vorbei" : ""} ${a ? "belegt" : ""}" data-stag="${t}" ${a ? `style="--k:${a.farbe}"` : ""}
             aria-label="${esc(`${dd.getDate()}. ${MONATE[dd.getMonth()]}: ${a ? `${a.name} ${this._schichtZeit(a)}` : "keine Schicht"}`)}">
             <span class="mnr">${dd.getDate()}</span>${a ? `<span class="skurz">${esc(a.kurz)}</span><span class="szeit">${esc(a.von || "")}</span>` : ""}</button>`;
         }).join("")}
@@ -2394,7 +2401,7 @@ class PlanerPanel extends HTMLElement {
         ${tage.slice(0, zeilen).map((t) => {
           const dd = ausIso(t);
           const l = pers.map((p) => ({ p, a: this._schichtAm(t, p) }));
-          return `<div role="gridcell" class="stag ${dd.getMonth() !== monat ? "fremd" : ""} ${t === heuteIso ? "heute" : ""}"
+          return `<div role="gridcell" class="stag ${dd.getMonth() !== monat ? "fremd" : ""} ${t === heuteIso ? "heute" : ""} ${t < heuteIso ? "vorbei" : ""}"
             aria-label="${esc(`${dd.getDate()}. ${MONATE[dd.getMonth()]}: ${l.map(({ p, a }) => `${vorname(p)} ${a ? a.name : "keine Schicht"}`).join(", ")}`)}">
             <span class="mnr">${dd.getDate()}</span><span class="sbeide">${l.map(({ p, a }) => a
               ? `<span class="sb" style="--k:${a.farbe}" title="${esc(`${vorname(p)}: ${a.name} ${this._schichtZeit(a)}`)}"><i>${esc(vorname(p)[0])}</i>${esc(a.kurz)}</span>`
