@@ -485,24 +485,52 @@ aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);positio
 .wkopf .navi{display:flex;gap:var(--s2);align-items:center}
 .kalleiste{display:flex;gap:var(--s3);align-items:center;flex-wrap:wrap;justify-content:space-between}
 .kalleiste .seg{flex:none}
-.monat{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:var(--s1)}
-.mkopf{font-size:var(--t-klein);text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:0 6px var(--s1);font-weight:600}
-.mtag{display:flex;flex-direction:column;align-items:stretch;gap:2px;text-align:left;min-height:104px;padding:6px;border-radius:10px;border:0;background:var(--card);box-shadow:var(--karte-schatten);color:var(--fg);font:inherit;cursor:pointer;min-width:0;overflow:hidden}
+.monat{--kompakt:1;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;align-content:start}
+.mkopf{font-size:var(--t-klein);text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:0 0 var(--s1);font-weight:600;text-align:center}
+.mtag{position:relative;display:flex;flex-direction:column;align-items:stretch;gap:2px;text-align:left;height:108px;padding:4px 2px 2px;border-radius:10px;border:0;background:var(--card);box-shadow:var(--karte-schatten);color:var(--fg);font:inherit;cursor:pointer;min-width:0;overflow:hidden}
+.schmal .mtag{height:auto;min-height:0;box-shadow:none}
 .mtag:hover{box-shadow:inset 0 0 0 1.5px var(--line2)}
 .mtag.fremd{background:transparent;box-shadow:none;color:var(--muted)}
-.mnr{font-weight:600;font-size:var(--t-sub);font-variant-numeric:tabular-nums;width:26px;height:26px;display:grid;place-items:center;border-radius:50%;margin-bottom:2px}
+.mtag.fremd .me,.mtag.fremd .msz{opacity:.55}
+.mtag.mschichttag{background:color-mix(in srgb,var(--sc1) 12%,var(--card))}
+.mtag.fremd.mschichttag{background:color-mix(in srgb,var(--sc1) 8%,transparent)}
+.mnr{flex:none;font-weight:600;font-size:12px;font-variant-numeric:tabular-nums;width:22px;height:22px;display:grid;place-items:center;border-radius:50%;margin-bottom:1px}
 .mtag.heute .mnr,.schichtmonat .stag.heute .mnr{background:var(--rot);color:#fff;font-weight:700}
 .mtag.heute,.schichtmonat .stag.heute,.wtag.heute{box-shadow:inset 0 0 0 2.5px var(--rot),var(--karte-schatten)}
-.mpunkt{display:block;font-size:var(--t-klein);line-height:1.35;padding:1px 5px;border-radius:4px;background:color-mix(in srgb,var(--k,var(--accent)) 16%,transparent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mpunkt.aufg{background:var(--fill);color:var(--fg)}
-.mmehr{font-size:var(--t-klein);color:var(--muted);padding-left:5px}
-.schmal .monat{gap:2px}
-.schmal .mkopf{text-align:center;padding:0 0 var(--s1)}
-.schmal .mtag{min-height:60px;padding:var(--s1) 2px;border-radius:10px;gap:3px;align-items:center}
-.schmal .mnr{font-size:var(--t-sub)}
-.schmal .mpunkt{font-size:0;height:4px;width:100%;padding:0;border-radius:2px;background:var(--k,var(--accent))}
-.schmal .mpunkt.aufg{background:var(--muted)}
-.schmal .mmehr{font-size:var(--t-tab);padding:0;line-height:1}
+.mstreifen{position:absolute;left:0;right:0;top:0;height:3px;display:flex}
+.mstreifen i{flex:1;background:var(--sc)}
+.msz{display:flex;gap:2px;flex:none;flex-wrap:nowrap;min-width:0}
+.msk{flex:0 1 auto;min-width:0;overflow:hidden;white-space:nowrap;font-size:9px;font-weight:700;padding:0 3px;height:14px;line-height:14px;border-radius:4px;background:var(--sc);color:#fff}
+.msk .sz{display:none;font-weight:500;margin-left:4px}
+.me{flex:none;display:block;min-width:0;height:14px;line-height:14px;font-size:9.5px;font-weight:600;padding:0 2px 0 3px;border-radius:3px;background:color-mix(in srgb,var(--c) 20%,transparent);border-left:2px solid var(--c);color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.me[hidden]{display:none!important}
+.me .u,.me .o{display:none}
+.me.auf{background:none;border-left:0;padding-left:1px}
+.me.auf::before{content:"";display:inline-block;box-sizing:border-box;width:8px;height:8px;border-radius:50%;border:1.5px solid var(--c);margin-right:3px;vertical-align:-1px}
+.mmehr{flex:none;font-size:9px;color:var(--muted);font-weight:700;padding-left:3px;line-height:12px}
+.schmal .monat{grid-template-rows:auto repeat(var(--zeilen),minmax(0,1fr))}
+.schmal .monat .mtag{padding:3px 1px 1px}
+.schmal .mnr{width:20px;height:20px;font-size:12px}
+.schmal .mtag:has(.msz) .mnr{margin-bottom:0}
+@container (min-width:600px){
+.monat{--kompakt:0;gap:var(--s1)}
+.mkopf{text-align:left;padding-left:6px}
+.mtag{height:auto;min-height:112px;padding:6px 6px 8px;overflow:visible;gap:3px}
+.mnr{width:26px;height:26px;font-size:var(--t-sub);margin-bottom:2px}
+.msz{flex-wrap:wrap;gap:3px}
+.msk{font-size:10.5px;height:18px;line-height:18px;padding:0 6px;overflow:visible}
+.msk .sz{display:inline}
+.mstreifen{height:4px}
+.me{height:auto;line-height:1.25;font-size:11.5px;padding:3px 4px 3px 6px;white-space:nowrap;border-left-width:3px;border-radius:5px;overflow:hidden}
+.me .u{display:inline;color:var(--muted);font-variant-numeric:tabular-nums;margin-right:4px;font-weight:500}
+.me .tx{overflow:hidden;text-overflow:ellipsis}
+.me.auf{padding-left:2px;display:flex;gap:4px;align-items:baseline}
+.me.auf::before{flex:none;margin-right:0}
+.me.auf .u{margin-right:0;white-space:nowrap;flex:none}
+.me.auf .tx{flex:1;min-width:0}
+.me.auf::before{width:10px;height:10px;margin-right:4px;vertical-align:-1px}
+}
+@container (min-width:820px){.me{white-space:normal;overflow:visible}.me .tx{overflow:visible;overflow-wrap:anywhere}.me .o{display:block;color:var(--muted);font-size:10.5px;font-weight:400}}
 .woche-wrap{overflow-x:auto;padding-bottom:var(--s1)}
 .schmal .woche-wrap{overflow:visible}
 .woche{display:grid;grid-template-columns:repeat(7,minmax(118px,1fr));gap:var(--s2);min-width:860px}
@@ -719,6 +747,54 @@ dialog .schnellwahl .knopf:not(.primaer):not(.text)[aria-pressed="true"]{backgro
 .wpunkt .zt{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:600}
 .raster.waehlbar{cursor:crosshair;touch-action:pan-y;user-select:none;-webkit-user-select:none}
 .raster .auswahl{position:absolute;left:var(--rand);right:2px;border-radius:8px;background:color-mix(in srgb,var(--accent-fill) 22%,transparent);box-shadow:inset 0 0 0 2px var(--accent-fill);font-size:var(--t-klein);font-weight:700;color:var(--accent);padding:2px 8px;pointer-events:none;z-index:3;font-variant-numeric:tabular-nums}
+/* Woche wie Google Kalender */
+.wcal{--rand:44px;position:relative;overflow-y:auto;overflow-x:hidden;background:var(--card);border-radius:var(--r-karte);box-shadow:var(--karte-schatten);overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.schmal .wcal{--rand:26px;border-radius:12px}
+.wzeile{display:grid;grid-template-columns:var(--rand) repeat(7,minmax(0,1fr))}
+.wsticky{position:sticky;top:0;z-index:6;background:var(--card);box-shadow:0 1px 0 var(--line)}
+.wl{font-size:var(--t-tab);color:var(--muted);align-self:center;text-align:right;padding-right:4px;min-width:0}
+.wganzz .wl{font-size:9px;line-height:1.1}
+.schmal .wganzz .wl{font-size:0}
+.wkh{border:0;border-left:1px solid var(--line);background:none;font:inherit;color:var(--muted);text-transform:uppercase;font-size:10px;font-weight:600;letter-spacing:.04em;padding:5px 0 3px;cursor:pointer;display:grid;justify-items:center;gap:1px;min-width:0}
+.wkh b{font-size:17px;color:var(--fg);width:30px;height:30px;line-height:30px;border-radius:50%;text-transform:none;letter-spacing:0;font-weight:600;font-variant-numeric:tabular-nums}
+.schmal .wkh b{font-size:14px;width:24px;height:24px;line-height:24px}
+.wkh.heute b{background:var(--rot);color:#fff}
+.wkh.heute{box-shadow:inset 2px 0 0 var(--rot),inset -2px 0 0 var(--rot),inset 0 2px 0 var(--rot)}
+.wkg{display:flex;flex-direction:column;gap:2px;min-width:0;min-height:24px;padding:2px 1px;border-left:1px solid var(--line);border-top:1px solid var(--line);cursor:pointer}
+.wkg.heute{box-shadow:inset 2px 0 0 var(--rot),inset -2px 0 0 var(--rot)}
+.wc{display:block;box-sizing:border-box;width:100%;min-width:0;height:18px;line-height:18px;text-align:left;border:0;font:inherit;font-size:11px;padding:0 4px;border-radius:4px;background:color-mix(in srgb,var(--c,var(--accent)) 24%,var(--card));color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;flex:none}
+.wc.t{box-shadow:inset 3px 0 0 var(--c)}
+.wc.a{background:color-mix(in srgb,var(--c) 10%,var(--card))}
+.wc.a::before{content:"";display:inline-block;box-sizing:border-box;width:8px;height:8px;border-radius:50%;border:1.5px solid var(--c);margin-right:4px;vertical-align:-1px}
+.wc.a.fertig{opacity:.55;text-decoration:line-through}
+.wc.s{background:var(--sc);color:#fff;font-weight:700;pointer-events:none}
+.wc.s .nm{font-style:normal;font-weight:500;margin-left:4px}
+.wc.mehr{background:var(--fill);color:var(--muted);text-align:center;font-weight:600}
+.schmal .wc{font-size:9px;height:15px;line-height:15px;padding:0 2px;border-radius:3px}
+.schmal .wc.t{box-shadow:inset 2px 0 0 var(--c);padding-left:3px}
+.schmal .wc.a::before{width:6px;height:6px;margin-right:2px}
+.schmal .wc.s .nm{display:none}
+.wstunden{position:relative}
+.wstunden span{position:absolute;right:4px;transform:translateY(-50%);font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums;line-height:1}
+.wstunden span:first-child{transform:translateY(3px)}
+.schmal .wstunden span{font-size:9px;right:3px}
+.schmal .wstunden small{display:none}
+.wspalte{position:relative;min-width:0;border-left:1px solid var(--line);background-image:repeating-linear-gradient(to bottom,var(--line) 0 1px,transparent 1px var(--hpx));cursor:pointer}
+.wspalte.heute{box-shadow:inset 2px 0 0 var(--rot),inset -2px 0 0 var(--rot),inset 0 -2px 0 var(--rot)}
+.wspalte.ziel-drop,.wkg.ziel-drop{outline:2px dashed var(--accent);outline-offset:-2px}
+.wband{position:absolute;z-index:1;box-sizing:border-box;pointer-events:none;overflow:hidden;background:color-mix(in srgb,var(--k) 26%,transparent);border-left:3px solid var(--k);padding:2px 3px;font-size:10px;font-weight:600;line-height:1.15;color:var(--fg)}
+.wband span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wband b{font-weight:800}
+.schmal .wband{border-left-width:2px;padding:1px;font-size:8.5px}
+.schmal .wband.geteilt span{font-size:0}
+.schmal .wband.geteilt b{font-size:9px}
+.wcal .block{z-index:2;font-size:11px;line-height:1.2;padding:2px 4px;border-radius:5px}
+.wcal .block b{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;white-space:normal;overflow:hidden;overflow-wrap:anywhere}
+.schmal .wcal .block{font-size:9px;padding:1px 2px;border-radius:3px;box-shadow:inset 2px 0 0 var(--k)}
+.schmal .wcal .block.a{box-shadow:inset 0 0 0 1.5px var(--k)}
+.wjetzt{position:absolute;left:0;right:0;height:2px;margin-top:-1px;background:var(--rot);z-index:4;pointer-events:none}
+.wjetzt::before{content:"";position:absolute;left:-1px;top:-4px;width:10px;height:10px;border-radius:50%;background:var(--rot)}
+.schmal .wrap:has(.monat){padding-bottom:0}
 dialog.pop{width:min(440px,calc(100vw - 32px))}
 dialog.pop form{display:grid;gap:var(--s3);padding:var(--s3) var(--s5) var(--s5)}
 .schmal dialog.pop form{padding:var(--s3) var(--s4) calc(var(--s5) + env(safe-area-inset-bottom))}
@@ -765,7 +841,6 @@ dialog.pop form{display:grid;gap:var(--s3);padding:var(--s3) var(--s5) var(--s5)
 .schichtmonat .stag:active{transform:scale(.96)}
 .schicht-fuss{display:grid;gap:var(--s3);margin-top:var(--s3)}
 .schicht-summe{display:flex;flex-wrap:wrap;gap:var(--s2);align-items:center;font-size:var(--t-sub)}
-.mschicht{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 3px;margin-left:4px;border-radius:5px;background:var(--k);color:#fff;font-size:11px;font-weight:800;vertical-align:1px}
 .wpunkt.s{background:color-mix(in srgb,var(--k) 16%,var(--card));box-shadow:inset 3px 0 0 var(--k)}
 .wpunkt.s b{color:var(--k);filter:brightness(.85)}
 .termin.schicht{cursor:default}
@@ -862,9 +937,6 @@ dialog.pop form{display:grid;gap:var(--s3);padding:var(--s3) var(--s5) var(--s5)
 .fab{transition:transform .25s var(--bewegung),opacity .2s ease}
 .schmal nav.tabs{background:color-mix(in srgb,var(--bg) 86%,transparent);-webkit-backdrop-filter:blur(20px) saturate(1.6);backdrop-filter:blur(20px) saturate(1.6)}
 .schmal nav.tabs button{font-size:11px}
-.mnr:has(.mschicht){width:auto;min-width:26px;display:inline-flex;align-items:center;gap:2px;border-radius:13px;padding:0 2px 0 6px;align-self:flex-start}
-.schmal .mnr:has(.mschicht){align-self:center;padding:0 2px}
-.schmal .mtag .mschicht{margin-left:1px;min-width:14px;height:14px;font-size:9px}
 .tag-blatt .blatt-kopf h2{display:grid;justify-items:center;line-height:1.15}
 .tag-unter{font-size:var(--t-klein);font-weight:500;color:var(--muted)}
 .tag-r{display:inline-flex;align-items:center;gap:var(--s1);justify-self:end}
@@ -1029,6 +1101,14 @@ li.aufgabe .zeile,.nrow-zeile{-webkit-touch-callout:none}
 .schmal li.aufgabe .zeile{-webkit-user-select:none;user-select:none}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media (forced-colors:active){.haken[aria-checked="true"]::before{forced-color-adjust:none;background:Highlight}.seg button[aria-pressed="true"],nav.tabs button[aria-current="page"]{outline:2px solid Highlight}}
+.wpunkt.s b{filter:none;background:var(--k);padding:0 5px;border-radius:5px;color:#fff;margin-right:2px}
+/* Schichtfarbe: Schrift je nach Helligkeit der gewählten Farbe hell oder dunkel */
+@supports (color:oklch(from red l c h)){
+.msk,.wc.s{color:oklch(from var(--sc) calc((0.72 - l) * 1000) 0 0)}
+.stempel:not(.radierer):not(.neu) .skurz,.schichtmonat .stag .skurz,.schichtzeile .skurz,.szeile:not(.neu) .skurz,.svorschau .skurz,.sb:not(.leer),.wpunkt.s b{color:oklch(from var(--k) calc((0.72 - l) * 1000) 0 0)}
+}
+.sb i{background:color-mix(in srgb,currentColor 20%,transparent)}
+.rh-tag b{color:var(--fg)}
 `;
 
 const HAKEN = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
@@ -1185,6 +1265,7 @@ class PlanerPanel extends HTMLElement {
   }
   disconnectedCallback() {
     document.removeEventListener("keydown", this._tasten);
+    if (this._kalGroesse) { window.removeEventListener("resize", this._kalGroesse); this._kalGroesse = null; }
     window.removeEventListener("scroll", this._rollen, { capture: true });
     this.shadowRoot?.removeEventListener("scroll", this._rollen, { capture: true });
     if (this._abo) this._abo.then((ab) => ab()).catch(() => {});
@@ -2420,24 +2501,83 @@ class PlanerPanel extends HTMLElement {
     return `<section class="gruppe" aria-labelledby="m-titel">
       ${this._narrow ? this._kalenderUmschalter() : ""}
       <div class="wkopf"><h2 id="m-titel">${MONATE[dieserMonat]} ${dieserJahr}</h2>${this._narrow ? "" : this._kalenderUmschalter(true)}${this._kalNavi("monat", "Heute", dieserMonat === new Date().getMonth() && dieserJahr === new Date().getFullYear(), "Monat wechseln")}</div>
-      <div class="woche-wrap"><div class="monat" role="grid" aria-labelledby="m-titel">
+      <div class="woche-wrap"><div class="monat" role="grid" aria-labelledby="m-titel" style="--zeilen:${zeilen / 7}">
         ${["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((n) => `<div class="mkopf" role="columnheader">${n}</div>`).join("")}
         ${tage.slice(0, zeilen).map((t) => {
           const d = ausIso(t);
           const ts = am(t), as = aufg(t);
+          const sch = this._schichtenAm(t);
           const items = [
-            ...ts.map((x) => `<span class="mpunkt" style="--k:${this._farbe(x.kalender)}">${x.ganztag ? "" : uhr(x.start) + " "}${esc(x.titel)}</span>`),
-            ...as.map((a) => `<span class="mpunkt aufg">${esc(a.titel)}</span>`),
+            ...ts.map((x) => `<span class="me" style="--c:${this._farbe(x.kalender)}">${x.ganztag ? "" : `<span class="u">${uhr(x.start)}</span>`}<span class="tx">${esc(x.titel)}${x.ort ? `<span class="o">${esc(x.ort)}</span>` : ""}</span></span>`),
+            ...as.map((a) => `<span class="me auf" style="--c:${bereichFarbe(a.bereich, this._daten.farben) || "var(--muted)"}">${a.uhrzeit ? `<span class="u">${a.uhrzeit}</span>` : ""}<span class="tx">${esc(a.titel)}</span></span>`),
           ];
-          const sicht = items.slice(0, 3).join("");
-          const rest = items.length > 3 ? `<span class="mmehr">+${items.length - 3}${this._narrow ? "" : " weitere"}</span>` : "";
-          return `<button type="button" role="gridcell" class="mtag ${d.getMonth() !== dieserMonat ? "fremd" : ""} ${t === heuteIso ? "heute" : ""}" data-mtag="${t}"
-            aria-label="${esc(`${d.getDate()}. ${MONATE[d.getMonth()]}: ${ts.length} Termine, ${as.length} Aufgaben. Tag öffnen`)}">
-            <span class="mnr">${d.getDate()}${this._schichtenAm(t).map(({ a: sc, wer }) => `<span class="mschicht" style="--k:${sc.farbe}" title="${esc(`${wer ? wer + ": " : ""}${sc.name}`)}">${esc(wer ? wer[0] + sc.kurz : sc.kurz)}</span>`).join("")}</span>${sicht}${rest}</button>`;
+          const schHtml = sch.length ? `<span class="msz">${sch.map(({ a: sc, wer }) => `<span class="msk" style="--sc:${sc.farbe}" title="${esc(`${wer ? wer + ": " : ""}${sc.name} ${this._schichtZeit(sc)}`.trim())}">${esc(wer ? `${wer[0]} ${sc.kurz}` : sc.kurz)}${sc.von && sc.bis ? `<span class="sz">${sc.von}–${sc.bis}</span>` : ""}</span>`).join("")}</span>` : "";
+          const streifen = sch.length ? `<span class="mstreifen" aria-hidden="true">${sch.map(({ a: sc }) => `<i style="--sc:${sc.farbe}"></i>`).join("")}</span>` : "";
+          return `<button type="button" role="gridcell" class="mtag ${d.getMonth() !== dieserMonat ? "fremd" : ""} ${t === heuteIso ? "heute" : ""} ${sch.length ? "mschichttag" : ""}" data-mtag="${t}" ${sch.length ? `style="--sc1:${sch[0].a.farbe}"` : ""}
+            aria-label="${esc(`${d.getDate()}. ${MONATE[d.getMonth()]}: ${sch.map(({ a: sc, wer }) => `${wer ? wer + " " : ""}${sc.name}`).join(", ")}${sch.length ? ", " : ""}${ts.length} Termine, ${as.length} Aufgaben. Tag öffnen`)}">
+            ${streifen}<span class="mnr">${d.getDate()}</span>${schHtml}${items.join("")}</button>`;
         }).join("")}
       </div></div>
       ${termine === null ? `<p class="hinweis" role="status">Termine werden geladen …</p>` : ""}
     </section>`;
+  }
+
+  // Nach dem Zeichnen: Monat und Woche an die freie Höhe anpassen (Handy ohne Scrollen)
+  _kalPassen() {
+    if (this._ansicht !== "woche") return;
+    if (this._kalAnsicht === "monat") this._monatPassen();
+    else if (this._kalAnsicht === "woche") this._wochePassen();
+    else return;
+    if (!this._kalGroesse) {
+      this._kalGroesse = () => { cancelAnimationFrame(this._kalRaf); this._kalRaf = requestAnimationFrame(() => this._kalPassen()); };
+      window.addEventListener("resize", this._kalGroesse);
+    }
+  }
+  _freieHoehe(el) {
+    const nav = this._app.querySelector("nav.tabs[aria-label]") || this._app.querySelector("nav.tabs");
+    const oben = el.getBoundingClientRect().top + (window.scrollY || 0);
+    const unten = this._narrow && nav ? nav.getBoundingClientRect().top - 8 : window.innerHeight - 16;
+    return Math.max(280, Math.floor(unten - oben));
+  }
+  _monatPassen() {
+    const m = this._app.querySelector(".monat");
+    if (!m) return;
+    const kompakt = getComputedStyle(m).getPropertyValue("--kompakt").trim() === "1";
+    if (this._narrow) m.style.height = `${this._freieHoehe(m)}px`; else m.style.height = "";
+    m.querySelectorAll(".mmehr").forEach((x) => x.remove());
+    m.querySelectorAll(".me[hidden]").forEach((x) => { x.hidden = false; });
+    if (!kompakt) return;
+    m.querySelectorAll(".mtag").forEach((z) => {
+      const es = [...z.querySelectorAll(".me")];
+      if (!es.length) return;
+      const unten = z.getBoundingClientRect().bottom - 3;
+      let weg = 0;
+      for (let i = es.length - 1; i >= 0; i--) if (es[i].getBoundingClientRect().bottom > unten) { es[i].hidden = true; weg++; }
+      if (!weg) return;
+      const mm = document.createElement("span");
+      mm.className = "mmehr";
+      mm.textContent = `+${weg}`;
+      z.appendChild(mm);
+      while (mm.getBoundingClientRect().bottom > unten) {
+        const sicht = es.filter((e) => !e.hidden);
+        if (!sicht.length) break;
+        sicht[sicht.length - 1].hidden = true; weg++;
+        mm.textContent = `+${weg}`;
+      }
+    });
+  }
+  _wochePassen() {
+    const c = this._app.querySelector("#wcal");
+    if (!c) return;
+    const von = +c.dataset.von, hpx = +c.dataset.hpx;
+    const voll = c.querySelector(".wsticky").offsetHeight + c.querySelector(".wkoerper").offsetHeight;
+    c.style.height = `${Math.min(voll, Math.max(this._narrow ? 0 : 400, this._freieHoehe(c)))}px`;
+    c.onscroll = () => { this._wScroll = c.scrollTop; };
+    if (this._wScroll === undefined) {
+      const h = new Date().getHours();
+      this._wScroll = h >= von + 3 ? Math.max(0, (h - 1 - von) * hpx) : 0;
+    }
+    c.scrollTop = this._wScroll;
   }
 
   async _monatTermineLaden(von, key) {
@@ -2453,35 +2593,24 @@ class PlanerPanel extends HTMLElement {
     if (this._ansicht === "woche" && this._kalAnsicht === "monat") this._zeichnen();
   }
 
-  // Woche als Liste: Starttag (normal heute) oben, dann die nächsten 7 Tage, jeder Tag nach Uhrzeit
+  // Woche wie im Google Kalender: 7 Tage als Spalten (Mo–So), Ganztags-Zeile, Stundenraster
   _wocheHtml(alle) {
-    const start = this._wStart || ausIso(heute());
-    const k = kw(montag(start));
-    const tage = [...Array(8)].map((_, i) => iso(plusTage(start, i)));
+    const start = montag(this._wStart || ausIso(heute()));
+    const k = kw(start);
+    const tage = [...Array(7)].map((_, i) => iso(plusTage(start, i)));
     const termine = this._wTermine?.start === iso(start) ? this._wTermine.liste : null;
     if (!termine) this._wocheTermineLaden(start);
     const ziele = [...((this._daten.wochen || {})[k]?.ziele || [])];
     while (ziele.length < 3) ziele.push({ text: "", erledigt: false });
     const aufg = (tag) => this._sortiert(alle.filter((a) => a.datum === tag && (a.status === "offen" || (a.erledigt_am || "").slice(0, 10) === tag)));
-    const d0 = ausIso(tage[0]), d7 = ausIso(tage[7]);
+    const d0 = ausIso(tage[0]), d7 = ausIso(tage[6]);
     const spanne = `${d0.getDate()}. ${d0.getMonth() !== d7.getMonth() ? MONATE[d0.getMonth()] + " " : ""}– ${d7.getDate()}. ${MONATE[d7.getMonth()]}`;
     const eingang = this._sortiert(alle.filter((a) => a.status === "offen" && !a.datum));
     return `<section class="gruppe" aria-labelledby="w-titel">
       ${this._narrow ? this._kalenderUmschalter() : ""}
-      <div class="wkopf"><h2 id="w-titel">${esc(spanne)}</h2>${this._narrow ? "" : this._kalenderUmschalter(true)}${this._kalNavi("woche", "Heute", !this._wStart || iso(start) === heute(), "Tage wechseln")}</div>
+      <div class="wkopf"><h2 id="w-titel">${esc(spanne)}</h2>${this._narrow ? "" : this._kalenderUmschalter(true)}${this._kalNavi("woche", "Heute", iso(start) === iso(montag(new Date())), "Woche wechseln")}</div>
     </section>
-    <span class="sr" id="wt-h">Antippen zeigt den Tag mit Uhrzeiten</span>
-    <div class="tagliste" role="list" aria-label="Die nächsten Tage">
-      ${tage.map((t) => {
-        const d = ausIso(t);
-        const ts = this._termineIn(termine || [], t);
-        const as = aufg(t);
-        return `<section class="wtag kompakt ${t === this._tag ? "heute" : ""}" role="listitem" data-tag="${t}" data-tagauf="${t}" tabindex="0" aria-labelledby="wt-${t}" aria-describedby="wt-h">
-          <h3 id="wt-${t}"><span class="wt-name">${t === this._tag ? "Heute" : WOCHENTAGE[wt(d)]}</span><span class="d">${d.getDate()}. ${MONATE[d.getMonth()]}</span></h3>
-          ${this._tagKompakt(t, ts, as)}
-        </section>`;
-      }).join("")}
-    </div>
+    ${this._wocheRaster(tage, termine || [], aufg)}
     <section class="gruppe" aria-labelledby="z-titel">
       <h2 id="z-titel">Wochenziele <span class="zahl">KW ${+k.slice(6)}</span></h2>
       <form class="ziele" id="zform" data-kw="${k}">
@@ -2498,6 +2627,88 @@ class PlanerPanel extends HTMLElement {
       <h2 id="ab-titel">Aus dem Eingang einplanen</h2>
       <div class="ablage">${eingang.map((a) => `<button type="button" class="wpunkt a" style="--k:${bereichFarbe(a.bereich, this._daten.farben) || "var(--accent)"}" draggable="true" data-ziehen="${a.id}" data-aktion="oeffnen" data-id="${a.id}">${esc(a.titel)}</button>`).join("")}</div>
     </section>` : ""}`;
+  }
+
+  // Ganztags-Zeile und Stundenraster der Woche; Schichten mit Uhrzeit als Band hinter den Terminen
+  _wocheRaster(tage, termine, aufg) {
+    const von = this._daten.einst?.tag_von ?? 7, bis = this._daten.einst?.tag_bis ?? 22;
+    const hpx = this._narrow ? 44 : 48;
+    const zeit = (x) => +x.slice(0, 2) * 60 + +x.slice(3, 5);
+    const stunden = bis - von;
+    const jetzt = new Date();
+    const jetztMin = jetzt.getHours() * 60 + jetzt.getMinutes();
+    const aussen = (s0, e0) => e0 <= von * 60 || s0 >= bis * 60;
+    const spalten = tage.map((tag, i) => {
+      const ganz = [], bloecke = [], baender = [];
+      const ts = this._termineIn(termine, tag), as = aufg(tag);
+      for (const t of ts) {
+        if (t.ganztag) { ganz.push(`<button type="button" class="wc t" style="--c:${this._farbe(t.kalender)}" data-termin="${esc(`${t.kalender}|${t.uid}|${t.start}`)}" title="${esc(t.titel)}">${esc(t.titel)}</button>`); continue; }
+        const s0 = t.start.slice(0, 10) < tag ? 0 : zeit(uhr(t.start));
+        const e0 = Math.max(t.ende.slice(0, 10) > tag ? 1440 : zeit(uhr(t.ende)), s0 + 25);
+        const text = `${uhr(t.start)}–${uhr(t.ende)}`;
+        const attr = `data-termin="${esc(`${t.kalender}|${t.uid}|${t.start}`)}" aria-label="${esc(`${t.titel}, ${text}, ${this._kal(t.kalender).name}`)}"`;
+        if (aussen(s0, e0)) { ganz.push(`<button type="button" class="wc t" style="--c:${this._farbe(t.kalender)}" ${attr}>${uhr(t.start)} ${esc(t.titel)}</button>`); continue; }
+        bloecke.push({ s: s0, e: e0, html: (stil, hoch) => `<button type="button" class="block t" style="${stil};--k:${this._farbe(t.kalender)}" ${attr}><b>${esc(t.titel)}</b>${hoch ? `<span>${text}</span>` : ""}</button>` });
+      }
+      for (const a of as) {
+        const farbe = bereichFarbe(a.bereich, this._daten.farben) || "var(--accent)";
+        if (!a.uhrzeit) { ganz.push(`<button type="button" class="wc a ${a.status === "erledigt" ? "fertig" : ""}" style="--c:${farbe}" data-aktion="oeffnen" data-id="${a.id}" draggable="${a.status === "offen"}" data-ziehen="${a.id}" title="${esc(a.titel)}">${esc(a.titel)}</button>`); continue; }
+        const s0 = zeit(a.uhrzeit), e0 = s0 + Math.max(a.dauer || 30, 25);
+        const attr = `data-aktion="oeffnen" data-id="${a.id}" draggable="${a.status === "offen"}" data-ziehen="${a.id}" aria-label="${esc(`Aufgabe ${a.titel} um ${a.uhrzeit}`)}"`;
+        if (aussen(s0, e0)) { ganz.push(`<button type="button" class="wc a" style="--c:${farbe}" ${attr}>${a.uhrzeit} ${esc(a.titel)}</button>`); continue; }
+        bloecke.push({ s: s0, e: e0, html: (stil, hoch) => `<button type="button" class="block a ${a.status === "erledigt" ? "fertig" : ""}" style="${stil};--k:${farbe}" ${attr}><b>${esc(a.titel)}</b>${hoch ? `<span>${a.uhrzeit} · Aufgabe</span>` : ""}</button>` });
+      }
+      const schicht = [];
+      for (const { a: sc, wer } of this._schichtenAm(tag)) {
+        if (sc.von && sc.bis) {
+          const s0 = zeit(sc.von); let e0 = zeit(sc.bis); if (e0 <= s0) e0 = 1440;
+          if (!aussen(s0, e0)) { baender.push({ s: s0, e: e0, sc, wer }); continue; }
+        }
+        schicht.push({ sc, wer });
+      }
+      // Nachtschicht vom Vortag läuft bis in den Morgen
+      for (const { a: sc, wer } of this._schichtenAm(iso(plusTage(ausIso(tag), -1)))) {
+        if (!(sc.von && sc.bis)) continue;
+        const s0 = zeit(sc.von), e0 = zeit(sc.bis);
+        if (e0 <= s0 && e0 > von * 60) baender.push({ s: 0, e: e0, sc, wer, fort: true });
+      }
+      const sChips = schicht.map(({ sc, wer }) => `<span class="wc s" style="--sc:${sc.farbe}" title="${esc(`${wer ? wer + ": " : ""}${sc.name} ${this._schichtZeit(sc)}`.trim())}"><b>${esc(wer ? `${wer[0]} ${sc.kurz}` : sc.kurz)}</b><i class="nm">${esc(sc.name)}</i></span>`);
+      const alleGanz = [...sChips, ...ganz];
+      const sichtbar = alleGanz.slice(0, 3).join("") + (alleGanz.length > 3 ? `<button type="button" class="wc mehr" data-tagauf="${tag}">+${alleGanz.length - 3}</button>` : "");
+      // Spalten für überschneidende Blöcke
+      bloecke.sort((x, y) => x.s - y.s || y.e - x.e);
+      let gruppe = [], gEnde = -1;
+      const fertig = () => { const n = Math.max(...gruppe.map((x) => x.sp)) + 1; gruppe.forEach((x) => { x.n = n; }); gruppe = []; };
+      for (const x of bloecke) {
+        if (x.s >= gEnde && gruppe.length) fertig();
+        const belegt = new Set(gruppe.filter((y) => y.e > x.s).map((y) => y.sp));
+        x.sp = 0; while (belegt.has(x.sp)) x.sp++;
+        gruppe.push(x); gEnde = Math.max(gEnde, x.e);
+      }
+      if (gruppe.length) fertig();
+      const px = (m) => (Math.max(m, von * 60) - von * 60) / 60 * hpx;
+      const bandHtml = baender.map((x, n) => {
+        const top = px(x.s), h = px(Math.min(x.e, bis * 60)) - top;
+        return `<div class="wband ${x.fort ? "fort" : ""} ${baender.length > 1 ? "geteilt" : ""}" style="top:${top}px;height:${h}px;left:${n * 100 / baender.length}%;width:${100 / baender.length}%;--k:${x.sc.farbe}" title="${esc(`${x.wer ? x.wer + ": " : ""}${x.sc.name} ${this._schichtZeit(x.sc)}`.trim())}"><span>${x.wer ? `<b>${esc(x.wer[0])}</b> ` : ""}${esc(x.sc.name)}</span></div>`;
+      }).join("");
+      const blockHtml = bloecke.map((x) => {
+        const top = px(x.s), hoehe = Math.max(18, px(Math.min(x.e, bis * 60)) - top - 1);
+        return x.html(`top:${top}px;height:${hoehe}px;left:calc(${x.sp * 100 / x.n}% + 1px);width:calc(${100 / x.n}% - 2px)`, hoehe >= 34 && !this._narrow);
+      }).join("");
+      const heuteTag = tag === this._tag;
+      const jetztHtml = heuteTag && jetztMin > von * 60 && jetztMin < bis * 60 ? `<div class="wjetzt" style="top:${px(jetztMin)}px" aria-hidden="true"></div>` : "";
+      const d = ausIso(tag);
+      return { kopf: `<button type="button" class="wkh ${heuteTag ? "heute" : ""}" data-tagauf="${tag}" aria-label="${esc(datumText(tag) + ", Tag öffnen")}"><span class="wn">${WT_KURZ[i]}</span><b>${d.getDate()}</b></button>`,
+        ganz: `<div class="wkg ${heuteTag ? "heute" : ""}" data-tag="${tag}" data-wleer="${tag}">${sichtbar}</div>`,
+        spalte: `<div class="wspalte ${heuteTag ? "heute" : ""}" data-tag="${tag}" data-wleer="${tag}" style="height:${stunden * hpx}px">${bandHtml}${blockHtml}${jetztHtml}</div>` };
+    });
+    return `<div class="wcal" id="wcal" style="--hpx:${hpx}px" role="group" aria-label="Wochenkalender" data-von="${von}" data-hpx="${hpx}">
+      <div class="wsticky">
+        <div class="wzeile"><div class="wl"></div>${spalten.map((x) => x.kopf).join("")}</div>
+        <div class="wzeile wganzz"><div class="wl">Ganztag</div>${spalten.map((x) => x.ganz).join("")}</div>
+      </div>
+      <div class="wzeile wkoerper"><div class="wl wstunden" style="height:${stunden * hpx}px" aria-hidden="true">${[...Array(stunden)].map((_, i) => `<span style="top:${i * hpx}px">${String(von + i).padStart(2, "0")}<small>:00</small></span>`).join("")}</div>${spalten.map((x) => x.spalte).join("")}</div>
+    </div>`;
   }
 
   _termineIn(liste, tag) {
@@ -2958,12 +3169,14 @@ class PlanerPanel extends HTMLElement {
       b.addEventListener("click", () => this._tagZeigen(b.dataset.tagauf));
       b.addEventListener("keydown", (ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); this._tagZeigen(b.dataset.tagauf); } });
     });
+    this._app.querySelectorAll("[data-wleer]").forEach((el) => el.addEventListener("click", (ev) => { if (ev.target === el) this._tagZeigen(el.dataset.wleer); }));
+    this._kalPassen();
     this._app.querySelectorAll("[data-woche]").forEach((b) => b.addEventListener("click", () => {
       const n = +b.dataset.woche;
       this._wStart = n === 0 ? null : plusTage(this._wStart || ausIso(heute()), 7 * n);
       this._zeichnen();
-      const st = this._wStart || ausIso(heute());
-      this._sagen(`${datumText(iso(st))} bis ${datumText(iso(plusTage(st, 7)))}`);
+      const st = montag(this._wStart || ausIso(heute()));
+      this._sagen(`${datumText(iso(st))} bis ${datumText(iso(plusTage(st, 6)))}`);
     }));
     const zf = root.getElementById("zform");
     if (zf) {
@@ -2981,7 +3194,7 @@ class PlanerPanel extends HTMLElement {
       e.dataTransfer.setData("text/plain", el.dataset.ziehen);
       e.dataTransfer.effectAllowed = "move";
     }));
-    this._app.querySelectorAll(".wtag").forEach((tag) => {
+    this._app.querySelectorAll(".wtag,.wspalte,.wkg").forEach((tag) => {
       tag.addEventListener("dragover", (e) => { e.preventDefault(); tag.classList.add("ziel-drop"); });
       tag.addEventListener("dragleave", () => tag.classList.remove("ziel-drop"));
       tag.addEventListener("drop", async (e) => {
