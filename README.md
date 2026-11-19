@@ -100,6 +100,11 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
 - **Gemeinsames überall** (v0.9.2): Aufgaben mit „Gemeinsam“ erscheinen auch dann, wenn oben eine bestimmte Person (z. B. Linda) gewählt ist, nicht nur bei „Ich“.
 - **Handy** (v0.9): größere Tippflächen, Verschieben-Knopf in jeder Zeile, Plus-Knopf weicht beim Scrollen aus,
   deckende Tab-Leiste, kompakter Tages-Dialog, Einstellungen speichern beim Schließen automatisch.
+- **Sicherung** (v0.10): jede Nacht um 03:30 (und beim Start, falls die heutige fehlt) eine Kopie der Planer-Daten in `planer_sicherungen/` (die letzten 14). Einstellungen › Sicherung: „Jetzt sichern“ und „Wiederherstellen“ mit Bestätigung.
+- **Schichten ohne Flackern** (v0.10): mehrere Schichten schnell nacheinander stempeln lässt nichts mehr verschwinden.
+- **Aufgabenlisten sortieren und ausblenden** (v0.10): im „⋯“-Menü von Heute und Demnächst nach Fällig, Priorität, Bereich, Neueste zuerst oder A–Z sortieren und #Hashtags ausblenden („n ausgeblendet“ zeigt sie wieder). Gilt pro Person.
+- **Gemeinsamer Kalender mit Einzel-To-dos** (v0.10): bei „Gemeinsam“ und „Alle“ zeigt der Kalender-Reiter auch die Aufgaben von Corin und Linda, mit Avatar.
+- **Schicht-Statistik** (v0.10): Kalender › Schichten › „⋯“ › „Statistik …“: Arbeitsstunden, Schichtarten, Wochenenden, Nachtstunden, freie Tage und Vergleich zum Vormonat.
 
 ## Daten
 

@@ -118,6 +118,8 @@ class Planer:
             "handy": e.get("handy"),
             "standard_kalender": e.get("standard_kalender"),
             "erinnerungen": e.get("erinnerungen", STANDARD_ERINNERUNGEN),
+            "aufgaben_sortierung": e.get("aufgaben_sortierung", "faellig"),
+            "ausgeblendete_tags": e.get("ausgeblendete_tags", []),
             "tag_von": e.get("tag_von", 7),
             "tag_bis": e.get("tag_bis", 22),
             # Schichten: None = Kalender „<Vorname> Arbeit“ automatisch, "" = nicht übertragen
@@ -146,11 +148,23 @@ class Planer:
         self._zuhoerer.append(fn)
         return lambda: self._zuhoerer.remove(fn) if fn in self._zuhoerer else None
 
+    def alles(self) -> dict[str, Any]:
+        return {"aufgaben": self.aufgaben, "notizen": self.notizen, "einstellungen": self.einstellungen, "wochen": self.wochen, "allgemein": self.allgemein,
+                "schichten": self.schichten}
+
+    async def ersetzen(self, daten: dict[str, Any]) -> None:
+        """Ersetzt den ganzen Bestand (Wiederherstellen aus einer Sicherung) und meldet es allen Geräten."""
+        self.aufgaben = daten.get("aufgaben", {})
+        self.notizen = daten.get("notizen", {})
+        self.einstellungen = daten.get("einstellungen", {})
+        self.wochen = daten.get("wochen", {})
+        self.allgemein = daten.get("allgemein", {})
+        self.schichten = daten.get("schichten", {})
+        await self.async_personen()
+        await self._sichern()
+
     async def _sichern(self) -> None:
-        await self._store.async_save(
-            {"aufgaben": self.aufgaben, "notizen": self.notizen, "einstellungen": self.einstellungen, "wochen": self.wochen, "allgemein": self.allgemein,
-             "schichten": self.schichten}
-        )
+        await self._store.async_save(self.alles())
         for fn in list(self._zuhoerer):
             fn()
 
@@ -443,6 +457,11 @@ class Planer:
             if feld in werte:
                 v = werte[feld]
                 e[feld] = None if v is None else [str(x) for x in v if str(x).startswith("calendar.")]
+        if "aufgaben_sortierung" in werte:
+            v = str(werte["aufgaben_sortierung"])
+            e["aufgaben_sortierung"] = v if v in ("faellig", "prio", "bereich", "neu", "az") else "faellig"
+        if "ausgeblendete_tags" in werte and isinstance(werte["ausgeblendete_tags"], list):
+            e["ausgeblendete_tags"] = list(dict.fromkeys(_text(x, 40).lstrip("#").lower() for x in werte["ausgeblendete_tags"] if _text(x, 40)))[:100]
         if "standard_kalender" in werte:
             e["standard_kalender"] = str(werte["standard_kalender"]) if werte["standard_kalender"] else None
         if "handy" in werte:
