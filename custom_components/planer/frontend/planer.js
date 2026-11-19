@@ -610,6 +610,8 @@ dialog form{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s4);paddi
 .blatt-kopf .l{justify-self:start}
 .blatt-kopf .r{justify-self:end}
 .blatt-kopf .stand{font-size:var(--t-fuss);color:var(--muted);padding-left:var(--s2)}
+.blatt-kopf h2 .stand{display:block;padding:0;font-size:var(--t-tab);font-weight:500;line-height:1.2}
+.blatt-kopf h2 .stand:empty{display:none}
 .blatt-kopf h2:focus{outline:none}
 .griff{width:36px;height:5px;border-radius:3px;background:var(--line2);position:absolute;top:5px;left:50%;transform:translateX(-50%)}
 .feld{display:grid;gap:6px;min-width:0}
@@ -4079,9 +4081,9 @@ class PlanerPanel extends HTMLElement {
     const personen = [...d.personen.map((p) => [p.id, p.name]), [GEMEINSAM, "Gemeinsam"]];
     dlg.innerHTML = `<form method="dialog" id="bform" novalidate>
       <div class="blatt-kopf">${this._narrow ? '<div class="griff" aria-hidden="true"></div>' : ""}
-        ${a.id ? '<span class="l stand" id="b-stand" aria-live="polite"></span>' : '<button type="button" class="knopf text l" id="b-abbrechen">Abbrechen</button>'}
-        <h2 id="blatt-titel">${a.id ? "Aufgabe" : "Neue Aufgabe"}</h2>
-        <button type="submit" class="knopf text fett r">${a.id ? "Fertig" : "Hinzufügen"}</button>
+        ${a.id ? '<button type="submit" class="knopf text l">Schließen</button>' : '<button type="button" class="knopf text l" id="b-abbrechen">Abbrechen</button>'}
+        <h2 id="blatt-titel">${a.id ? `Aufgabe<span class="stand" id="b-stand" aria-live="polite"></span>` : "Neue Aufgabe"}</h2>
+        ${a.id ? `<button type="button" class="knopf text fett r" id="b-erledigt">${a.status === "erledigt" ? "Wieder offen" : "Erledigt"}</button>` : '<button type="submit" class="knopf text fett r">Hinzufügen</button>'}
       </div>
       <div class="feld"><label for="b-titel">Titel</label><input id="b-titel" required value="${esc(a.titel)}"></div>
       <fieldset>
@@ -4118,7 +4120,6 @@ class PlanerPanel extends HTMLElement {
       <p class="hinweis">Ohne Uhrzeit wird um 9:00 Uhr am Fälligkeitstag gerechnet. Erinnert wird nur, wenn für die Person ein Handy eingestellt ist.</p>
       <div class="feld"><label for="b-notiz">Notiz</label><textarea id="b-notiz">${esc(a.notiz || "")}</textarea></div>
       <p class="fehler" id="b-fehler" role="alert"></p>
-      ${a.id ? `<div class="fuss"><button type="button" class="knopf ${a.status === "erledigt" ? "" : "primaer"}" id="b-erledigt" style="width:100%">${a.status === "erledigt" ? "Wieder offen" : "Erledigt"}</button></div>` : ""}
       ${a.id ? `<div class="fuss"><button type="button" class="knopf gefahr" id="b-loeschen" style="width:100%">Aufgabe löschen</button></div>` : ""}
     </form>`;
 
