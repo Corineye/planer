@@ -547,7 +547,7 @@ aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);positio
 .monat{--kompakt:1;gap:var(--s1);grid-template-rows:auto repeat(var(--zeilen),minmax(0,1fr))}
 .mkopf{text-align:left;padding-left:6px}
 .mtag{height:auto;min-height:0;padding:5px 6px 4px;overflow:hidden;gap:3px}
-.mmehr{font-size:11px;line-height:16px;padding-left:6px}
+.mmehr{font-size:var(--t-tab);line-height:16px;padding-left:6px}
 .mnr{width:26px;height:26px;font-size:var(--t-sub);margin-bottom:2px}
 .msz{flex-wrap:nowrap;gap:3px;overflow:hidden}
 .msz:has(.msk + .msk) .sz{display:none}
@@ -758,7 +758,34 @@ dialog.schliesst::backdrop{background:rgba(0,0,0,0)}
 main.einblenden{animation:einblenden .28s var(--bewegung)}
 @keyframes einblenden{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 li.aufgabe.abgehakt .zeile{animation:abhaken .35s var(--bewegung) forwards}
-li.aufgabe.abgehakt .haken::before{background:var(--accent-fill);border-color:var(--accent-fill)}
+li.aufgabe.abgehakt .haken::before{background:var(--accent-fill);border-color:var(--accent-fill);animation:haken-fuell .32s var(--bewegung)}
+li.aufgabe.abgehakt .haken::after{content:"";grid-area:1/1;width:24px;height:24px;border-radius:50%;box-shadow:0 0 0 0 var(--accent-fill);animation:haken-ring .5s ease-out forwards;pointer-events:none}
+li.aufgabe.abgehakt .haken svg{animation:haken-svg .3s .08s var(--bewegung) both}
+@keyframes haken-fuell{0%{transform:scale(.6)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+@keyframes haken-ring{to{box-shadow:0 0 0 10px transparent}}
+@keyframes haken-svg{from{transform:scale(0) rotate(-20deg);opacity:0}}
+@media (prefers-reduced-motion:reduce){li.aufgabe.abgehakt .haken::before,li.aufgabe.abgehakt .haken::after,li.aufgabe.abgehakt .haken svg{animation:none}}
+/* Kontextmenü: Eintrag hebt sich an, der Rest tritt zurück (wie iOS) */
+li.angehoben{position:relative;z-index:5;transform:scale(1.03);box-shadow:0 12px 32px rgba(0,0,0,.18);border-radius:var(--r-karte);transition:transform .25s var(--bewegung),box-shadow .25s ease}
+#rahmen.kontext-an li.aufgabe:not(.angehoben),#rahmen.kontext-an li.nrow:not(.angehoben){opacity:.45;filter:blur(1.5px);transition:opacity .2s ease,filter .2s ease}
+/* Großer Titel: beim Scrollen erscheint oben eine schmale Glasleiste mit kleinem Titel */
+.kompakt-kopf{display:none}
+.schmal .kompakt-kopf{display:grid;place-items:center;position:fixed;left:0;right:0;top:0;z-index:20;height:calc(44px + env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px);font-size:var(--t-kopf);font-weight:600;color:var(--fg);background:color-mix(in srgb,var(--bg) 72%,transparent);-webkit-backdrop-filter:var(--glas-blur);backdrop-filter:var(--glas-blur);box-shadow:0 .5px 0 var(--line2);opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .2s ease,transform .25s var(--bewegung)}
+#rahmen.eingerollt .kompakt-kopf{opacity:1;transform:none}
+.schmal header h1{transition:opacity .2s ease}
+#rahmen.eingerollt header h1{opacity:0}
+#rahmen.eingerollt .wcal.drei .wsticky{top:calc(44px + env(safe-area-inset-top,0px))}
+/* Blätter: folgen dem Finger, hochziehen = ganze Höhe */
+.schmal dialog.zieht{transition:none}
+.schmal dialog.voll{min-height:calc(100dvh - 12px)}
+/* Einstellungen als gruppierte Listen (wie iOS-Einstellungen) */
+#einst fieldset,#einst .person-einst{border:0;margin:0 0 var(--s5);padding:var(--s2) var(--s4);border-radius:var(--r-karte);background:var(--card);box-shadow:none;display:grid;gap:0}
+#einst fieldset>legend,#einst .person-einst>h3{float:left;width:100%;left:0;padding:0 0 var(--s2) var(--s4);margin:0;font-size:var(--t-fuss);font-weight:500;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);transform:translateY(calc(-100% - var(--s2)));position:absolute}
+#einst fieldset,#einst .person-einst{position:relative;margin-top:calc(var(--s5) + var(--s2))}
+#einst fieldset>*:not(legend)+*:not(legend),#einst .person-einst>*:not(h3)+*:not(h3){border-top:.5px solid var(--line2)}
+#einst fieldset>*:not(legend),#einst .person-einst>*:not(h3){padding-block:var(--s3);margin:0}
+#einst .check{min-height:44px;display:flex;align-items:center;gap:var(--s3)}
+#einst form>.hinweis{padding:0 var(--s4);margin:0 0 var(--s2)}
 @keyframes abhaken{50%{transform:scale(.98)}to{opacity:.4}}
 .schmal form.schnell:not([hidden]){animation:einblenden .25s var(--bewegung)}
 .fab{transition:transform .2s var(--bewegung)}
@@ -829,11 +856,11 @@ dialog .schnellwahl .knopf:not(.primaer):not(.text)[aria-pressed="true"]{backgro
 .wcal.drei .wband{left:calc(var(--bi) * 7px + 1px)!important;width:5px!important;padding:0;border:0;border-radius:3px;background:var(--k)}
 .wcal.drei .wband span{display:none}
 .wcal.drei .block{margin-left:calc(var(--nb,0) * 7px);max-width:calc(100% - var(--nb,0) * 7px - 2px);border-radius:8px;padding:3px 7px}
-.wcal.drei .block b{font-size:13px}
+.wcal.drei .block b{font-size:var(--t-fuss)}
 .wcal.drei .block.a b{white-space:nowrap;display:block}
 .wcal.drei .block.t b{white-space:normal;display:-webkit-box;-webkit-line-clamp:var(--zl,1);-webkit-box-orient:vertical}
-.wcal.drei .block span{font-size:11px}
-.wcal.drei .wkh b{font-size:17px}
+.wcal.drei .block span{font-size:var(--t-tab)}
+.wcal.drei .wkh b{font-size:var(--t-kopf)}
 .wcal.drei .wc.s .nm{display:inline}
 .wcal.rein-r .wkoerper,.wcal.rein-r .wsticky{animation:w-rein-r .28s var(--bewegung)}
 .wcal.rein-l .wkoerper,.wcal.rein-l .wsticky{animation:w-rein-l .28s var(--bewegung)}
@@ -1350,6 +1377,7 @@ class PlanerPanel extends HTMLElement {
       if (!el || el.classList?.contains("tl-scroll") || el.closest?.("dialog")) return;
       const y = el.scrollTop || 0, alt = this._rollY?.get?.(el) ?? 0;
       (this._rollY ||= new WeakMap()).set(el, y);
+      if (!e.target.closest || el === document.scrollingElement) this.shadowRoot?.getElementById("rahmen")?.classList.toggle("eingerollt", !!this._narrow && y > 44);
       if (Math.abs(y - alt) < 6) return;
       this.shadowRoot?.querySelector(".fab")?.classList.toggle("weg", y > alt && y > 40);
     };
@@ -1525,6 +1553,7 @@ class PlanerPanel extends HTMLElement {
     const neueAnsicht = this._zuletzt !== this._ansicht;
     this._zuletzt = this._ansicht;
     this._app.innerHTML = `
+    <div class="kompakt-kopf" aria-hidden="true">${esc(tabName)}</div>
     <div class="wrap">
       <header>
         ${this._menuKnopf()}
@@ -1968,6 +1997,8 @@ class PlanerPanel extends HTMLElement {
     const auf = (opt) => {
       if (Date.now() - (this._kontextZeit || 0) < 700) return;
       this._kontextZeit = Date.now();
+      const rahmen = this.shadowRoot.getElementById("rahmen");
+      if (!opt.tastatur && !opt.punkt) { li.classList.add("angehoben"); rahmen?.classList.add("kontext-an"); this._angehoben = li; }
       oeffnen(opt);
     };
     const stopp = () => { clearTimeout(uhr); uhr = null; };
@@ -4074,6 +4105,7 @@ class PlanerPanel extends HTMLElement {
       wirt.removeEventListener("cancel", abbruch);
       if (anker.hasAttribute("aria-haspopup")) anker.setAttribute("aria-expanded", "false");
       if (this._menueZu === zu) this._menueZu = null;
+      if (this._angehoben) { this._angehoben.classList.remove("angehoben"); this._angehoben = null; root.getElementById("rahmen")?.classList.remove("kontext-an"); }
       if (fokusZurueck !== false && drin) anker.focus({ preventScroll: true });
     };
     const waehlen = (e, ev) => {
@@ -5011,12 +5043,27 @@ class PlanerPanel extends HTMLElement {
   _wischZu(dlg) {
     if (!this._narrow || dlg.dataset.wisch) return;
     dlg.dataset.wisch = "1";
-    let y0 = null;
-    dlg.addEventListener("touchstart", (e) => { y0 = dlg.scrollTop <= 0 ? e.touches[0].clientY : null; }, { passive: true });
-    dlg.addEventListener("touchend", (e) => {
-      if (y0 !== null && e.changedTouches[0].clientY - y0 > 110) this._zu(dlg);
-      y0 = null;
+    let y0 = null, t0 = 0, dy = 0;
+    const vomKopf = (e) => !!e.target.closest(".blatt-kopf");
+    dlg.addEventListener("touchstart", (e) => {
+      // Ziehen am Kopf immer, sonst nur, wenn der Inhalt ganz oben steht
+      y0 = dlg.scrollTop <= 0 || vomKopf(e) ? e.touches[0].clientY : null; t0 = Date.now(); dy = 0;
+    }, { passive: true });
+    dlg.addEventListener("touchmove", (e) => {
+      if (y0 === null || e.target.closest("input[type=range],textarea,.tl-scroll")) return;
+      dy = e.touches[0].clientY - y0;
+      if (dy > 0) { dlg.classList.add("zieht"); dlg.style.transform = `translateY(${dy}px)`; }
+      else if (dy < -50 && vomKopf(e)) dlg.classList.add("voll");
+    }, { passive: true });
+    dlg.addEventListener("touchend", () => {
+      if (y0 === null) return;
+      const schnell = dy > 40 && dy / Math.max(1, Date.now() - t0) > 0.6;
+      dlg.classList.remove("zieht");
+      dlg.style.transform = "";
+      if (dy > 110 || schnell) this._zu(dlg);
+      y0 = null; dy = 0;
     });
+    dlg.addEventListener("close", () => dlg.classList.remove("voll"));
   }
 
   // Einstellungen › Sicherung: Liste, Jetzt sichern, Wiederherstellen mit Bestätigung im Dialog
