@@ -823,11 +823,13 @@ dialog .schnellwahl .knopf:not(.primaer):not(.text)[aria-pressed="true"]{backgro
 .wband b{font-weight:800}
 .schmal .wband{border-left-width:2px;padding:1px;font-size:8.5px}
 /* 3-Tage-Ansicht am Handy */
-.wcal.drei{--rand:38px}
+.wcal.drei{--rand:38px;overflow:visible;overscroll-behavior:auto}
+.wcal.drei .wsticky{top:0;border-radius:var(--r-karte) var(--r-karte) 0 0}
 .wcal.drei .wband{left:calc(var(--bi) * 7px + 1px)!important;width:5px!important;padding:0;border:0;border-radius:3px;background:var(--k)}
 .wcal.drei .wband span{display:none}
 .wcal.drei .block{margin-left:calc(var(--nb,0) * 7px);max-width:calc(100% - var(--nb,0) * 7px - 2px);border-radius:8px;padding:3px 7px}
 .wcal.drei .block b{font-size:13px}
+.wcal.drei .block.a b{white-space:nowrap;display:block}
 .wcal.drei .block.t:has(span) b{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .wcal.drei .block span{font-size:11px}
 .wcal.drei .wkh b{font-size:17px}
@@ -2923,6 +2925,23 @@ class PlanerPanel extends HTMLElement {
         this._wocheRO.observe(document.documentElement);
         if (this._app.firstElementChild) this._wocheRO.observe(this._app.firstElementChild);
       }
+    } else if (c.classList.contains("drei")) {
+      // Handy, 3 Tage: kein eigener Scrollbereich. Die Seite scrollt, der Tageskopf bleibt oben stehen,
+      // und der ganze Zeitraum passt dann genau zwischen Tageskopf und Leiste unten.
+      // Unterkante = so weit, wie die Seite höchstens hochscrollt (Abstand unten im Rahmen)
+      const wrap = c.closest(".wrap");
+      const pad = wrap ? parseFloat(getComputedStyle(wrap).paddingBottom) || 0 : 0;
+      let danach = 0;
+      for (let el = c.nextElementSibling; el; el = el.nextElementSibling) danach += el.offsetHeight;
+      const unten = window.innerHeight - pad - danach - 4;
+      hpx = Math.max(36, (unten - kopfH) / stunden);
+      c.style.setProperty("--hpx", `${hpx}px`);
+      c.style.height = "";
+      if (!this._dreiGroesse) {
+        this._dreiGroesse = true;
+        window.addEventListener("resize", () => { cancelAnimationFrame(this._wocheRaf); this._wocheRaf = requestAnimationFrame(() => this._wochePassen()); });
+      }
+      return;
     } else {
       const voll = kopfH + c.querySelector(".wkoerper").offsetHeight;
       c.style.height = `${Math.min(voll, this._freieHoehe(c))}px`;
