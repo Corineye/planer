@@ -795,6 +795,11 @@ li.angehoben{position:relative;z-index:5;transform:scale(1.03);box-shadow:0 12px
 #einst fieldset,#einst .person-einst{position:relative;margin-top:calc(var(--s5) + var(--s2))}
 #einst fieldset>*:not(legend)+*:not(legend),#einst .person-einst>*:not(h3)+*:not(h3){border-top:.5px solid var(--line2)}
 #einst fieldset>*:not(legend),#einst .person-einst>*:not(h3){padding-block:var(--s3);margin:0}
+/* Verschachtelte Gruppen in einer Karte (z. B. Erinnerung aufs Handy) nicht noch einmal als Karte */
+#einst fieldset fieldset,#einst .person-einst fieldset{position:static;margin:0;padding:var(--s3) 0;background:none;border-radius:0;display:grid;gap:var(--s2)}
+#einst fieldset fieldset>legend,#einst .person-einst fieldset>legend{position:static;transform:none;float:left;width:100%;padding:0;margin:0 0 var(--s2);text-transform:none;letter-spacing:0;font-size:var(--t-fuss);font-weight:600;color:var(--muted)}
+#einst fieldset fieldset>*,#einst .person-einst fieldset>*{border-top:0!important;padding-block:0!important}
+#einst .feld input,#einst .feld select,#einst .feld textarea{background:var(--card2);border-color:transparent}
 #einst .regel-liste{list-style:none;margin:0;padding:0;display:grid}
 #einst .regel-liste li{display:flex;align-items:center;gap:var(--s2);padding:var(--s2) 0}
 #einst .regel-liste li+li{border-top:.5px solid var(--line2)}
