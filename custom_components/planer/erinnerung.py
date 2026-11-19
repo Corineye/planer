@@ -114,7 +114,14 @@ class Erinnerungen:
         if self._termine_stand and jetzt - self._termine_stand < timedelta(minutes=10):
             return
         self._termine_stand = jetzt
-        ids = sorted({k for p in self.planer.personen for k in self.planer.einst(p["id"])["kalender_erinnern"]})
+        ids = {k for p in self.planer.personen for k in self.planer.einst(p["id"])["kalender_erinnern"]}
+        # Abfahrtserinnerung: alle Kalender, die die Person sieht
+        alle = [k["id"] for k in kalender.liste(self.hass)]
+        for p in self.planer.personen:
+            e = self.planer.einst(p["id"])
+            if e.get("abfahrt") and e["handy"]:
+                ids |= set(alle if e["kalender_sehen"] is None else e["kalender_sehen"])
+        ids = sorted(ids)
         start = jetzt - timedelta(hours=1)
         liste = await kalender.termine(self.hass, ids, start, jetzt + timedelta(days=8)) if ids else []
         self._termine = {}
@@ -185,6 +192,70 @@ class Erinnerungen:
                     )
         return raus
 
+    # --- Abfahrt: Fahrzeit über Waze, Push „Jetzt losfahren“ -----------------------------------
+
+    def _start_ort(self, person: str) -> str:
+        """Aktueller Standort der Person (person.*), sonst Zuhause."""
+        for st in self.hass.states.async_all("person"):
+            if st.attributes.get("user_id") == person and st.attributes.get("latitude") is not None:
+                return f"{st.attributes['latitude']},{st.attributes['longitude']}"
+        return f"{self.hass.config.latitude},{self.hass.config.longitude}"
+
+    async def _fahrzeit(self, start: str, ziel: str, jetzt: datetime) -> int | None:
+        fz = self.__dict__.setdefault("_fahrzeiten", {})
+        alt = fz.get((start, ziel))
+        if alt and jetzt - alt[1] < timedelta(minutes=10):
+            return alt[0]
+        if not self.hass.services.has_service("waze_travel_time", "get_travel_times"):
+            return None
+        region = "us" if (self.hass.config.country or "") in ("US", "CA") else "eu"
+        try:
+            antwort = await self.hass.services.async_call(
+                "waze_travel_time", "get_travel_times",
+                {"origin": start, "destination": ziel, "region": region, "vehicle_type": "car", "realtime": True},
+                blocking=True, return_response=True,
+            )
+            wege = (antwort or {}).get("routes") or []
+            minuten = round(min(float(w["duration"]) for w in wege)) if wege else None
+        except Exception as err:  # noqa: BLE001 – Waze-Fehler dürfen die Erinnerungen nicht stoppen
+            _LOGGER.debug("Planer: Waze-Fahrzeit nach %s nicht ermittelt: %s", ziel, err)
+            minuten = None
+        fz[(start, ziel)] = (minuten, jetzt)
+        return minuten
+
+    async def _abfahrten_faellig(self, jetzt: datetime) -> list[dict[str, Any]]:
+        raus = []
+        for p in self.planer.personen:
+            e = self.planer.einst(p["id"])
+            if not e.get("abfahrt") or not e["handy"]:
+                continue
+            sehen = e["kalender_sehen"]
+            gesehen = set()
+            for kid, liste in self._termine.items():
+                if sehen is not None and kid not in sehen:
+                    continue
+                for t in liste:
+                    if t["ganztag"] or not (t.get("ort") or "").strip() or (t["uid"], t["start"]) in gesehen:
+                        continue
+                    gesehen.add((t["uid"], t["start"]))
+                    beginn = dt_util.as_local(datetime.fromisoformat(t["start"]))
+                    if not (jetzt < beginn <= jetzt + timedelta(hours=4)):
+                        continue
+                    minuten = await self._fahrzeit(self._start_ort(p["id"]), t["ort"].strip(), jetzt)
+                    if minuten is None or minuten < 3:
+                        continue  # kein Weg gefunden oder schon da
+                    puffer = int(e.get("abfahrt_puffer") or 0)
+                    los = beginn - timedelta(minutes=minuten + puffer)
+                    if los <= jetzt:
+                        raus.append({
+                            "schluessel": f"a|{p['id']}|{t['uid']}|{t['start']}",
+                            "titel": f"Jetzt losfahren: {t['titel']}",
+                            "text": f"Fahrzeit {minuten} Min. + {puffer} Min. Puffer · Beginn {beginn.strftime('%H:%M')} Uhr · {t['ort'].strip()}",
+                            "handys": [e["handy"]],
+                            "aufgabe": None,
+                        })
+        return raus
+
     async def _lauf(self, jetzt: datetime) -> None:
         jetzt = dt_util.as_local(jetzt)
         try:
@@ -194,6 +265,8 @@ class Erinnerungen:
         von = max(letzter, jetzt - NACHHOLEN)
         await self._termine_laden(jetzt)
         faellig = self._aufgaben_faellig(von, jetzt) + self._termine_faellig(von, jetzt) + self._schichten_faellig(von, jetzt)
+        if jetzt.minute % 2 == 0:  # Fahrzeiten alle 2 Minuten prüfen (Waze wird pro Ziel höchstens alle 10 Min. gefragt)
+            faellig += await self._abfahrten_faellig(jetzt)
         # zurückgestellte Erinnerungen
         bleiben = []
         for s in self._zustand["spaeter"]:

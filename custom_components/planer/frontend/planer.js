@@ -362,7 +362,10 @@ header nav.tabs button{padding:0 var(--s3)}
 @container (min-width:1120px){.tagraster{grid-template-columns:repeat(6,minmax(0,1fr))}.tagraster>.tkarte{grid-column:span 2}.tagraster>.tkarte:nth-child(-n+2 of .tkarte){grid-column:span 3}}
 .tagraster>.zu,.tagraster>.fehler{grid-column:1/-1}
 .tkarte{align-content:start}
-.tkarte h2{margin:0;padding:0 var(--s1);min-height:28px;display:flex;align-items:center}
+.tkarte h2{margin:0;padding:0 var(--s1);min-height:28px;display:flex;align-items:center;gap:var(--s2)}
+.tkarte h2 .wetter{margin-left:auto;display:inline-flex;align-items:baseline;gap:4px;font-size:var(--t-sub);font-weight:600;color:var(--fg);font-variant-numeric:tabular-nums}
+.tkarte h2 .wetter>span[aria-hidden]{font-size:1.2em;align-self:center}
+.tkarte h2 .wetter small{font-size:var(--t-fuss);font-weight:500;color:var(--muted)}
 .tkarte{padding:var(--s3);border-radius:20px;background:var(--fill);display:grid;gap:var(--s3);min-width:0}
 .tkarte h2{font-size:var(--t-kopf);color:var(--muted)}
 .tkarte.heute h2{color:var(--accent)}
@@ -511,6 +514,9 @@ aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);positio
 .wkopf .kalumschalter{margin:0;justify-self:auto}
 .wkopf .navi .knopf{padding:0 var(--s3)}
 .wkopf .navi{display:flex;gap:var(--s2);align-items:center}
+.schmal .wkopf:has(#w-titel){flex-wrap:nowrap}
+.schmal #w-titel{flex-wrap:nowrap;white-space:nowrap;min-width:0}
+.schmal #w-titel .zahl{font-size:var(--t-titel);font-weight:700;color:var(--muted)}
 .kalleiste{display:flex;gap:var(--s3);align-items:center;flex-wrap:wrap;justify-content:space-between}
 .kalleiste .seg{flex:none}
 .monat{--kompakt:1;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;align-content:start}
@@ -541,11 +547,13 @@ aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);positio
 .schmal .mnr{width:20px;height:20px;font-size:12px}
 .schmal .mtag:has(.msz) .mnr{margin-bottom:0}
 @container (min-width:600px){
-.monat{--kompakt:0;gap:var(--s1)}
+.monat{--kompakt:1;gap:var(--s1);grid-template-rows:auto repeat(var(--zeilen),minmax(0,1fr))}
 .mkopf{text-align:left;padding-left:6px}
-.mtag{height:auto;min-height:112px;padding:6px 6px 8px;overflow:visible;gap:3px}
+.mtag{height:auto;min-height:0;padding:5px 6px 4px;overflow:hidden;gap:3px}
+.mmehr{font-size:var(--t-tab);line-height:16px;padding-left:6px}
 .mnr{width:26px;height:26px;font-size:var(--t-sub);margin-bottom:2px}
-.msz{flex-wrap:wrap;gap:3px}
+.msz{flex-wrap:nowrap;gap:3px;overflow:hidden}
+.msz:has(.msk + .msk) .sz{display:none}
 .msk{font-size:10.5px;height:18px;line-height:18px;padding:0 6px;overflow:visible}
 .msk .sz{display:inline}
 .mstreifen{height:4px}
@@ -750,10 +758,61 @@ dialog:not([open]){opacity:0;transform:translateY(12px) scale(.98)}
 .schmal dialog:not([open]){opacity:1;transform:translateY(100%)}
 dialog:not([open])::backdrop{background:rgba(0,0,0,0)}
 dialog.schliesst::backdrop{background:rgba(0,0,0,0)}
-main.einblenden{animation:einblenden .28s var(--bewegung)}
+main.einblenden{animation:einblenden .3s var(--bewegung)}
+@media (prefers-reduced-motion:reduce){main.einblenden{animation:none}}
 @keyframes einblenden{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+li.aufgabe.klappt{transition:height .28s var(--bewegung),opacity .22s ease,margin .28s var(--bewegung);opacity:0;margin-block:0!important}
 li.aufgabe.abgehakt .zeile{animation:abhaken .35s var(--bewegung) forwards}
-li.aufgabe.abgehakt .haken::before{background:var(--accent-fill);border-color:var(--accent-fill)}
+.tag-aufgaben{list-style:none;margin:0;padding:var(--s1) var(--s3);border-radius:var(--r-karte);background:var(--card);display:grid}
+.tag-aufgaben li{display:flex;align-items:center;gap:var(--s1);min-height:44px;border-left:3px solid var(--k);padding-left:var(--s1)}
+.tag-aufgaben li+li{border-top:.5px solid var(--line2)}
+.tag-aufgaben .ta-titel{flex:1;min-width:0;text-align:left;border:0;background:none;font:inherit;color:var(--fg);padding:var(--s2) 0;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tag-aufgaben .ta-titel .u{color:var(--muted);margin-right:var(--s2);font-variant-numeric:tabular-nums}
+.tag-aufgaben li.fertig .ta-titel{color:var(--muted);text-decoration:line-through}
+.tag-aufgaben li.abgehakt .haken::before,li.aufgabe.abgehakt .haken::before{background:var(--accent-fill);border-color:var(--accent-fill);animation:haken-fuell .32s var(--bewegung)}
+li.aufgabe.abgehakt .haken::after{content:"";grid-area:1/1;width:24px;height:24px;border-radius:50%;box-shadow:0 0 0 0 var(--accent-fill);animation:haken-ring .5s ease-out forwards;pointer-events:none}
+li.aufgabe.abgehakt .haken svg{animation:haken-svg .3s .08s var(--bewegung) both}
+@keyframes haken-fuell{0%{transform:scale(.6)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+@keyframes haken-ring{to{box-shadow:0 0 0 10px transparent}}
+@keyframes haken-svg{from{transform:scale(0) rotate(-20deg);opacity:0}}
+@media (prefers-reduced-motion:reduce){li.aufgabe.abgehakt .haken::before,li.aufgabe.abgehakt .haken::after,li.aufgabe.abgehakt .haken svg{animation:none}}
+/* Kontextmenü: Eintrag hebt sich an, der Rest tritt zurück (wie iOS) */
+li.angehoben{position:relative;z-index:5;transform:scale(1.03);box-shadow:0 12px 32px rgba(0,0,0,.18);border-radius:var(--r-karte);transition:transform .25s var(--bewegung),box-shadow .25s ease}
+#rahmen.kontext-an li.aufgabe:not(.angehoben),#rahmen.kontext-an li.nrow:not(.angehoben){opacity:.45;filter:blur(1.5px);transition:opacity .2s ease,filter .2s ease}
+/* Großer Titel: beim Scrollen erscheint oben eine schmale Glasleiste mit kleinem Titel */
+.kompakt-kopf{display:none}
+.schmal .kompakt-kopf{display:grid;place-items:center;position:fixed;left:0;right:0;top:0;z-index:20;height:calc(44px + env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px);font-size:var(--t-kopf);font-weight:600;color:var(--fg);background:color-mix(in srgb,var(--bg) 72%,transparent);-webkit-backdrop-filter:var(--glas-blur);backdrop-filter:var(--glas-blur);box-shadow:0 .5px 0 var(--line2);opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .2s ease,transform .25s var(--bewegung)}
+#rahmen.eingerollt .kompakt-kopf{opacity:1;transform:none}
+.schmal header h1{transition:opacity .2s ease}
+#rahmen.eingerollt header h1{opacity:0}
+#rahmen.eingerollt .wcal.drei .wsticky{top:calc(44px + env(safe-area-inset-top,0px))}
+/* Blätter: folgen dem Finger, hochziehen = ganze Höhe */
+.schmal dialog.zieht{transition:none}
+.schmal dialog.voll{min-height:calc(100dvh - 12px)}
+/* Einstellungen als gruppierte Listen (wie iOS-Einstellungen) */
+#einst fieldset,#einst .person-einst{border:0;margin:0 0 var(--s5);padding:var(--s2) var(--s4);border-radius:var(--r-karte);background:var(--card);box-shadow:none;display:grid;gap:0}
+#einst fieldset>legend,#einst .person-einst>h3{float:left;width:100%;left:0;padding:0 0 var(--s2) var(--s4);margin:0;font-size:var(--t-fuss);font-weight:500;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);transform:translateY(calc(-100% - var(--s2)));position:absolute}
+#einst fieldset,#einst .person-einst{position:relative;margin-top:calc(var(--s5) + var(--s2))}
+#einst fieldset>*:not(legend)+*:not(legend),#einst .person-einst>*:not(h3)+*:not(h3){border-top:.5px solid var(--line2)}
+#einst fieldset>*:not(legend),#einst .person-einst>*:not(h3){padding-block:var(--s3);margin:0}
+/* Verschachtelte Gruppen in einer Karte (z. B. Erinnerung aufs Handy) nicht noch einmal als Karte */
+#einst fieldset fieldset,#einst .person-einst fieldset{position:static;margin:0;padding:var(--s3) 0;background:none;border-radius:0;display:grid;gap:var(--s2)}
+#einst fieldset fieldset>legend,#einst .person-einst fieldset>legend{position:static;transform:none;float:left;width:100%;padding:0;margin:0 0 var(--s2);text-transform:none;letter-spacing:0;font-size:var(--t-fuss);font-weight:600;color:var(--muted)}
+#einst fieldset fieldset>*,#einst .person-einst fieldset>*{border-top:0!important;padding-block:0!important}
+#einst .feld input,#einst .feld select,#einst .feld textarea{background:var(--card2);border-color:transparent}
+#einst .regel-liste{list-style:none;margin:0;padding:0;display:grid}
+#einst .regel-liste li{display:flex;align-items:center;gap:var(--s2);padding:var(--s2) 0}
+#einst .regel-liste li+li{border-top:.5px solid var(--line2)}
+#einst .regel-text{flex:1;min-width:0;display:grid;gap:2px}
+#einst .regel-form{display:grid;gap:var(--s4);padding-top:var(--s4)}
+#einst .regel-form .reihe{gap:var(--s3)}
+#einst .regel-form #r-speichern{width:100%;margin-top:var(--s1)}
+#einst .regel-form .fehler:empty,#einst .regel-form .hinweis:empty{display:none}
+#einst .regel-neu summary{list-style:none;width:max-content}
+#einst .regel-neu summary::-webkit-details-marker{display:none}
+#einst .regel-neu .feld input,#einst .regel-neu .feld select{background:var(--card2);border-color:transparent}
+#einst .check{min-height:44px;display:flex;align-items:center;gap:var(--s3)}
+#einst form>.hinweis{padding:0 var(--s4);margin:0 0 var(--s2)}
 @keyframes abhaken{50%{transform:scale(.98)}to{opacity:.4}}
 .schmal form.schnell:not([hidden]){animation:einblenden .25s var(--bewegung)}
 .fab{transition:transform .2s var(--bewegung)}
@@ -776,7 +835,7 @@ dialog .schnellwahl .knopf:not(.primaer):not(.text)[aria-pressed="true"]{backgro
 /* Woche wie Google Kalender */
 .wcal{--rand:44px;position:relative;overflow-y:auto;overflow-x:hidden;background:var(--card);border-radius:var(--r-karte);box-shadow:var(--karte-schatten);overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .schmal .wcal{--rand:26px;border-radius:12px}
-.wzeile{display:grid;grid-template-columns:var(--rand) repeat(7,minmax(0,1fr))}
+.wzeile{display:grid;grid-template-columns:var(--rand) repeat(var(--wn,7),minmax(0,1fr))}
 .wsticky{position:sticky;top:0;z-index:6;background:var(--card);box-shadow:0 1px 0 var(--line)}
 .wl{font-size:var(--t-tab);color:var(--muted);align-self:center;text-align:right;padding-right:4px;min-width:0}
 .wganzz .wl{font-size:9px;line-height:1.1}
@@ -812,12 +871,47 @@ dialog .schnellwahl .knopf:not(.primaer):not(.text)[aria-pressed="true"]{backgro
 .wspalte.vorbei>*,.wkg.vorbei>*{filter:grayscale(1);opacity:.6}
 .mtag.vorbei,.mtag.vorbei.mschichttag,.mtag.fremd.vorbei.mschichttag{background:color-mix(in srgb,var(--fg) 6%,var(--card))}
 .mtag.vorbei>*{filter:grayscale(1);opacity:.55}
+.schichtmonat .stag.vorbei,.schichtmonat .stag.vorbei.belegt{background:color-mix(in srgb,var(--fg) 6%,var(--card));box-shadow:none}
+.schichtmonat .stag.vorbei>*{filter:grayscale(1);opacity:.55}
+/* Formulare in Blättern: lose Felder als Karten wie gruppierte iOS-Listen, Eingaben ohne Rahmen */
+dialog:not(.pop) form>.feld,dialog:not(.pop) form>.reihe,dialog:not(.pop) form>label.check{background:var(--card);border-radius:var(--r-karte);padding:var(--s3) var(--s4);margin:0}
+dialog:not(.pop) form>label.check{min-height:44px;display:flex;align-items:center;gap:var(--s3)}
+dialog:not(.pop) form>.feld input,dialog:not(.pop) form>.feld select,dialog:not(.pop) form>.feld textarea,dialog:not(.pop) form>.reihe .feld input,dialog:not(.pop) form>.reihe .feld select{background:var(--card2);border-color:transparent}
+dialog:not(.pop) form>.feld input:focus,dialog:not(.pop) form>.reihe .feld input:focus,dialog:not(.pop) form>.feld textarea:focus{border-color:var(--accent)}
 .mtag.vorbei .mnr{color:var(--muted)}
 .wspalte.ziel-drop,.wkg.ziel-drop{outline:2px dashed var(--accent);outline-offset:-2px}
 .wband{position:absolute;z-index:1;box-sizing:border-box;pointer-events:none;overflow:hidden;background:color-mix(in srgb,var(--k) 26%,transparent);border-left:3px solid var(--k);padding:2px 3px;font-size:10px;font-weight:600;line-height:1.15;color:var(--fg)}
 .wband span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wband b{font-weight:800}
 .schmal .wband{border-left-width:2px;padding:1px;font-size:8.5px}
+/* 3-Tage-Ansicht am Handy */
+.wcal.drei{--rand:38px;overflow:visible;overscroll-behavior:auto}
+.wcal.drei .wsticky{top:0;border-radius:var(--r-karte) var(--r-karte) 0 0}
+.wcal.drei .wband{left:calc(var(--bi) * 7px + 1px)!important;width:5px!important;padding:0;border:0;border-radius:3px;background:var(--k)}
+.wcal.drei .wband span{display:none}
+.wcal.drei .block{margin-left:calc(var(--nb,0) * 7px);max-width:calc(100% - var(--nb,0) * 7px - 2px);border-radius:8px;padding:3px 7px}
+.wcal.drei .block b{font-size:var(--t-fuss)}
+.wcal.drei .block.a b{white-space:nowrap;display:block}
+.wcal.drei .block.t b{white-space:normal;display:-webkit-box;-webkit-line-clamp:var(--zl,1);-webkit-box-orient:vertical}
+.wcal.drei .block span{font-size:var(--t-tab)}
+.wcal.drei .wkh b{font-size:var(--t-kopf)}
+.wcal.drei .wc.s .nm{display:inline}
+.monat.rein-r{animation:w-rein-r .28s var(--bewegung)}
+.monat.rein-l{animation:w-rein-l .28s var(--bewegung)}
+.wcal.rein-r .wkoerper,.wcal.rein-r .wsticky{animation:w-rein-r .28s var(--bewegung)}
+.wcal.rein-l .wkoerper,.wcal.rein-l .wsticky{animation:w-rein-l .28s var(--bewegung)}
+@keyframes w-rein-r{from{transform:translateX(40px);opacity:.3}}
+@keyframes w-rein-l{from{transform:translateX(-40px);opacity:.3}}
+@media (prefers-reduced-motion:reduce){.monat.rein-r,.monat.rein-l,.wcal.rein-r .wkoerper,.wcal.rein-l .wkoerper,.wcal.rein-r .wsticky,.wcal.rein-l .wsticky{animation:none}}
+.wleiste{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:0 0 var(--s2)}
+.wleiste button{display:grid;justify-items:center;gap:2px;min-height:48px;padding:4px 0;border:0;border-radius:12px;background:transparent;color:var(--fg);font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.wleiste button small{font-size:10px;font-weight:600;color:var(--muted)}
+.wleiste button b{font-size:15px;font-weight:600;width:28px;height:28px;display:grid;place-items:center;border-radius:50%}
+.wleiste button.an{background:var(--fill)}
+.wleiste button.heute b{background:var(--rot);color:#fff}
+.wleiste button.vorbei{color:var(--muted)}
+.wleiste .pk{display:flex;gap:2px;height:5px}
+.wleiste .pk i{width:5px;height:5px;border-radius:50%;background:var(--sc)}
 .schmal .wband.geteilt span{font-size:0}
 .schmal .wband.geteilt b{font-size:9px}
 .wcal .block{z-index:2;font-size:11px;line-height:1.2;padding:2px 4px;border-radius:5px}
@@ -1319,6 +1413,7 @@ class PlanerPanel extends HTMLElement {
       if (!el || el.classList?.contains("tl-scroll") || el.closest?.("dialog")) return;
       const y = el.scrollTop || 0, alt = this._rollY?.get?.(el) ?? 0;
       (this._rollY ||= new WeakMap()).set(el, y);
+      if (!e.target.closest || el === document.scrollingElement) this.shadowRoot?.getElementById("rahmen")?.classList.toggle("eingerollt", !!this._narrow && y > 44);
       if (Math.abs(y - alt) < 6) return;
       this.shadowRoot?.querySelector(".fab")?.classList.toggle("weg", y > alt && y > 40);
     };
@@ -1342,6 +1437,7 @@ class PlanerPanel extends HTMLElement {
     this._gestartet = true;
     await this._lesen();
     this._termineLaden();
+    this._wetterStart();
     try {
       this._abo = this._hass.connection.subscribeMessage(() => {
         clearTimeout(this._neuTimer);
@@ -1403,7 +1499,7 @@ class PlanerPanel extends HTMLElement {
   }
   // Termine, die an diesem Tag stattfinden (ganztägige: Ende exklusiv)
   _termineAm(tag) {
-    return (this._termine || []).filter((t) => {
+    return this._ohneSchichtTermine(this._termine || []).filter((t) => {
       const s = t.start.slice(0, 10), e = t.ende.slice(0, 10);
       return t.ganztag ? s <= tag && tag < e : s <= tag && tag <= e;
     });
@@ -1491,9 +1587,10 @@ class PlanerPanel extends HTMLElement {
         ${tabs.map(([k, t]) => `<button type="button" data-ansicht="${k}" data-fokus="t-${k}" ${this._ansicht === k ? 'aria-current="page"' : ""}>${(k === "eingang" ? ICON.aufgaben : ICON[k]) || ""}<span>${t}</span><span class="zahl ${!zaehler[k] ? "null" : ""}" aria-label="${zaehler[k]} ${k === "notizen" ? (zaehler[k] === 1 ? "Notiz" : "Notizen") : "offen"}">${zaehler[k]}</span></button>`).join("")}
       </nav>`;
     this._gerust(schmal);
-    const neueAnsicht = this._zuletzt !== this._ansicht;
-    this._zuletzt = this._ansicht;
+    const neueAnsicht = this._zuletzt !== this._ansicht || (this._ansicht === "woche" && this._zuletztKal !== this._kalAnsicht);
+    this._zuletzt = this._ansicht; this._zuletztKal = this._kalAnsicht;
     this._app.innerHTML = `
+    <div class="kompakt-kopf" aria-hidden="true">${esc(tabName)}</div>
     <div class="wrap">
       <header>
         ${this._menuKnopf()}
@@ -1937,6 +2034,8 @@ class PlanerPanel extends HTMLElement {
     const auf = (opt) => {
       if (Date.now() - (this._kontextZeit || 0) < 700) return;
       this._kontextZeit = Date.now();
+      const rahmen = this.shadowRoot.getElementById("rahmen");
+      if (!opt.tastatur && !opt.punkt) { li.classList.add("angehoben"); rahmen?.classList.add("kontext-an"); this._angehoben = li; }
       oeffnen(opt);
     };
     const stopp = () => { clearTimeout(uhr); uhr = null; };
@@ -2120,7 +2219,7 @@ class PlanerPanel extends HTMLElement {
       const id = `g-${tag}`;
       const chips = schs.length ? `<div class="schicht-chips">${schs.map(({ a: sc, wer }) => `<span class="schicht-chip" style="--k:${sc.farbe}"><b>${esc(sc.kurz || sc.name)}</b> ${esc(sc.name)}${sc.von && sc.bis ? ` <span class="sz">${esc(sc.von)}–${esc(sc.bis)}</span>` : ""}${wer ? ` <span class="sw">${esc(wer)}</span>` : ""}</span>`).join("")}</div>` : "";
       return `<section class="gruppe tkarte ${heute ? "heute" : ""}" aria-labelledby="${id}">
-        <h2 id="${id}">${esc(name)}, ${esc((() => { const d = ausIso(tag); const m = MONATE[d.getMonth()]; return `${d.getDate()}. ${m.length > 4 ? m.slice(0, 3) + "." : m}`; })())}</h2>
+        <h2 id="${id}">${esc(name)}, ${esc((() => { const d = ausIso(tag); const m = MONATE[d.getMonth()]; return `${d.getDate()}. ${m.length > 4 ? m.slice(0, 3) + "." : m}`; })())}${this._wetterHtml(tag)}</h2>
         ${chips}
         ${ganz.length ? `<ul class="termine ganztag" aria-label="Ganztägig">${ganz.map((t) => this._terminZeile(t, tag)).join("")}</ul>` : ""}
         ${items.length ? `<ul class="liste" aria-label="Einträge">${items.join("")}</ul>` : heute ? `<p class="leer">Für heute ist nichts offen.</p>` : ""}
@@ -2212,7 +2311,28 @@ class PlanerPanel extends HTMLElement {
   }
   _schichtPersonen() {
     const p = this._schichtPerson();
-    return p ? [p] : (this._daten.personen || []).map((x) => x.id).filter((id) => (this._daten.schichten || {})[id]);
+    if (!p) return (this._daten.personen || []).map((x) => x.id).filter((id) => (this._daten.schichten || {})[id]);
+    // Wer den Arbeitskalender einer anderen Person eingeblendet hat, sieht auch deren Schichten
+    if (this._ansicht === "woche" && this._kalAnsicht === "schichten") return [p];
+    const extra = (this._daten.personen || []).map((x) => x.id).filter((id) => id !== p && this._plan(id).arten.length && this._schichtKalAn(id));
+    return [p, ...extra];
+  }
+  // Kalender, in den die Schichten einer Person laufen (eingestellt oder „<Vorname> Arbeit“)
+  _schichtKal(person) {
+    const se = (this._daten.schicht_einst || {})[person] || {};
+    if (se.kalender) return se.kalender;
+    const vn = `${(this._name(person) || "").split(" ")[0].toLowerCase()} arbeit`;
+    return (this._daten.kalender || []).find((k) => (k.name || "").trim().toLowerCase() === vn)?.id || null;
+  }
+  _schichtKalAn(person) {
+    const id = this._schichtKal(person);
+    return !!id && (this._daten.kalender || []).some((k) => k.id === id && k.angezeigt !== false);
+  }
+  // Vom Planer eingetragene Schicht-Termine ausblenden, wenn die Schicht schon als Schicht gezeigt wird
+  _ohneSchichtTermine(liste) {
+    const kals = new Set(this._schichtPersonen().map((p) => this._schichtKal(p)).filter(Boolean));
+    if (!kals.size) return liste;
+    return liste.filter((t) => !(kals.has(t.kalender) && (t.beschreibung || "").includes("planer-schicht")));
   }
   // Schichten an einem Tag für alle gerade gezeigten Personen; bei mehreren mit Namenskürzel
   _schichtenAm(tag) {
@@ -2265,7 +2385,7 @@ class PlanerPanel extends HTMLElement {
         ${tage.slice(0, zeilen).map((t) => {
           const dd = ausIso(t);
           const a = this._schichtAm(t, person);
-          return `<button type="button" role="gridcell" class="stag ${dd.getMonth() !== monat ? "fremd" : ""} ${t === heuteIso ? "heute" : ""} ${a ? "belegt" : ""}" data-stag="${t}" ${a ? `style="--k:${a.farbe}"` : ""}
+          return `<button type="button" role="gridcell" class="stag ${dd.getMonth() !== monat ? "fremd" : ""} ${t === heuteIso ? "heute" : ""} ${t < heuteIso ? "vorbei" : ""} ${a ? "belegt" : ""}" data-stag="${t}" ${a ? `style="--k:${a.farbe}"` : ""}
             aria-label="${esc(`${dd.getDate()}. ${MONATE[dd.getMonth()]}: ${a ? `${a.name} ${this._schichtZeit(a)}` : "keine Schicht"}`)}">
             <span class="mnr">${dd.getDate()}</span>${a ? `<span class="skurz">${esc(a.kurz)}</span><span class="szeit">${esc(a.von || "")}</span>` : ""}</button>`;
         }).join("")}
@@ -2311,7 +2431,7 @@ class PlanerPanel extends HTMLElement {
         ${tage.slice(0, zeilen).map((t) => {
           const dd = ausIso(t);
           const l = pers.map((p) => ({ p, a: this._schichtAm(t, p) }));
-          return `<div role="gridcell" class="stag ${dd.getMonth() !== monat ? "fremd" : ""} ${t === heuteIso ? "heute" : ""}"
+          return `<div role="gridcell" class="stag ${dd.getMonth() !== monat ? "fremd" : ""} ${t === heuteIso ? "heute" : ""} ${t < heuteIso ? "vorbei" : ""}"
             aria-label="${esc(`${dd.getDate()}. ${MONATE[dd.getMonth()]}: ${l.map(({ p, a }) => `${vorname(p)} ${a ? a.name : "keine Schicht"}`).join(", ")}`)}">
             <span class="mnr">${dd.getDate()}</span><span class="sbeide">${l.map(({ p, a }) => a
               ? `<span class="sb" style="--k:${a.farbe}" title="${esc(`${vorname(p)}: ${a.name} ${this._schichtZeit(a)}`)}"><i>${esc(vorname(p)[0])}</i>${esc(a.kurz)}</span>`
@@ -2769,7 +2889,7 @@ class PlanerPanel extends HTMLElement {
     const key = tage[0];
     const termine = this._mTermine?.start === key ? this._mTermine.liste : null;
     if (!termine) this._monatTermineLaden(von, key);
-    const am = (tag) => (termine || []).filter((t) => {
+    const am = (tag) => this._ohneSchichtTermine(termine || []).filter((t) => {
       const s0 = t.start.slice(0, 10), e0 = t.ende.slice(0, 10);
       return t.ganztag ? s0 <= tag && tag < e0 : s0 <= tag && tag <= e0;
     });
@@ -2780,7 +2900,7 @@ class PlanerPanel extends HTMLElement {
     return `<section class="gruppe" aria-labelledby="m-titel">
       ${this._narrow ? this._kalenderUmschalter() : ""}
       <div class="wkopf"><h2 id="m-titel">${MONATE[dieserMonat]} ${dieserJahr}</h2>${this._narrow ? "" : this._kalenderUmschalter(true)}${this._kalNavi("monat", "Heute", dieserMonat === new Date().getMonth() && dieserJahr === new Date().getFullYear(), "Monat wechseln")}</div>
-      <div class="woche-wrap"><div class="monat" role="grid" aria-labelledby="m-titel" style="--zeilen:${zeilen / 7}">
+      <div class="woche-wrap"><div class="monat ${this._mRichtung > 0 ? "rein-r" : this._mRichtung < 0 ? "rein-l" : ""}" role="grid" aria-labelledby="m-titel" style="--zeilen:${zeilen / 7}">
         ${["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((n) => `<div class="mkopf" role="columnheader">${n}</div>`).join("")}
         ${tage.slice(0, zeilen).map((t) => {
           const d = ausIso(t);
@@ -2822,7 +2942,7 @@ class PlanerPanel extends HTMLElement {
     const m = this._app.querySelector(".monat");
     if (!m) return;
     const kompakt = getComputedStyle(m).getPropertyValue("--kompakt").trim() === "1";
-    if (this._narrow) m.style.height = `${this._freieHoehe(m)}px`; else m.style.height = "";
+    m.style.height = this._narrow ? `${this._freieHoehe(m) - (this._app.querySelector(".fab") ? 60 : 0)}px` : `${Math.max(520, this._freieHoehe(m))}px`;
     // Ändert sich die Größe später (Schrift geladen, Kopf umgebrochen), neu verteilen
     if (window.ResizeObserver && this._monatRO?.ziel !== m) {
       this._monatRO?.disconnect();
@@ -2833,22 +2953,24 @@ class PlanerPanel extends HTMLElement {
     m.querySelectorAll(".mmehr").forEach((x) => x.remove());
     m.querySelectorAll(".me[hidden]").forEach((x) => { x.hidden = false; });
     if (!kompakt) return;
+    const wort = this._narrow ? "" : " weitere";
     m.querySelectorAll(".mtag").forEach((z) => {
       const es = [...z.querySelectorAll(".me")];
       if (!es.length) return;
       const unten = z.getBoundingClientRect().bottom - 3;
       let weg = 0;
-      for (let i = es.length - 1; i >= 0; i--) if (es[i].getBoundingClientRect().bottom > unten) { es[i].hidden = true; weg++; }
+      // Höchstens 3 Einträge pro Tag, der Rest als „+n weitere“
+      for (let i = es.length - 1; i >= 0; i--) if (i >= 3 || es[i].getBoundingClientRect().bottom > unten) { es[i].hidden = true; weg++; }
       if (!weg) return;
       const mm = document.createElement("span");
       mm.className = "mmehr";
-      mm.textContent = `+${weg}`;
+      mm.textContent = `+${weg}${wort}`;
       z.appendChild(mm);
       while (mm.getBoundingClientRect().bottom > unten) {
         const sicht = es.filter((e) => !e.hidden);
         if (!sicht.length) break;
         sicht[sicht.length - 1].hidden = true; weg++;
-        mm.textContent = `+${weg}`;
+        mm.textContent = `+${weg}${wort}`;
       }
     });
   }
@@ -2872,6 +2994,23 @@ class PlanerPanel extends HTMLElement {
         this._wocheRO.observe(document.documentElement);
         if (this._app.firstElementChild) this._wocheRO.observe(this._app.firstElementChild);
       }
+    } else if (c.classList.contains("drei")) {
+      // Handy, 3 Tage: kein eigener Scrollbereich. Die Seite scrollt, der Tageskopf bleibt oben stehen,
+      // und der ganze Zeitraum passt dann genau zwischen Tageskopf und Leiste unten.
+      // Unterkante = so weit, wie die Seite höchstens hochscrollt (Abstand unten im Rahmen)
+      const wrap = c.closest(".wrap");
+      const pad = wrap ? parseFloat(getComputedStyle(wrap).paddingBottom) || 0 : 0;
+      let danach = 0;
+      for (let el = c.nextElementSibling; el; el = el.nextElementSibling) danach += el.offsetHeight;
+      const unten = window.innerHeight - pad - danach - 4;
+      hpx = Math.max(36, (unten - kopfH) / stunden);
+      c.style.setProperty("--hpx", `${hpx}px`);
+      c.style.height = "";
+      if (!this._dreiGroesse) {
+        this._dreiGroesse = true;
+        window.addEventListener("resize", () => { cancelAnimationFrame(this._wocheRaf); this._wocheRaf = requestAnimationFrame(() => this._wochePassen()); });
+      }
+      return;
     } else {
       const voll = kopfH + c.querySelector(".wkoerper").offsetHeight;
       c.style.height = `${Math.min(voll, this._freieHoehe(c))}px`;
@@ -2900,19 +3039,22 @@ class PlanerPanel extends HTMLElement {
 
   // Woche wie im Google Kalender: 7 Tage als Spalten (Mo–So), Ganztags-Zeile, Stundenraster
   _wocheHtml(alle) {
-    const start = montag(this._wStart || ausIso(heute()));
+    // Handy: 3 Tage ab heute, Wischen und Pfeile blättern um 3 Tage
+    const drei = this._narrow;
+    const start = drei ? (this._w3Start || ausIso(heute())) : montag(this._wStart || ausIso(heute()));
     const k = kw(start);
-    const tage = [...Array(7)].map((_, i) => iso(plusTage(start, i)));
+    const tage = [...Array(drei ? 3 : 7)].map((_, i) => iso(plusTage(start, i)));
     const termine = this._wTermine?.start === iso(start) ? this._wTermine.liste : null;
     if (!termine) this._wocheTermineLaden(start);
     const aufg = (tag) => this._sortiert(alle.filter((a) => a.datum === tag && (a.status === "offen" || (a.erledigt_am || "").slice(0, 10) === tag)));
-    const d0 = ausIso(tage[0]), d7 = ausIso(tage[6]);
+    const d0 = ausIso(tage[0]), d7 = ausIso(tage[tage.length - 1]);
     const spanne = `${d0.getDate()}. ${d0.getMonth() !== d7.getMonth() ? MONATE[d0.getMonth()] + " " : ""}– ${d7.getDate()}. ${MONATE[d7.getMonth()]}`;
     const eingang = this._sortiert(alle.filter((a) => a.status === "offen" && !a.datum));
     return `<section class="gruppe" aria-labelledby="w-titel">
       ${this._narrow ? this._kalenderUmschalter() : ""}
-      <div class="wkopf"><h2 id="w-titel">${esc(spanne)}<span class="zahl">KW ${+k.slice(6)}</span></h2>${this._narrow ? "" : this._kalenderUmschalter(true)}${this._kalNavi("woche", "Heute", iso(start) === iso(montag(new Date())), "Woche wechseln")}</div>
+      <div class="wkopf"><h2 id="w-titel">${this._narrow ? `<span class="wmon">${esc(d0.getMonth() !== d7.getMonth() ? `${MONATE[d0.getMonth()].slice(0, 3)}/${MONATE[d7.getMonth()].slice(0, 3)}` : MONATE[d7.getMonth()].slice(0, 3))}</span><span class="zahl">KW ${+k.slice(6)}</span><span class="sr">${esc(spanne)}</span>` : `${esc(spanne)}<span class="zahl">KW ${+k.slice(6)}</span>`}</h2>${this._narrow ? "" : this._kalenderUmschalter(true)}${this._kalNavi("woche", "Heute", drei ? iso(start) === heute() : iso(start) === iso(montag(new Date())), drei ? "Tage wechseln" : "Woche wechseln")}</div>
     </section>
+    ${drei ? this._wocheLeiste(tage) : ""}
     ${this._wocheRaster(tage, termine || [], aufg)}
     ${termine === null ? `<p class="hinweis" role="status">Termine werden geladen …</p>` : ""}
     ${eingang.length ? `<section class="gruppe" aria-labelledby="ab-titel">
@@ -2964,6 +3106,8 @@ class PlanerPanel extends HTMLElement {
         const s0 = zeit(sc.von), e0 = zeit(sc.bis);
         if (e0 <= s0 && e0 > von * 60) baender.push({ s: 0, e: e0, sc, wer, fort: true });
       }
+      // 3-Tage-Ansicht: Schichten mit Uhrzeit zusätzlich als Chip oben, im Raster nur als Randstreifen
+      if (tage.length === 3) for (const b of baender) if (!b.fort) schicht.push({ sc: b.sc, wer: b.wer });
       const sChips = schicht.map(({ sc, wer }) => `<span class="wc s" style="--sc:${sc.farbe}" title="${esc(`${wer ? wer + ": " : ""}${sc.name} ${this._schichtZeit(sc)}`.trim())}"><b>${esc(wer ? `${wer[0]} ${sc.kurz}` : sc.kurz)}</b><i class="nm">${esc(sc.name)}</i></span>`);
       const alleGanz = [...sChips, ...ganz];
       const sichtbar = alleGanz.slice(0, 3).join("") + (alleGanz.length > 3 ? `<button type="button" class="wc mehr" data-tagauf="${tag}">+${alleGanz.length - 3}</button>` : "");
@@ -2982,20 +3126,24 @@ class PlanerPanel extends HTMLElement {
       const cp = (h, extra = "") => `calc(var(--hpx) * ${h.toFixed(4)}${extra})`;
       const bandHtml = baender.map((x, n) => {
         const top = px(x.s), h = px(Math.min(x.e, bis * 60)) - top;
-        return `<div class="wband ${x.fort ? "fort" : ""} ${baender.length > 1 ? "geteilt" : ""}" style="top:${cp(top)};height:${cp(h)};left:${n * 100 / baender.length}%;width:${100 / baender.length}%;--k:${x.sc.farbe}" title="${esc(`${x.wer ? x.wer + ": " : ""}${x.sc.name} ${this._schichtZeit(x.sc)}`.trim())}"><span>${x.wer ? `<b>${esc(x.wer[0])}</b> ` : ""}${esc(x.sc.name)}</span></div>`;
+        return `<div class="wband ${x.fort ? "fort" : ""} ${baender.length > 1 ? "geteilt" : ""}" style="--bi:${n};top:${cp(top)};height:${cp(h)};left:${n * 100 / baender.length}%;width:${100 / baender.length}%;--k:${x.sc.farbe}" title="${esc(`${x.wer ? x.wer + ": " : ""}${x.sc.name} ${this._schichtZeit(x.sc)}`.trim())}"><span>${x.wer ? `<b>${esc(x.wer[0])}</b> ` : ""}${esc(x.sc.name)}</span></div>`;
       }).join("");
       const blockHtml = bloecke.map((x) => {
         const top = px(x.s), hoeheH = px(Math.min(x.e, bis * 60)) - top;
-        return x.html(`top:${cp(top)};height:max(18px, ${cp(hoeheH, " - 1px")});left:calc(${x.sp * 100 / x.n}% + 1px);width:calc(${100 / x.n}% - 2px)`, hoeheH * hpx - 1 >= 34 && !this._narrow);
+        // 3-Tage-Ansicht: Überschneidungen leicht versetzt übereinander (wie Apple), sonst nebeneinander
+        const lage = tage.length === 3
+          ? `left:calc(${x.sp * 16}px + 1px);width:calc(100% - ${x.sp * 16}px - 2px);z-index:${2 + x.sp}`
+          : `left:calc(${x.sp * 100 / x.n}% + 1px);width:calc(${100 / x.n}% - 2px)`;
+        return x.html(`top:${cp(top)};height:max(${tage.length === 3 ? 24 : 20}px, ${cp(hoeheH, " - 1px")});${lage};--zl:${hoeheH * hpx >= 38 ? 2 : 1}`, hoeheH * hpx - 1 >= (tage.length === 3 ? 58 : 34) && (!this._narrow || tage.length === 3));
       }).join("");
       const heuteTag = tag === this._tag;
       const jetztHtml = heuteTag && jetztMin > von * 60 && jetztMin < bis * 60 ? `<div class="wjetzt" style="top:${cp(px(jetztMin))}" aria-hidden="true"></div>` : "";
       const d = ausIso(tag);
-      return { kopf: `<button type="button" class="wkh ${heuteTag ? "heute" : ""} ${tag < this._tag ? "vorbei" : ""}" data-tagauf="${tag}" aria-label="${esc(datumText(tag) + ", Tag öffnen")}"><span class="wn">${WT_KURZ[i]}</span><b>${d.getDate()}</b></button>`,
+      return { kopf: `<button type="button" class="wkh ${heuteTag ? "heute" : ""} ${tag < this._tag ? "vorbei" : ""}" data-tagauf="${tag}" aria-label="${esc(datumText(tag) + ", Tag öffnen")}"><span class="wn">${WT_KURZ[wt(d)]}</span><b>${d.getDate()}</b></button>`,
         ganz: `<div class="wkg ${heuteTag ? "heute" : ""} ${tag < this._tag ? "vorbei" : ""}" data-tag="${tag}" data-wleer="${tag}">${sichtbar}</div>`,
-        spalte: `<div class="wspalte ${heuteTag ? "heute" : ""} ${tag < this._tag ? "vorbei" : ""}" data-tag="${tag}" data-wleer="${tag}" style="height:${cp(stunden)}">${bandHtml}${blockHtml}${jetztHtml}</div>` };
+        spalte: `<div style="--nb:${tage.length === 3 ? new Set(baender.map((b) => b.wer + b.sc.id)).size : 0}" class="wspalte ${heuteTag ? "heute" : ""} ${tag < this._tag ? "vorbei" : ""}" data-tag="${tag}" data-wleer="${tag}" style="height:${cp(stunden)}">${bandHtml}${blockHtml}${jetztHtml}</div>` };
     });
-    return `<div class="wcal" id="wcal" style="--hpx:${hpx}px" role="group" aria-label="Wochenkalender" data-von="${von}" data-bis="${bis}" data-hpx="${hpx}">
+    return `<div class="wcal ${tage.length === 3 ? "drei" : ""} ${this._wRichtung ? (this._wRichtung > 0 ? "rein-r" : "rein-l") : ""}" id="wcal" style="--hpx:${hpx}px;--wn:${tage.length}" role="group" aria-label="Wochenkalender" data-von="${von}" data-bis="${bis}" data-hpx="${hpx}">
       <div class="wsticky">
         <div class="wzeile"><div class="wl"></div>${spalten.map((x) => x.kopf).join("")}</div>
         <div class="wzeile wganzz"><div class="wl">Ganztag</div>${spalten.map((x) => x.ganz).join("")}</div>
@@ -3005,7 +3153,7 @@ class PlanerPanel extends HTMLElement {
   }
 
   _termineIn(liste, tag) {
-    return liste.filter((t) => {
+    return this._ohneSchichtTermine(liste).filter((t) => {
       const s0 = t.start.slice(0, 10), e0 = t.ende.slice(0, 10);
       return t.ganztag ? s0 <= tag && tag < e0 : s0 <= tag && tag <= e0;
     });
@@ -3121,12 +3269,19 @@ class PlanerPanel extends HTMLElement {
         <span class="r tag-r"><button type="button" class="rund" data-tagweiter="1" aria-label="Nächster Tag">${ICON.vor}</button><button type="submit" class="knopf text fett">Fertig</button></span></div>
       ${quelle ? "" : `<p class="hinweis" role="status">Termine werden geladen …</p>`}
       ${this._narrow ? "" : `<p class="hinweis">Im Raster ein Zeitfenster ziehen, um etwas einzutragen.</p>`}
+      ${as.length ? `<ul class="tag-aufgaben" aria-label="Aufgaben an diesem Tag">${as.map((a) => { const fertig = a.status === "erledigt"; return `<li class="${fertig ? "fertig" : ""}" style="--k:${bereichFarbe(a.bereich, this._daten.farben) || "var(--accent)"}">
+        <button type="button" class="haken" role="checkbox" aria-checked="${fertig}" data-tag-haken="${a.id}" aria-label="${esc(a.titel)} erledigt">${fertig ? HAKEN : ""}</button>
+        <button type="button" class="ta-titel" data-aktion="oeffnen" data-id="${a.id}">${a.uhrzeit ? `<span class="u">${a.uhrzeit}</span>` : ""}${esc(a.titel)}</button></li>`; }).join("")}</ul>` : ""}
       <div class="tag-inhalt">${this._tagInhalt(tag, ts, as, 52, true)}</div>
       ${kannTermin ? `<button type="button" class="knopf" data-tagtermin="1">${ICON.termin}Ganztägig oder mit allen Optionen</button>` : ""}
     </form>`;
     dlg.querySelectorAll("[data-tagweiter]").forEach((b) => b.addEventListener("click", () => this._tagZeigen(iso(plusTage(ausIso(tag), +b.dataset.tagweiter)))));
     dlg.querySelectorAll("[data-aktion=oeffnen]").forEach((b) => b.addEventListener("click", () => { const a = this._finde(b.dataset.id); if (a) this._oeffnen(a); }));
     dlg.querySelector("[data-tagtermin]")?.addEventListener("click", () => this._terminNeu(tag));
+    dlg.querySelectorAll("[data-tag-haken]").forEach((b) => b.addEventListener("click", async () => {
+      b.closest("li")?.classList.add("abgehakt");
+      try { await this._aktion("haken", b.dataset.tagHaken); } finally { if (dlg.open) this._tagZeigen(tag); }
+    }));
     this._terminKlicks(dlg);
     const raster = dlg.querySelector(".raster.waehlbar");
     if (raster) this._rasterWahl(raster, tag);
@@ -3250,6 +3405,169 @@ class PlanerPanel extends HTMLElement {
     if (tag && this._tagOffen === tag) this._tagZeigen(tag);
   }
 
+  // Handy: Mo–So als kleine Leiste, gezeigte Tage markiert, Schichten als Farbpunkte; Tipp springt hin
+  _wocheLeiste(tage) {
+    const mo = montag(ausIso(tage[1]));
+    return `<div class="wleiste" role="group" aria-label="Tag wählen">${[...Array(7)].map((_, i) => {
+      const t = iso(plusTage(mo, i)), d = ausIso(t);
+      const sch = this._schichtenAm(t);
+      return `<button type="button" data-wsprung="${t}" class="${tage.includes(t) ? "an" : ""} ${t === this._tag ? "heute" : ""} ${t < this._tag ? "vorbei" : ""}" aria-label="${esc(datumText(t))}"><small>${WT_KURZ[i]}</small><b>${d.getDate()}</b><span class="pk">${sch.map(({ a }) => `<i style="--sc:${a.farbe}"></i>`).join("")}</span></button>`;
+    }).join("")}</div>`;
+  }
+
+  _wocheBlaettern(n, gewischt) {
+    if (this._narrow) {
+      this._w3Start = n === 0 ? null : plusTage(this._w3Start || ausIso(heute()), 3 * n);
+      this._wRichtung = n;
+      this._zeichnen();
+      const st = this._w3Start || ausIso(heute());
+      this._sagen(`${datumText(iso(st))} bis ${datumText(iso(plusTage(st, 2)))}`);
+      return;
+    }
+    this._wStart = n === 0 ? null : plusTage(this._wStart || ausIso(heute()), 7 * n);
+    this._zeichnen();
+    const st = montag(this._wStart || ausIso(heute()));
+    this._sagen(`${datumText(iso(st))} bis ${datumText(iso(plusTage(st, 6)))}`);
+  }
+
+  // ---------- Wetter (Tagesvorhersage aus der HA-Wetter-Entität) ----------
+  _wetterEntitaet() {
+    const st = this._hass?.states || {};
+    const wahl = this._daten?.wetter || this._konf?.wetter;
+    if (wahl === "-") return null;
+    if (wahl && st[wahl]) return wahl;
+    if (st["weather.forecast_home"]) return "weather.forecast_home";
+    return Object.keys(st).find((k) => k.startsWith("weather.")) || null;
+  }
+  _wetterStart() {
+    const id = this._wetterEntitaet();
+    if (!id || this._wetterAbo?.id === id) return;
+    this._wetterAbo?.ab?.then?.((f) => f()).catch?.(() => {});
+    const abo = { id, ab: null };
+    this._wetterAbo = abo;
+    try {
+      abo.ab = this._hass.connection.subscribeMessage((m) => {
+        const neu = {};
+        for (const f of m?.forecast || []) {
+          const d = new Date(f.datetime);
+          neu[iso(d)] = { z: f.condition, hoch: f.temperature, tief: f.templow };
+        }
+        this._wetter = neu;
+        if (this._ansicht === "heute") this._zeichnen();
+      }, { type: "weather/subscribe_forecast", entity_id: id, forecast_type: "daily" });
+      abo.ab.catch?.(() => { this._wetterAbo = { id, ab: null }; });
+    } catch (e) { /* ohne Wetter weiter */ }
+  }
+  // Einstellungen: Wetter-Entität wählen und Regeln für automatische Aufgaben
+  _wetterRegelnHtml() {
+    const d = this._daten, st = this._hass?.states || {};
+    const name = (id) => st[id]?.attributes?.friendly_name || id;
+    const wetter = Object.keys(st).filter((k) => k.startsWith("weather.")).sort();
+    const regeln = d.regeln || [];
+    const personen = [...(d.personen || []).map((p) => [p.id, p.name]), [GEMEINSAM, "Gemeinsam"]];
+    const zText = (z) => ({ on: "An", off: "Aus", open: "Offen", closed: "Zu", home: "Zuhause", not_home: "Abwesend", unavailable: "Nicht verfügbar" }[z] || z);
+    return `<fieldset><legend>Wetter</legend>
+        <div class="feld"><label for="wetter-wahl">Wetter in den Tageskarten</label>
+          <select id="wetter-wahl"><option value="">Automatisch${this._wetterEntitaet() ? ` (${esc(name(this._wetterEntitaet()))})` : ""}</option><option value="-" ${d.wetter === "-" ? "selected" : ""}>Kein Wetter</option>
+          ${wetter.map((w) => `<option value="${esc(w)}" ${d.wetter === w ? "selected" : ""}>${esc(name(w))}</option>`).join("")}</select></div>
+      </fieldset>
+      <fieldset id="sensoren"><legend>Sensoren für Automationen</legend>
+        <p class="hinweis">Der Planer stellt diese Werte als Sensoren in Home Assistant bereit, zum Beispiel für eine Heizungs- oder Weckautomation. Der Name bestimmt die Entitäts-ID.</p>
+        ${(d.sensoren || []).length ? `<ul class="regel-liste">${d.sensoren.map((x) => { const ent = Object.keys(st).find((k) => k.startsWith("sensor.") && st[k].attributes?.friendly_name === x.name); return `<li>
+          <span class="regel-text"><b>${esc(x.name)}</b><span class="hinweis">${esc(SENSOR_ARTEN[x.art] || x.art)} · ${esc((personen.find(([id]) => id === x.person) || [, "Gemeinsam"])[1])}${ent ? ` · ${esc(ent)} = ${esc(st[ent].state)}` : " · erscheint nach dem Speichern"}</span></span>
+          <button type="button" class="knopf klein gefahr" data-sensor-weg="${esc(x.id)}">Löschen</button></li>`; }).join("")}</ul>` : ""}
+        <details class="regel-neu"><summary class="knopf">Sensor hinzufügen</summary><div class="regel-form">
+          <div class="feld"><label for="s-art">Was soll der Sensor zeigen?</label><select id="s-art">${Object.entries(SENSOR_ARTEN).map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join("")}</select></div>
+          <div class="feld"><label for="s-wer">Für</label><select id="s-wer">${personen.map(([id, n]) => `<option value="${esc(id)}" ${id === d.ich ? "selected" : ""}>${esc(n)}</option>`).join("")}</select></div>
+          <div class="feld"><label for="s-name">Name</label><input id="s-name" placeholder="z. B. Corin Schicht heute"></div>
+          <button type="button" class="knopf primaer" id="s-speichern">Sensor speichern</button>
+          <p class="fehler" id="s-fehler" role="alert"></p>
+        </div></details>
+      </fieldset>
+      <fieldset id="regeln"><legend>Automatische Aufgaben</legend>
+        <p class="hinweis">Wechselt ein Gerät oder Schalter in einen bestimmten Zustand, legt der Planer eine Aufgabe für heute an. Solange sie offen ist, kommt keine zweite dazu.</p>
+        ${regeln.length ? `<ul class="regel-liste">${regeln.map((x) => `<li data-regel="${esc(x.id)}">
+          <span class="regel-text"><b>${esc(x.titel)}</b><span class="hinweis">Wenn ${esc(name(x.entitaet))} → ${esc(zText(x.zu))}${x.erledigen_bei ? ` · erledigt bei ${esc(zText(x.erledigen_bei))}` : ""} · ${esc((personen.find(([id]) => id === x.person) || [, "Gemeinsam"])[1])}</span></span>
+          <label class="schalter" title="Regel an/aus"><input type="checkbox" data-regel-an="${esc(x.id)}" ${x.aktiv !== false ? "checked" : ""} aria-label="Regel ${esc(x.titel)} aktiv"></label>
+          <button type="button" class="knopf klein gefahr" data-regel-weg="${esc(x.id)}">Löschen</button></li>`).join("")}</ul>` : ""}
+        <details class="regel-neu"><summary class="knopf">Regel hinzufügen</summary><div class="regel-form">
+          <div class="feld"><label for="r-ent">Gerät oder Schalter</label><input id="r-ent" list="r-ent-liste" placeholder="z. B. Schalter Waschmaschine" autocomplete="off">
+            <datalist id="r-ent-liste">${Object.keys(st).filter((k) => /^(switch|binary_sensor|input_boolean|sensor|light|cover|lock|button|input_button|person|device_tracker|media_player|climate|fan|vacuum)\./.test(k)).sort().map((k) => `<option value="${esc(k)}">${esc(name(k))}</option>`).join("")}</datalist></div>
+          <div class="reihe"><div class="feld"><label for="r-zu">Wenn Zustand wird</label><input id="r-zu" list="r-zust" placeholder="on"></div>
+            <div class="feld"><label for="r-weg">Erledigen bei (optional)</label><input id="r-weg" list="r-zust" placeholder="off"></div></div>
+          <datalist id="r-zust"><option value="on">An</option><option value="off">Aus</option><option value="open">Offen</option><option value="closed">Zu</option><option value="home">Zuhause</option><option value="not_home">Abwesend</option></datalist>
+          <p class="hinweis" id="r-jetzt"></p>
+          <div class="feld"><label for="r-titel">Aufgabe</label><input id="r-titel" placeholder="z. B. Wäsche aufhängen"></div>
+          <div class="reihe"><div class="feld"><label for="r-wer">Für</label><select id="r-wer">${personen.map(([id, n]) => `<option value="${esc(id)}" ${id === d.ich ? "selected" : ""}>${esc(n)}</option>`).join("")}</select></div>
+            <div class="feld"><label for="r-ber">Bereich (optional)</label><input id="r-ber" placeholder="haushalt"></div></div>
+          <button type="button" class="knopf primaer" id="r-speichern">Regel speichern</button>
+          <p class="fehler" id="r-fehler" role="alert"></p>
+        </div></details>
+      </fieldset>`;
+  }
+  _regelnBinden(dlg) {
+    const d = this._daten, st = this._hass?.states || {};
+    const $ = (id) => dlg.querySelector(`#${id}`);
+    const speichern = async (regeln, text) => {
+      await this._ws({ type: "planer/allgemein", werte: { regeln } });
+      d.regeln = regeln;
+      this._sagen(text);
+      const offen = $("regeln")?.querySelector("details")?.open;
+      this._einstellungen();
+      if (offen) this.shadowRoot.getElementById("einst").querySelector("#regeln details")?.setAttribute("open", "");
+    };
+    const sSpeichern = async (sensoren, text) => {
+      await this._ws({ type: "planer/allgemein", werte: { sensoren } });
+      d.sensoren = sensoren;
+      this._sagen(text);
+      this._einstellungen();
+      setTimeout(() => { if (this.shadowRoot.getElementById("einst").open) this._einstellungen(); }, 1500); // Entitäts-ID nachladen
+    };
+    const sNameVorschlag = () => {
+      const n = $("s-name"); if (!n || n.dataset.eigen) return;
+      const wer = $("s-wer").selectedOptions[0]?.textContent.split(" ")[0] || "";
+      n.value = `${wer} ${SENSOR_ARTEN[$("s-art").value]}`.trim();
+    };
+    $("s-art")?.addEventListener("change", sNameVorschlag);
+    $("s-wer")?.addEventListener("change", sNameVorschlag);
+    $("s-name")?.addEventListener("input", (e) => { e.target.dataset.eigen = "1"; });
+    sNameVorschlag();
+    $("s-speichern")?.addEventListener("click", async () => {
+      const name = $("s-name").value.trim();
+      if (!name) { $("s-fehler").textContent = "Bitte einen Namen eingeben."; return; }
+      await sSpeichern([...(d.sensoren || []), { name, art: $("s-art").value, person: $("s-wer").value }], `Sensor „${name}“ angelegt`);
+    });
+    dlg.querySelectorAll("[data-sensor-weg]").forEach((b) => b.addEventListener("click", () => sSpeichern((d.sensoren || []).filter((x) => x.id !== b.dataset.sensorWeg), "Sensor gelöscht")));
+    $("wetter-wahl")?.addEventListener("change", async (e) => {
+      await this._ws({ type: "planer/allgemein", werte: { wetter: e.target.value || null } });
+      d.wetter = e.target.value === "-" ? "-" : e.target.value || null;
+      this._wetterAbo = null; this._wetter = null; this._wetterStart();
+      this._sagen("Wetter gespeichert");
+    });
+    $("r-ent")?.addEventListener("input", (e) => {
+      const s0 = st[e.target.value];
+      $("r-jetzt").textContent = s0 ? `Gerade: ${s0.state}` : "";
+    });
+    $("r-speichern")?.addEventListener("click", async () => {
+      const ent = $("r-ent").value.trim(), zu = $("r-zu").value.trim(), titel = $("r-titel").value.trim();
+      if (!st[ent]) { $("r-fehler").textContent = "Dieses Gerät gibt es in Home Assistant nicht."; return; }
+      if (!zu || !titel) { $("r-fehler").textContent = "Bitte Zustand und Aufgabe ausfüllen."; return; }
+      const neu = { entitaet: ent, zu, erledigen_bei: $("r-weg").value.trim(), titel, person: $("r-wer").value, bereich: $("r-ber").value.trim().replace(/^#/, ""), aktiv: true };
+      await speichern([...(d.regeln || []), neu], `Regel „${titel}“ gespeichert`);
+    });
+    dlg.querySelectorAll("[data-regel-weg]").forEach((b) => b.addEventListener("click", () => speichern((d.regeln || []).filter((x) => x.id !== b.dataset.regelWeg), "Regel gelöscht")));
+    dlg.querySelectorAll("[data-regel-an]").forEach((c) => c.addEventListener("change", () => speichern((d.regeln || []).map((x) => (x.id === c.dataset.regelAn ? { ...x, aktiv: c.checked } : x)), c.checked ? "Regel an" : "Regel aus")));
+  }
+
+  _wetterHtml(tag) {
+    const w = (this._wetter || {})[tag];
+    if (!w) return "";
+    const S = { "clear-night": "🌙", cloudy: "☁️", exceptional: "⚠️", fog: "🌫️", hail: "🌨️", lightning: "🌩️", "lightning-rainy": "⛈️", partlycloudy: "⛅", pouring: "🌧️", rainy: "🌦️", snowy: "❄️", "snowy-rainy": "🌨️", sunny: "☀️", windy: "💨", "windy-variant": "💨" };
+    const T = { "clear-night": "klar", cloudy: "bewölkt", fog: "Nebel", hail: "Hagel", lightning: "Gewitter", "lightning-rainy": "Gewitter mit Regen", partlycloudy: "teils bewölkt", pouring: "starker Regen", rainy: "Regen", snowy: "Schnee", "snowy-rainy": "Schneeregen", sunny: "sonnig", windy: "windig", "windy-variant": "windig" };
+    const r = (x) => (x == null ? "" : `${Math.round(x)}°`);
+    return `<span class="wetter" title="${esc(T[w.z] || w.z || "")}"><span aria-hidden="true">${S[w.z] || "🌡️"}</span><b>${r(w.hoch)}</b>${w.tief != null ? `<small>${r(w.tief)}</small>` : ""}<span class="sr">${esc(`${T[w.z] || ""}, bis ${r(w.hoch)}${w.tief != null ? `, nachts ${r(w.tief)}` : ""}`)}</span></span>`;
+  }
+
   async _wocheTermineLaden(start) {
     const key = iso(start);
     if (this._wLaedt === key) return;
@@ -3371,7 +3689,9 @@ class PlanerPanel extends HTMLElement {
       const jetzt = new Date();
       const e = this._mStart || new Date(jetzt.getFullYear(), jetzt.getMonth(), 1);
       this._mStart = n === 0 ? new Date(jetzt.getFullYear(), jetzt.getMonth(), 1) : new Date(e.getFullYear(), e.getMonth() + n, 1);
+      this._mRichtung = n === 0 ? (e > this._mStart ? -1 : e < this._mStart ? 1 : 0) : n;
       this._zeichnen();
+      this._mRichtung = 0;
       this._sagen(`${MONATE[this._mStart.getMonth()]} ${this._mStart.getFullYear()}`);
     }));
     this._app.querySelectorAll("[data-mtag]").forEach((b) => b.addEventListener("click", () => this._tagZeigen(b.dataset.mtag)));
@@ -3379,15 +3699,54 @@ class PlanerPanel extends HTMLElement {
       b.addEventListener("click", () => this._tagZeigen(b.dataset.tagauf));
       b.addEventListener("keydown", (ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); this._tagZeigen(b.dataset.tagauf); } });
     });
-    this._app.querySelectorAll("[data-wleer]").forEach((el) => el.addEventListener("click", (ev) => { if (ev.target === el) this._tagZeigen(el.dataset.wleer); }));
+    this._app.querySelectorAll("[data-wleer]").forEach((el) => el.addEventListener("click", (ev) => { if (el._lang) { el._lang = false; return; } if (ev.target === el) this._tagZeigen(el.dataset.wleer); }));
     this._kalPassen();
+    this._wRichtung = 0;
     this._app.querySelectorAll("[data-woche]").forEach((b) => b.addEventListener("click", () => {
       const n = +b.dataset.woche;
-      this._wStart = n === 0 ? null : plusTage(this._wStart || ausIso(heute()), 7 * n);
-      this._zeichnen();
-      const st = montag(this._wStart || ausIso(heute()));
-      this._sagen(`${datumText(iso(st))} bis ${datumText(iso(plusTage(st, 6)))}`);
+      this._wocheBlaettern(n);
     }));
+    this._app.querySelectorAll("[data-wsprung]").forEach((b) => b.addEventListener("click", () => {
+      const ziel = b.dataset.wsprung, alt = iso(this._w3Start || ausIso(heute()));
+      this._w3Start = ziel === heute() ? null : ausIso(ziel);
+      this._wRichtung = ziel > alt ? 1 : ziel < alt ? -1 : 0;
+      this._zeichnen();
+    }));
+    // 3-Tage-Woche: lange auf eine freie Stelle drücken legt dort einen Eintrag an (volle halbe Stunde, 1 Std.)
+    const wc3 = this._app.querySelector("#wcal.drei");
+    if (wc3) wc3.querySelectorAll(".wspalte").forEach((sp) => {
+      let t = null, y0 = 0, x0b = 0;
+      const ab = () => { clearTimeout(t); t = null; };
+      sp.addEventListener("touchstart", (e) => {
+        if (e.target !== sp && !e.target.classList.contains("wband")) return;
+        const r = sp.getBoundingClientRect();
+        y0 = e.touches[0].clientY; x0b = e.touches[0].clientX;
+        const y = y0 - r.top;
+        t = setTimeout(() => {
+          t = null; sp._lang = true; setTimeout(() => { sp._lang = false; }, 800);
+          const hpx = parseFloat(getComputedStyle(wc3).getPropertyValue("--hpx")) || 44;
+          const m = Math.round((+wc3.dataset.von * 60 + (y / hpx) * 60) / 30) * 30;
+          const s0 = Math.min(Math.max(0, m), 23 * 60);
+          navigator.vibrate?.(10);
+          this._schnellEintrag(sp.dataset.tag, hhmm(s0), hhmm(Math.min(s0 + 60, 23 * 60 + 59)), () => {});
+        }, 500);
+      }, { passive: true });
+      sp.addEventListener("touchmove", (e) => { if (t && Math.hypot(e.touches[0].clientX - x0b, e.touches[0].clientY - y0) > 10) ab(); }, { passive: true });
+      sp.addEventListener("touchend", ab, { passive: true });
+      sp.addEventListener("touchcancel", ab, { passive: true });
+    });
+    // Handy: in der Woche nach links/rechts wischen blättert um 3 Tage
+    const wc = this._app.querySelector("#wcal");
+    if (wc && this._narrow) {
+      let x0 = null, y0 = 0;
+      wc.addEventListener("touchstart", (e) => { if (e.touches.length === 1) { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; } }, { passive: true });
+      wc.addEventListener("touchend", (e) => {
+        if (x0 === null) return;
+        const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+        x0 = null;
+        if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) this._wocheBlaettern(dx < 0 ? 1 : -1, true);
+      }, { passive: true });
+    }
     // Ziehen auf einen Tag (Maus/Trackpad); am Handy und mit Tastatur über „Öffnen“ und Datum
     this._app.querySelectorAll("[data-ziehen]").forEach((el) => el.addEventListener("dragstart", (e) => {
       e.dataTransfer.setData("text/plain", el.dataset.ziehen);
@@ -3516,8 +3875,11 @@ class PlanerPanel extends HTMLElement {
       const jetztErledigt = !(a.status === "erledigt" || (a.wiederholung && (a.verlauf || []).includes(this._tag) && a.datum > this._tag));
       if (!jetztErledigt && a.wiederholung) { this._sagen("Wiederkehrende Aufgabe ist schon auf den nächsten Termin gesetzt."); return; }
       const vorher = { datum: a.datum || null, top: a.top || null };
-      this._abhakAnimation(a.id);
-      const neu = await this._ws({ type: "planer/erledigen", aufgabe_id: a.id, erledigt: jetztErledigt });
+      const li = this._abhakAnimation(a.id);
+      const [neu] = await Promise.all([
+        this._ws({ type: "planer/erledigen", aufgabe_id: a.id, erledigt: jetztErledigt }),
+        jetztErledigt ? new Promise((ok) => setTimeout(ok, 380)).then(() => this._zuklappen(li)) : null,
+      ]);
       const text = jetztErledigt
         ? (neu.status === "offen" && neu.wiederholung ? `Erledigt: ${a.titel}. Nächstes Mal ${datumText(neu.datum)}.` : `Erledigt: ${a.titel}`)
         : `Wieder offen: ${a.titel}`;
@@ -3656,6 +4018,19 @@ class PlanerPanel extends HTMLElement {
   _abhakAnimation(id) {
     const li = this._app?.querySelector(`li.aufgabe[data-id="${CSS_escape(id)}"]`);
     li?.classList.add("abgehakt");
+    return li;
+  }
+  // Zeile weich zuklappen (Höhe → 0), die anderen rücken nach; danach neu zeichnen
+  _zuklappen(li) {
+    if (!li || !li.isConnected || matchMedia("(prefers-reduced-motion: reduce)").matches) return Promise.resolve();
+    return new Promise((fertig) => {
+      li.style.height = `${li.offsetHeight}px`;
+      li.style.overflow = "hidden";
+      li.getBoundingClientRect();
+      li.classList.add("klappt");
+      li.style.height = "0px";
+      setTimeout(fertig, 300);
+    });
   }
 
   _wischen(li) {
@@ -3743,6 +4118,7 @@ class PlanerPanel extends HTMLElement {
       <p class="hinweis">Ohne Uhrzeit wird um 9:00 Uhr am Fälligkeitstag gerechnet. Erinnert wird nur, wenn für die Person ein Handy eingestellt ist.</p>
       <div class="feld"><label for="b-notiz">Notiz</label><textarea id="b-notiz">${esc(a.notiz || "")}</textarea></div>
       <p class="fehler" id="b-fehler" role="alert"></p>
+      ${a.id ? `<div class="fuss"><button type="button" class="knopf ${a.status === "erledigt" ? "" : "primaer"}" id="b-erledigt" style="width:100%">${a.status === "erledigt" ? "Wieder offen" : "Erledigt"}</button></div>` : ""}
       ${a.id ? `<div class="fuss"><button type="button" class="knopf gefahr" id="b-loeschen" style="width:100%">Aufgabe löschen</button></div>` : ""}
     </form>`;
 
@@ -3862,6 +4238,12 @@ class PlanerPanel extends HTMLElement {
       await autoSpeichern();
       if (geaendert) { geaendert = false; await this._lesen(); }
     };
+    $("b-erledigt")?.addEventListener("click", async () => {
+      try { await dlg._vorZu?.(); } catch (e) { /* Speichern meldet selbst */ }
+      this._zu(dlg);
+      await this._aktion("haken", a.id);
+      if (this._tagOffen) this._tagZeigen(this._tagOffen);
+    });
     $("b-loeschen")?.addEventListener("click", async () => {
       if (!sicher) { sicher = true; $("b-loeschen").textContent = "Wirklich löschen?"; $("b-loeschen").focus(); return; }
       weg = true; clearTimeout(uhr);
@@ -3930,6 +4312,7 @@ class PlanerPanel extends HTMLElement {
       wirt.removeEventListener("cancel", abbruch);
       if (anker.hasAttribute("aria-haspopup")) anker.setAttribute("aria-expanded", "false");
       if (this._menueZu === zu) this._menueZu = null;
+      if (this._angehoben) { this._angehoben.classList.remove("angehoben"); this._angehoben = null; root.getElementById("rahmen")?.classList.remove("kontext-an"); }
       if (fokusZurueck !== false && drin) anker.focus({ preventScroll: true });
     };
     const waehlen = (e, ev) => {
@@ -4867,12 +5250,27 @@ class PlanerPanel extends HTMLElement {
   _wischZu(dlg) {
     if (!this._narrow || dlg.dataset.wisch) return;
     dlg.dataset.wisch = "1";
-    let y0 = null;
-    dlg.addEventListener("touchstart", (e) => { y0 = dlg.scrollTop <= 0 ? e.touches[0].clientY : null; }, { passive: true });
-    dlg.addEventListener("touchend", (e) => {
-      if (y0 !== null && e.changedTouches[0].clientY - y0 > 110) this._zu(dlg);
-      y0 = null;
+    let y0 = null, t0 = 0, dy = 0;
+    const vomKopf = (e) => !!e.target.closest(".blatt-kopf");
+    dlg.addEventListener("touchstart", (e) => {
+      // Ziehen am Kopf immer, sonst nur, wenn der Inhalt ganz oben steht
+      y0 = dlg.scrollTop <= 0 || vomKopf(e) ? e.touches[0].clientY : null; t0 = Date.now(); dy = 0;
+    }, { passive: true });
+    dlg.addEventListener("touchmove", (e) => {
+      if (y0 === null || e.target.closest("input[type=range],textarea,.tl-scroll")) return;
+      dy = e.touches[0].clientY - y0;
+      if (dy > 0) { dlg.classList.add("zieht"); dlg.style.transform = `translateY(${dy}px)`; }
+      else if (dy < -50 && vomKopf(e)) dlg.classList.add("voll");
+    }, { passive: true });
+    dlg.addEventListener("touchend", () => {
+      if (y0 === null) return;
+      const schnell = dy > 40 && dy / Math.max(1, Date.now() - t0) > 0.6;
+      dlg.classList.remove("zieht");
+      dlg.style.transform = "";
+      if (dy > 110 || schnell) this._zu(dlg);
+      y0 = null; dy = 0;
     });
+    dlg.addEventListener("close", () => dlg.classList.remove("voll"));
   }
 
   // Einstellungen › Sicherung: Liste, Jetzt sichern, Wiederherstellen mit Bestätigung im Dialog
@@ -4947,6 +5345,7 @@ class PlanerPanel extends HTMLElement {
           <div class="farben">${namen.map((x) => `<label><input type="color" data-farbe="${esc(x)}" value="${bereichFarbe(x, d.farben)}"> ${esc(x[0].toUpperCase() + x.slice(1))}</label>`).join("")}</div>
         </fieldset>`;
       })()}
+      ${d.admin ? this._wetterRegelnHtml() : ""}
       <fieldset id="sich"><legend>Sicherung</legend>
         <p class="hinweis">Der Planer sichert seine Daten jede Nacht um 03:30 in den Ordner planer_sicherungen (die letzten 14 bleiben).</p>
         <div class="sich-kopf"><button type="button" class="knopf" id="sich-jetzt">Jetzt sichern</button></div>
@@ -4982,6 +5381,11 @@ class PlanerPanel extends HTMLElement {
             <div class="feld"><label for="tb-${i}">bis</label><select id="tb-${i}" data-feld="tag_bis">${[...Array(24)].map((_, h) => h + 1).map((h) => `<option value="${h}" ${(e.tag_bis ?? 22) === h ? "selected" : ""}>${String(h).padStart(2, "0")}:00</option>`).join("")}</select></div>
           </div>
           ${erinnHtml(`se${i}`, e.erinnerungen || [30, 180, 1440])}
+          <div class="reihe">
+            <div class="feld"><label for="ab-${i}">Abfahrtserinnerung (Waze)</label><select id="ab-${i}" data-feld="abfahrt"><option value="">Aus</option><option value="1" ${e.abfahrt ? "selected" : ""}>An: Push, wenn es Zeit zum Losfahren ist</option></select></div>
+            <div class="feld"><label for="ap-${i}">Puffer in Minuten</label><input id="ap-${i}" data-feld="abfahrt_puffer" type="number" min="0" max="180" step="5" inputmode="numeric" value="${e.abfahrt_puffer ?? 10}"></div>
+          </div>
+          <p class="hinweis">Für Termine mit Ort: Fahrzeit mit dem Auto ab deinem aktuellen Standort (sonst Zuhause) plus Puffer. Braucht die Integration „Waze Travel Time“ und ein Handy für Erinnerungen.</p>
           <div class="fuss"><button type="button" class="knopf" data-speichern="${i}">Für ${esc(p.name.split(" ")[0])} speichern</button></div>
         </section>`;
       }).join("")}
@@ -5004,6 +5408,7 @@ class PlanerPanel extends HTMLElement {
       await this._ws({ type: "planer/allgemein", werte: { ausgeblendet: aus } });
       this._sagen("Gespeichert. Die Liste aktualisiert sich beim Schließen.");
     }));
+    this._regelnBinden(dlg);
     dlg.querySelector("#gk")?.addEventListener("change", async (e) => {
       await this._ws({ type: "planer/allgemein", werte: { gemeinsam_kalender: e.target.value || null } });
       this._sagen("Kalender für gemeinsame Termine gespeichert");
@@ -5024,6 +5429,8 @@ class PlanerPanel extends HTMLElement {
         erinnerungen: erinnLesen(dlg, `se${i}`),
         tag_von: +sec.querySelector('[data-feld="tag_von"]').value,
         tag_bis: +sec.querySelector('[data-feld="tag_bis"]').value,
+        abfahrt: !!sec.querySelector('[data-feld="abfahrt"]').value,
+        abfahrt_puffer: String(Math.max(0, Math.min(180, parseInt(sec.querySelector('[data-feld="abfahrt_puffer"]').value, 10) || 0))),
       };
       if (kal.length) {
         werte.kalender_sehen = liste("sehen").length === alle("sehen") ? null : liste("sehen");
@@ -5178,6 +5585,8 @@ class PlanerPanel extends HTMLElement {
     dlg.showModal();
   }
 }
+
+const SENSOR_ARTEN = { schicht_heute: "Schicht heute", schicht_morgen: "Schicht morgen", naechste_schicht: "Nächster Schichtbeginn", offene_aufgaben: "Offene Aufgaben heute", ueberfaellig: "Überfällige Aufgaben" };
 
 function CSS_escape(s) { return String(s).replace(/["\\]/g, "\\$&"); }
 

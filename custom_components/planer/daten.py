@@ -127,6 +127,9 @@ class Planer:
             # "" = keine Erinnerung, "vorabend" = am Vortag zur Uhrzeit schicht_push_uhr, Zahl = Minuten vor Beginn
             "schicht_push": e.get("schicht_push", ""),
             "schicht_push_uhr": e.get("schicht_push_uhr", "20:00"),
+            # Abfahrtserinnerung: Fahrzeit per Waze zu Terminen mit Ort, Puffer in Minuten
+            "abfahrt": e.get("abfahrt", False),
+            "abfahrt_puffer": e.get("abfahrt_puffer", 10),
         }
 
     def sichtbar(self, aufgabe: dict[str, Any], benutzer_id: str | None) -> bool:
@@ -444,6 +447,33 @@ class Planer:
         if "einkauf_listen" in werte:
             v = werte["einkauf_listen"]
             self.allgemein["einkauf_listen"] = None if v is None else [str(x) for x in v if str(x).startswith("todo.")][:10]
+        if "wetter" in werte:
+            v = werte["wetter"]
+            self.allgemein["wetter"] = str(v) if v and (str(v).startswith("weather.") or v == "-") else None
+        if "sensoren" in werte and isinstance(werte["sensoren"], list):
+            arten = {"schicht_heute", "schicht_morgen", "naechste_schicht", "offene_aufgaben", "ueberfaellig"}
+            self.allgemein["sensoren"] = [
+                {"id": _text(x.get("id"), 12) or uuid.uuid4().hex[:8], "name": _text(x.get("name"), 60),
+                 "art": x["art"], "person": _text(x.get("person"), 64) or GEMEINSAM}
+                for x in werte["sensoren"][:20]
+                if isinstance(x, dict) and x.get("art") in arten and _text(x.get("name"), 60)
+            ]
+        if "regeln" in werte and isinstance(werte["regeln"], list):
+            sauber = []
+            for x in werte["regeln"][:30]:
+                if not isinstance(x, dict) or "." not in str(x.get("entitaet", "")) or not _text(x.get("titel"), 120) or not _text(x.get("zu"), 60):
+                    continue
+                sauber.append({
+                    "id": _text(x.get("id"), 12) or uuid.uuid4().hex[:8],
+                    "entitaet": _text(x.get("entitaet"), 120),
+                    "zu": _text(x.get("zu"), 60),
+                    "erledigen_bei": _text(x.get("erledigen_bei"), 60) or "",
+                    "titel": _text(x.get("titel"), 120),
+                    "person": _text(x.get("person"), 64) or GEMEINSAM,
+                    "bereich": _text(x.get("bereich"), 40).lower(),
+                    "aktiv": bool(x.get("aktiv", True)),
+                })
+            self.allgemein["regeln"] = sauber
         if "ausgeblendet" in werte and isinstance(werte["ausgeblendet"], list):
             self.allgemein["ausgeblendet"] = [str(x) for x in werte["ausgeblendet"]][:100]
             await self.async_personen()
@@ -479,6 +509,10 @@ class Planer:
             e["schicht_push"] = v if v == "vorabend" or (v.isdigit() and int(v) <= 1440) else ""
         if "schicht_push_uhr" in werte and UHRZEIT.match(str(werte["schicht_push_uhr"])):
             e["schicht_push_uhr"] = str(werte["schicht_push_uhr"])
+        if "abfahrt" in werte:
+            e["abfahrt"] = bool(werte["abfahrt"])
+        if "abfahrt_puffer" in werte and str(werte["abfahrt_puffer"]).isdigit():
+            e["abfahrt_puffer"] = min(180, int(werte["abfahrt_puffer"]))
         if "erinnerungen" in werte:
             e["erinnerungen"] = sorted({int(m) for m in werte["erinnerungen"] or [] if str(m).isdigit() and int(m) <= 43200})
         await self._sichern()
