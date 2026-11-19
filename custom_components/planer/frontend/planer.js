@@ -463,6 +463,7 @@ li.aufgabe.farbig .zeile{box-shadow:inset 4px 0 0 var(--b),var(--karte-schatten)
 .titel{overflow-wrap:anywhere;font-size:var(--t-text);line-height:1.3}
 .unter{font-size:var(--t-sub);color:var(--muted);overflow-wrap:anywhere}
 .meta{display:flex;gap:6px;flex-wrap:wrap;min-width:0}
+.schmal .aufgabe .meta{flex-wrap:nowrap;overflow:hidden}.schmal .aufgabe .meta .chip{flex:0 1 auto;min-width:0}.schmal .aufgabe .meta .chip.rot,.schmal .aufgabe .meta .chip.zeit{flex:none}
 .aktionen{display:flex;gap:var(--s2);flex:none}
 .leer{color:var(--muted);padding:var(--s3) var(--s4);border-radius:var(--r-karte);background:var(--fill);margin:0;font-size:var(--t-sub)}
 .wisch{position:absolute;inset:0;border-radius:var(--r-karte);display:flex;align-items:center;padding:0 var(--s4);font-weight:700;pointer-events:none;opacity:0;gap:var(--s2)}
@@ -3284,7 +3285,7 @@ class PlanerPanel extends HTMLElement {
       meta.push(`<span class="chip rot">${n <= 1 ? "seit gestern" : `seit ${n} Tagen`}</span>`);
     } else if (a.datum && this._ansicht !== "heute") meta.push(`<span class="chip ${a.datum < this._tag ? "warn" : ""}">${esc(datumText(a.datum))}</span>`);
     if (wiederErledigt) meta.push(`<span class="chip mint">nächstes Mal ${esc(datumText(a.datum))}</span>`);
-    if (a.uhrzeit) meta.push(`<span class="chip">${esc(a.uhrzeit)} Uhr</span>`);
+    if (a.uhrzeit) meta.push(`<span class="chip zeit">${esc(a.uhrzeit)}${this._narrow ? "" : " Uhr"}</span>`);
     const farbe = bereichFarbe(a.bereich, this._daten.farben);
     // Kompakt: nur Datum/Uhrzeit und Bereich; alles Weitere im Detail beim Antippen
     if (a.bereich) meta.push(`<span class="chip" style="--b:${farbe}"><span class="punkt" aria-hidden="true"></span> ${esc(a.bereich)}</span>`);
