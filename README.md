@@ -10,10 +10,11 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
 3. Einstellungen › Geräte & Dienste › Integration hinzufügen › **Planer**.
 4. In der Seitenleiste erscheint „Planer“.
 
-## Was es gibt (v0.10.0)
+## Was es gibt (v0.11.0)
 
-- **Heute** mit Top 3 (je Rang 1–3, nie mehr als drei), weiteren Aufgaben, Überfälligem und „Heute erledigt“.
-- **Demnächst** (nach Tagen gruppiert) und **Eingang** (alles ohne Datum).
+- **Heute** als Tageskarten für heute und die nächsten 14 Tage (Schichten oben, Termine und Aufgaben chronologisch). Überfälliges steht rot in der Heute-Karte, Aufgaben ohne Datum wandern unrot mit. Top 3 zuerst, „Heute erledigt“ darunter.
+- **Filter** oben rechts: Personenknopf (C/L/G/Alle) neben Lupe und ⋯; Bereich, Sortierung und Ausblenden im ⋯-Menü unter „Filter“.
+- **Kalender** kompakt (nur Uhrzeit und Titel, Details per Klick), Kalenderwoche im Kopf, Wochenraster am PC füllt die Fensterhöhe.
 - **Schnelleingabe**: `morgen 15 Uhr !1 PETG bestellen #werkstatt @linda` oder `Müll rausbringen jeden Montag`.
   Erkennt heute/morgen/übermorgen, Wochentage, `24.12.`, `in 3 Tagen`, Uhrzeiten, `!1`–`!3`, `#bereich`,
   `@person`/`@gemeinsam` und Wiederholungen (täglich, jeden Montag, jeden Mo und Do, alle 2 Wochen, monatlich, jährlich).

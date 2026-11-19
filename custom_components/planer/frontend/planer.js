@@ -353,10 +353,31 @@ header .titel-block{flex:1 1 200px}
 header .rechts{order:2}
 header nav.tabs button{padding:0 var(--s3)}
 #rahmen:not(.schmal) .wrap{container-type:inline-size}
-@container (min-width:840px){header nav.tabs{order:2;margin:0 var(--s2)}header .titel-block{flex:0 1 170px;min-width:110px}header .rechts{order:3;margin-left:auto}header nav.tabs .zahl{display:none}}
+@container (min-width:840px){header{flex-wrap:nowrap}header nav.tabs{flex:0 1 auto;min-width:0}header nav.tabs{order:2;margin:0 var(--s2)}header .titel-block{flex:0 1 170px;min-width:110px}header .rechts{order:3;margin-left:auto}header nav.tabs .zahl{display:none}}
 @container (min-width:990px){header nav.tabs .zahl:not(.null){display:inline}}
 @container (max-width:700px){header nav.tabs{max-width:100%}header nav.tabs button{padding:0 var(--s2);gap:4px;flex:1 1 auto;justify-content:center;min-width:0}header nav.tabs .zahl{display:none}}
-.schmal header{align-items:flex-start;padding-top:var(--s1)}
+.schmal header{padding-top:var(--s1)}
+.tage{display:grid;gap:var(--s4);max-width:760px;width:100%;margin:0 auto;min-width:0}
+.tkarte{padding:var(--s3);border-radius:20px;background:var(--fill);display:grid;gap:var(--s3);min-width:0}
+.tkarte h2{font-size:var(--t-kopf);color:var(--muted)}
+.tkarte.heute h2{color:var(--accent)}
+.tkarte.heute{box-shadow:inset 0 0 0 1.5px var(--accent-dim,var(--line2))}
+.schicht-chips{display:flex;flex-wrap:wrap;gap:6px}
+.schicht-chip{display:inline-flex;align-items:center;gap:5px;max-width:100%;padding:5px 11px;border-radius:var(--r-voll,999px);font-size:var(--t-fuss);font-weight:600;color:var(--fg);background:color-mix(in srgb,var(--k) 22%,transparent);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--k) 55%,transparent)}
+.schicht-chip b{display:inline-grid;place-items:center;min-width:20px;height:20px;border-radius:10px;background:var(--k);color:#fff;font-size:11px;padding:0 4px}
+.schicht-chip .sz{font-variant-numeric:tabular-nums;font-weight:500}
+.schicht-chip .sw{color:var(--muted);font-weight:500}
+ul.liste>li.vorbei{opacity:.5}
+ul.liste>li.jetzt{display:flex;align-items:center;gap:var(--s2);color:var(--rot);font-size:var(--t-klein);font-weight:700;margin:2px 0}
+ul.liste>li.jetzt::before,ul.liste>li.jetzt::after{content:"";height:2px;border-radius:1px;background:var(--rot);flex:1}
+ul.liste>li.jetzt::before{flex:0 0 12px}
+.chip.rot{color:var(--rot);background:color-mix(in srgb,var(--rot) 14%,transparent)}
+li.aufgabe.ueberf .zeile{box-shadow:inset 4px 0 0 var(--rot),var(--karte-schatten)}
+li.aufgabe.ueberf .haken::before{border-color:var(--rot)}
+.schmal header{flex-wrap:nowrap;align-items:center}
+.schmal header .titel-block{flex:1 1 0;min-width:0}
+.schmal header .rechts{order:0;gap:var(--s1)}
+.schmal header h1{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .schmal header .titel-block{padding-top:2px}
 
 /* ---------- Bedienelemente ---------- */
@@ -442,6 +463,7 @@ li.aufgabe.farbig .zeile{box-shadow:inset 4px 0 0 var(--b),var(--karte-schatten)
 .titel{overflow-wrap:anywhere;font-size:var(--t-text);line-height:1.3}
 .unter{font-size:var(--t-sub);color:var(--muted);overflow-wrap:anywhere}
 .meta{display:flex;gap:6px;flex-wrap:wrap;min-width:0}
+.schmal .aufgabe .meta{flex-wrap:nowrap;overflow:hidden}.schmal .aufgabe .meta .chip{flex:0 1 auto;min-width:0}.schmal .aufgabe .meta .chip.rot,.schmal .aufgabe .meta .chip.zeit{flex:none}
 .aktionen{display:flex;gap:var(--s2);flex:none}
 .leer{color:var(--muted);padding:var(--s3) var(--s4);border-radius:var(--r-karte);background:var(--fill);margin:0;font-size:var(--t-sub)}
 .wisch{position:absolute;inset:0;border-radius:var(--r-karte);display:flex;align-items:center;padding:0 var(--s4);font-weight:700;pointer-events:none;opacity:0;gap:var(--s2)}
@@ -497,7 +519,7 @@ aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);positio
 .mtag.fremd.mschichttag{background:color-mix(in srgb,var(--sc1) 8%,transparent)}
 .mnr{flex:none;font-weight:600;font-size:12px;font-variant-numeric:tabular-nums;width:22px;height:22px;display:grid;place-items:center;border-radius:50%;margin-bottom:1px}
 .mtag.heute .mnr,.schichtmonat .stag.heute .mnr{background:var(--rot);color:#fff;font-weight:700}
-.mtag.heute,.schichtmonat .stag.heute,.wtag.heute{box-shadow:inset 0 0 0 2.5px var(--rot),var(--karte-schatten)}
+.schichtmonat .stag.heute,.wtag.heute{box-shadow:inset 0 0 0 2.5px var(--rot),var(--karte-schatten)}
 .mstreifen{position:absolute;left:0;right:0;top:0;height:3px;display:flex}
 .mstreifen i{flex:1;background:var(--sc)}
 .msz{display:flex;gap:2px;flex:none;flex-wrap:nowrap;min-width:0}
@@ -505,7 +527,7 @@ aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);positio
 .msk .sz{display:none;font-weight:500;margin-left:4px}
 .me{flex:none;display:block;min-width:0;height:14px;line-height:14px;font-size:9.5px;font-weight:600;padding:0 2px 0 3px;border-radius:3px;background:color-mix(in srgb,var(--c) 20%,transparent);border-left:2px solid var(--c);color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .me[hidden]{display:none!important}
-.me .u,.me .o{display:none}
+.me .u{display:none}
 .me.auf{background:none;border-left:0;padding-left:1px}
 .me.auf::before{content:"";display:inline-block;box-sizing:border-box;width:8px;height:8px;border-radius:50%;border:1.5px solid var(--c);margin-right:3px;vertical-align:-1px}
 .mmehr{flex:none;font-size:9px;color:var(--muted);font-weight:700;padding-left:3px;line-height:12px}
@@ -531,7 +553,7 @@ aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);positio
 .me.auf .tx{flex:1;min-width:0}
 .me.auf::before{width:10px;height:10px;margin-right:4px;vertical-align:-1px}
 }
-@container (min-width:820px){.me{white-space:normal;overflow:visible}.me .tx{overflow:visible;overflow-wrap:anywhere}.me .o{display:block;color:var(--muted);font-size:10.5px;font-weight:400}}
+@container (min-width:820px){.me{white-space:normal;overflow:visible}.me .tx{overflow:visible;overflow-wrap:anywhere}}
 .woche-wrap{overflow-x:auto;padding-bottom:var(--s1)}
 .schmal .woche-wrap{overflow:visible}
 .woche{display:grid;grid-template-columns:repeat(7,minmax(118px,1fr));gap:var(--s2);min-width:860px}
@@ -555,11 +577,6 @@ aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);positio
 .wleer{font-size:var(--t-fuss);color:var(--muted)}
 .ablage{display:flex;gap:var(--s2);flex-wrap:wrap}
 .ablage .wpunkt{width:auto}
-.ziele{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);min-width:0}
-.ziel{display:flex;gap:var(--s3);align-items:center;background:var(--card);border-radius:var(--r-karte);padding:var(--s1) var(--s3);box-shadow:var(--karte-schatten);min-height:52px}
-.ziel input[type=text]{flex:1;min-width:0;min-height:44px;border:0;background:none;padding:0}
-.ziel input[type=checkbox]{width:24px;height:24px;accent-color:var(--accent-fill);flex:none}
-.ziel .nr{font-weight:700;font-size:var(--t-klein);width:22px;height:22px;border-radius:6px;display:grid;place-items:center;background:var(--mint-dim);color:var(--accent);flex:none}
 
 /* ---------- Einkauf: gruppierte Liste wie in Erinnerungen ---------- */
 ul.liste.gruppiert{gap:0;background:var(--card);border-radius:var(--r-karte);box-shadow:var(--karte-schatten);overflow:hidden}
@@ -763,9 +780,8 @@ dialog .schnellwahl .knopf:not(.primaer):not(.text)[aria-pressed="true"]{backgro
 .wkh b{font-size:17px;color:var(--fg);width:30px;height:30px;line-height:30px;border-radius:50%;text-transform:none;letter-spacing:0;font-weight:600;font-variant-numeric:tabular-nums}
 .schmal .wkh b{font-size:14px;width:24px;height:24px;line-height:24px}
 .wkh.heute b{background:var(--rot);color:#fff}
-.wkh.heute{box-shadow:inset 2px 0 0 var(--rot),inset -2px 0 0 var(--rot),inset 0 2px 0 var(--rot)}
+.wkh.heute .wn{color:var(--rot)}
 .wkg{display:flex;flex-direction:column;gap:2px;min-width:0;min-height:24px;padding:2px 1px;border-left:1px solid var(--line);border-top:1px solid var(--line);cursor:pointer}
-.wkg.heute{box-shadow:inset 2px 0 0 var(--rot),inset -2px 0 0 var(--rot)}
 .wc{display:block;box-sizing:border-box;width:100%;min-width:0;height:18px;line-height:18px;text-align:left;border:0;font:inherit;font-size:11px;padding:0 4px;border-radius:4px;background:color-mix(in srgb,var(--c,var(--accent)) 24%,var(--card));color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;flex:none}
 .wc.t{box-shadow:inset 3px 0 0 var(--c)}
 .wc.a{background:color-mix(in srgb,var(--c) 10%,var(--card))}
@@ -784,7 +800,6 @@ dialog .schnellwahl .knopf:not(.primaer):not(.text)[aria-pressed="true"]{backgro
 .schmal .wstunden span{font-size:9px;right:3px}
 .schmal .wstunden small{display:none}
 .wspalte{position:relative;min-width:0;border-left:1px solid var(--line);background-image:repeating-linear-gradient(to bottom,var(--line) 0 1px,transparent 1px var(--hpx));cursor:pointer}
-.wspalte.heute{box-shadow:inset 2px 0 0 var(--rot),inset -2px 0 0 var(--rot),inset 0 -2px 0 var(--rot)}
 .wspalte.ziel-drop,.wkg.ziel-drop{outline:2px dashed var(--accent);outline-offset:-2px}
 .wband{position:absolute;z-index:1;box-sizing:border-box;pointer-events:none;overflow:hidden;background:color-mix(in srgb,var(--k) 26%,transparent);border-left:3px solid var(--k);padding:2px 3px;font-size:10px;font-weight:600;line-height:1.15;color:var(--fg)}
 .wband span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1105,6 +1120,12 @@ dialog.nz-farbig .blatt-kopf{box-shadow:inset 0 -3px 0 var(--nf)}
 .pille .pfeil-runter{width:14px;height:14px;opacity:.65;margin-left:-2px}
 .pille>svg:not(.pfeil-runter){width:16px;height:16px}
 .pille .punkt{width:10px;height:10px}
+.pille.filterchip{min-height:30px;padding:0 10px}
+.pille.filterchip .chip-x{font-size:11px;opacity:.7;margin-left:2px}
+.rund.wer-knopf .wer-av{width:30px;height:30px;font-size:14px}
+.rund.wer-knopf .wer-av.alle svg{width:18px;height:18px}
+.rund .filter-punkt{position:absolute;top:7px;right:7px;width:10px;height:10px;border-radius:50%;background:var(--accent-fill);box-shadow:0 0 0 2px var(--card)}
+.menue-kopf{padding:8px 12px 2px;font-size:var(--t-klein);font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
 .wer-av{flex:none;display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--pf);color:#fff;font-size:11px;font-weight:700;line-height:1;letter-spacing:0;font-style:normal}
 .wer-av.klein{width:14px;height:14px;font-size:9px;margin-right:4px;vertical-align:-2px}
 .wer-av.alle{background:var(--fill2);color:var(--fg)}
@@ -1256,6 +1277,7 @@ class PlanerPanel extends HTMLElement {
     this._tasten = (e) => this._taste(e);
     try {
       this._ansicht = localStorage.getItem("planer.ansicht") || "heute";
+      if (this._ansicht === "demnaechst") this._ansicht = "heute";
       this._kalAnsicht = localStorage.getItem("planer.kalansicht") || "monat";
       this._eListe = localStorage.getItem("planer.eliste") || "";
       this._filter = localStorage.getItem("planer.filter") || "ich";
@@ -1295,7 +1317,7 @@ class PlanerPanel extends HTMLElement {
   disconnectedCallback() {
     document.removeEventListener("keydown", this._tasten);
     if (this._kalGroesse) { window.removeEventListener("resize", this._kalGroesse); this._kalGroesse = null; }
-    this._monatRO?.disconnect(); this._monatRO = null;
+    this._monatRO?.disconnect(); this._monatRO = null; this._wocheRO?.disconnect(); this._wocheRO = null;
     window.removeEventListener("scroll", this._rollen, { capture: true });
     this.shadowRoot?.removeEventListener("scroll", this._rollen, { capture: true });
     if (this._abo) this._abo.then((ab) => ab()).catch(() => {});
@@ -1431,15 +1453,14 @@ class PlanerPanel extends HTMLElement {
     const offen = alle.filter((a) => a.status === "offen");
     const zaehler = {
       heute: offen.filter((a) => !a.datum || a.datum <= h).length,
-      demnaechst: offen.filter((a) => a.datum && a.datum > h).length,
       eingang: offen.length,
       woche: offen.filter((a) => a.datum && a.datum >= iso(montag(new Date())) && a.datum <= iso(plusTage(montag(new Date()), 6))).length,
       notizen: this._notizenSichtbar().length,
       einkauf: (this._eArtikel && this._eArtikel.liste === this._eListeId() ? this._eArtikel.items.filter((x) => !x.erledigt).length : 0),
     };
-    const tabs = [["heute", "Heute"], ["woche", "Kalender"], ["demnaechst", "Demnächst"]];
+    const tabs = [["heute", "Heute"], ["woche", "Kalender"]];
     tabs.push(["notizen", "Notizen"]);
-    if (this._ansicht === "eingang") this._ansicht = "heute";
+    if (this._ansicht === "eingang" || this._ansicht === "demnaechst") this._ansicht = "heute";
     if ((d.einkauf_listen || []).length) tabs.push(["einkauf", "Einkauf"]);
     if (this._ansicht === "einkauf" && !(d.einkauf_listen || []).length) this._ansicht = "heute";
     const heuteD = new Date();
@@ -1469,8 +1490,9 @@ class PlanerPanel extends HTMLElement {
         </div>
         ${schmal ? "" : tabsHtml}
         <div class="rechts">
+          ${this._werKnopf()}
           <button type="button" class="rund" data-aktion="suche" data-fokus="suche" aria-label="Suchen" title="Suchen (Taste /)">${ICON.suche}</button>
-          ${this._kopfEintraege().length ? `<button type="button" class="rund" data-aktion="kopf-menue" data-fokus="kopf-menue" aria-haspopup="menu" aria-expanded="false" aria-label="Weitere Aktionen" title="Weitere Aktionen">${ICON.mehr}</button>` : ""}
+          ${this._kopfEintraege().length ? `<button type="button" class="rund" data-aktion="kopf-menue" data-fokus="kopf-menue" aria-haspopup="menu" aria-expanded="false" aria-label="Weitere Aktionen${this._bereich && this._bereichFilterAn() ? `, Bereichsfilter aktiv: ${esc(this._bereich)}` : ""}" title="Weitere Aktionen">${ICON.mehr}${this._bereich && this._bereichFilterAn() ? '<span class="filter-punkt" aria-hidden="true"></span>' : ""}</button>` : ""}
         </div>
       </header>
       ${pillen}
@@ -1617,21 +1639,25 @@ class PlanerPanel extends HTMLElement {
   _pille(art, inhalt, label, aktiv) {
     return `<button type="button" class="pille${aktiv ? " aktiv" : ""}" data-menue="${art}" data-fokus="p-${art}" aria-haspopup="menu" aria-expanded="false" aria-label="${esc(label)}">${inhalt}${ICON.runter}</button>`;
   }
-  // Eine Zeile Filter direkt unter dem Titel, überall gleich
+  // Personenwahl: runder Knopf in der Kopfzeile (Avatar), öffnet das Auswahl-Menü
+  _werKnopf() {
+    if (this._ansicht === "einkauf") return "";
+    const d = this._daten, f = this._filter || "ich";
+    const werId = f === "ich" ? d.ich : f === "alle" ? "" : f;
+    const inhalt = werId ? this._avatar(werId) : `<span class="wer-av alle" aria-hidden="true">${ICON.personen}</span>`;
+    return `<button type="button" class="rund wer-knopf" data-menue="wer" data-fokus="p-wer" aria-haspopup="menu" aria-expanded="false" aria-label="Wessen Einträge: ${esc(this._werText())}. Ändern" title="Wessen Einträge: ${esc(this._werText())}">${inhalt}</button>`;
+  }
+  // Der Bereichsfilter wirkt in Heute, Demnächst und Kalender
+  _bereichFilterAn() { return ["heute", "woche"].includes(this._ansicht); }
+  // Eine Zeile unter dem Titel nur, wenn es etwas anzuzeigen gibt (Bereichsfilter aktiv, Notizen-Filter)
   _pillenHtml() {
     const d = this._daten, v = this._ansicht;
     if (v === "einkauf") return "";
-    const f = this._filter || "ich";
     const teile = [];
-    const werId = f === "ich" ? d.ich : f === "alle" ? "" : f;
-    teile.push(this._pille("wer", `${werId ? this._avatar(werId) : `<span class="wer-av alle" aria-hidden="true">${ICON.personen}</span>`}<span class="pille-text">${esc(this._werText())}</span>`,
-      `Wessen Einträge: ${this._werText()}. Ändern`, false));
-    if (v === "heute" || v === "demnaechst") {
-      const b = this._bereich;
-      if (b || this._bereichListe().length) {
-        const name = b ? b[0].toUpperCase() + b.slice(1) : "Alle Bereiche";
-        teile.push(this._pille("bereich", `${b ? `<span class="punkt" style="--b:${bereichFarbe(b, d.farben)}" aria-hidden="true"></span>` : ""}<span class="pille-text">${esc(name)}</span>`, `Bereich: ${name}. Ändern`, !!b));
-      }
+    const b = this._bereich;
+    if (b && v !== "notizen" && this._bereichFilterAn()) {
+      const name = b[0].toUpperCase() + b.slice(1);
+      teile.push(`<button type="button" class="pille aktiv filterchip" data-aktion="bereich-weg" data-fokus="p-bereich" aria-label="Bereichsfilter ${esc(name)} entfernen"><span class="punkt" style="--b:${bereichFarbe(b, d.farben)}" aria-hidden="true"></span><span class="pille-text">Bereich: ${esc(name)}</span><span class="chip-x" aria-hidden="true">✕</span></button>`);
     }
     if (v === "notizen") {
       const { ordner, tags } = this._notizFilterListen();
@@ -1640,7 +1666,13 @@ class PlanerPanel extends HTMLElement {
         teile.push(this._pille("notizen", `${this._nOrdner ? ICON.ordner : ""}<span class="pille-text">${esc(t)}</span>`, `Notizen filtern: ${t}. Ändern`, !!(this._nOrdner || this._nTag)));
       }
     }
-    return `<div class="pillen" role="group" aria-label="Filter">${teile.join("")}</div>`;
+    return teile.length ? `<div class="pillen" role="group" aria-label="Filter">${teile.join("")}</div>` : "";
+  }
+  _bereichSetzen(b) {
+    this._bereich = b;
+    try { localStorage.setItem("planer.bereich", b); } catch (e) { /* egal */ }
+    this._zeichnen();
+    this._sagen(b ? `Nur Bereich ${b}` : "Alle Bereiche");
   }
 
   _filterSetzen(f) {
@@ -1662,12 +1694,7 @@ class PlanerPanel extends HTMLElement {
   }
   _bereichMenue(anker, info) {
     const d = this._daten;
-    const setzen = (b) => {
-      this._bereich = b;
-      try { localStorage.setItem("planer.bereich", b); } catch (e) { /* egal */ }
-      this._zeichnen();
-      this._sagen(b ? `Nur Bereich ${b}` : "Alle Bereiche");
-    };
+    const setzen = (b) => this._bereichSetzen(b);
     this._menue(anker, [
       { text: "Alle Bereiche", radio: true, aktiv: !this._bereich, aktion: () => setzen("") },
       "-",
@@ -1704,8 +1731,18 @@ class PlanerPanel extends HTMLElement {
     const d = this._daten, v = this._ansicht;
     const termin = (d.kalender || []).some((k) => k.schreiben) ? { text: "Neuer Termin", icon: ICON.termin, aktion: () => this._terminNeu() } : null;
     let e = [];
+    // Bereichsfilter (Heute, Demnächst, Kalender; im Kalender nicht bei Schichten)
+    const bFilter = this._bereichFilterAn() && !(v === "woche" && this._kalAnsicht === "schichten") && (this._bereich || this._bereichListe().length) ? [
+      { kopf: "Filter" },
+      { text: this._bereich ? `Bereich: ${this._bereich[0].toUpperCase() + this._bereich.slice(1)}` : "Bereich: Alle", icon: this._bereich ? `<span class="nz-punkt" style="--nf:${bereichFarbe(this._bereich, d.farben)}"></span>` : ICON.filter, untermenue: true,
+        aktion: (i) => this._menue(anker, [
+          { text: "Zurück", icon: "‹", aktion: zurueck }, "-",
+          { text: "Alle Bereiche", radio: true, aktiv: !this._bereich, aktion: () => this._bereichSetzen("") },
+          ...this._bereichListe().map((x) => ({ text: x[0].toUpperCase() + x.slice(1), icon: `<span class="nz-punkt" style="--nf:${bereichFarbe(x, d.farben)}"></span>`, radio: true, aktiv: this._bereich === x, aktion: () => this._bereichSetzen(x) })),
+        ], { titel: "Bereich", tastatur: i?.tastatur }) },
+    ] : [];
     // Am PC stehen „Erweitert“ und „Termin“ schon neben der Eingabezeile, deshalb nur am Handy hier.
-    if ((v === "heute" || v === "demnaechst") && this._narrow) e = [{ text: "Neue Aufgabe mit allen Optionen", icon: ICON.regler, aktion: () => this._erweitert() }, termin];
+    if (v === "heute" && this._narrow) e = [{ text: "Neue Aufgabe mit allen Optionen", icon: ICON.regler, aktion: () => this._erweitert() }, termin];
     else if (v === "woche" && this._kalAnsicht === "schichten") {
       const aus = !this._schichtPerson();
       e = [
@@ -1733,7 +1770,9 @@ class PlanerPanel extends HTMLElement {
         ], { titel: "Liste", tastatur: i?.tastatur }) }];
       }
     }
-    if (v === "heute" || v === "demnaechst") e.push("-", ...this._listenEintraege(anker, zurueck));
+    // Abschnitt „Filter“: Bereich, Sortierung, Ausblenden
+    if (v === "heute") e.push("-", ...bFilter, ...this._listenEintraege(anker, zurueck));
+    else if (bFilter.length) e.push("-", ...bFilter);
     e = e.filter(Boolean);
     if (d.admin) e.push("-", { text: "Einstellungen", icon: ICON.einstellungen, aktion: () => this._einstellungen() });
     if (e[0] === "-") e.shift();
@@ -1925,6 +1964,7 @@ class PlanerPanel extends HTMLElement {
       else if (art === "bereich") this._bereichMenue(b, info);
       else if (art === "notizen") this._notizFilterMenue(b, info);
     }));
+    app.querySelectorAll('[data-aktion="bereich-weg"]').forEach((b) => b.addEventListener("click", () => this._bereichSetzen("")));
     app.querySelectorAll('[data-aktion="kopf-menue"]').forEach((b) => b.addEventListener("click", (e) => this._kopfMenue(b, { tastatur: e.detail === 0 })));
     app.querySelectorAll("[data-zmenue]").forEach((b) => b.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -1949,7 +1989,7 @@ class PlanerPanel extends HTMLElement {
 
   // Heute/Demnächst: ausgeblendete #Hashtags/Bereiche herausnehmen und darauf hinweisen
   _ansichtHtml(alle, offen) {
-    if (this._ansicht !== "heute" && this._ansicht !== "demnaechst") return this._ansichtInnen(alle, offen);
+    if (this._ansicht !== "heute") return this._ansichtInnen(alle, offen);
     const set = new Set(this._ausgeblendet());
     if (!set.size) return this._ansichtInnen(alle, offen);
     const weg = (a) => set.has(a.bereich || "") || (a.tags || []).some((t) => set.has(t));
@@ -1998,54 +2038,91 @@ class PlanerPanel extends HTMLElement {
     if (this._ansicht === "einkauf") return this._einkaufHtml();
     if (this._ansicht === "notizen") return this._notizenHtml();
     if (this._ansicht === "woche") return this._kalAnsicht === "monat" ? this._monatHtml(this._kalenderAufgaben()) : this._kalAnsicht === "schichten" ? this._schichtHtml() : this._wocheHtml(this._kalenderAufgaben());
-    if (this._ansicht === "demnaechst") {
-      const kommend = offen.filter((a) => a.datum && a.datum > h).sort((a, b) => a.datum.localeCompare(b.datum));
-      const tage = new Set(kommend.map((a) => a.datum));
-      for (let i = 1; i <= 14; i++) {
-        const t = iso(plusTage(new Date(), i));
-        if (this._termineAm(t).length) tage.add(t);
-      }
-      if (!tage.size) return `<p class="leer">Für die nächsten Tage ist nichts geplant.</p>`;
-      return [...tage].sort().map((t) => {
-        const termine = this._termineAm(t);
-        const aufg = this._listeSort(kommend.filter((a) => a.datum === t));
-        const id = `g-${t}`;
-        return `<section class="gruppe" aria-labelledby="${id}">
-          <h2 id="${id}">${esc(datumText(t))}</h2>
-          ${termine.length ? `<ul class="termine" aria-label="Termine">${termine.map((x) => this._terminZeile(x, t)).join("")}</ul>` : ""}
-          ${aufg.length ? `<ul class="liste" aria-label="Aufgaben">${aufg.map((a) => this._zeile(a)).join("")}</ul>` : ""}
-        </section>`;
-      }).join("");
-    }
-    // Heute
+    return this._heuteHtml(alle, offen);
+  }
+
+  // Heute: Tageskarten für heute und die nächsten 14 Tage
+  _heuteHtml(alle, offen) {
+    const h = this._tag;
+    const zeit = (x) => +x.slice(0, 2) * 60 + +x.slice(3, 5);
+    const jetztMin = new Date().getHours() * 60 + new Date().getMinutes();
+    const bisStd = this._daten.einst?.tag_bis ?? 22;
+    const tlKal = this._daten.einst?.kalender_zeitleiste;
+    const faellig = (this._daten.einst?.aufgaben_sortierung || "faellig") === "faellig";
+    const sort = (l) => (faellig ? this._sortiert(l) : this._listeSort(l));
     const ueber = this._listeSort(offen.filter((a) => a.datum && a.datum < h));
     const heuteOffen = offen.filter((a) => a.datum === h);
     const top = heuteOffen.filter((a) => a.top).sort((a, b) => a.top - b.top);
-    // Heute: alles von heute (auch mit Uhrzeit) plus Aufgaben ohne Datum
-    const restFaellig = [...this._sortiert(heuteOffen.filter((a) => !a.top)), ...this._sortiert(offen.filter((a) => !a.datum))];
-    const rest = (this._daten.einst?.aufgaben_sortierung || "faellig") === "faellig" ? restFaellig : this._listeSort(restFaellig);
-    const spaeterAlle = offen.filter((a) => a.datum && a.datum > h).sort((a, b) => a.datum.localeCompare(b.datum) || (a.uhrzeit || "99").localeCompare(b.uhrzeit || "99"));
-    const spaeter = (this._daten.einst?.aufgaben_sortierung || "faellig") === "faellig" ? spaeterAlle : this._listeSort(spaeterAlle);
+    const ohne = sort(offen.filter((a) => !a.datum));
     const fertig = alle.filter((a) => a.status === "erledigt" && (a.erledigt_am || "").slice(0, 10) === h);
     const wiederHeute = alle.filter((a) => a.wiederholung && (a.verlauf || []).includes(h) && a.status === "offen");
-    let html = "";
-    const jetztUhr = new Date().toTimeString().slice(0, 5);
-    const naechste = ueber[0] || this._sortiert(heuteOffen.filter((a) => a.uhrzeit && a.uhrzeit >= jetztUhr))[0] || top[0] || rest[0];
+    const naechste = ueber[0] || this._sortiert(heuteOffen.filter((a) => a.uhrzeit && a.uhrzeit >= hhmm(jetztMin)))[0] || top[0] || this._sortiert(heuteOffen)[0] || ohne[0];
     this._naechste = naechste ? naechste.id : null;
-    const kal = this._zeitleiste(offen);
-    if (ueber.length) html += this._gruppe("Überfällig", ueber, "", "rot");
-    const freie = 3 - top.length;
-    if (top.length) html += this._gruppe("Top 3", top, "", "", freie > 0 ? `${freie} ${freie === 1 ? "Platz" : "Plätze"} frei` : "");
-    if (this._narrow) html += kal;
-    html += this._gruppe(top.length ? "Weitere Aufgaben heute" : "Aufgaben heute", rest, "Für heute ist nichts offen.");
-    if (spaeter.length) html += this._gruppe("Demnächst", spaeter);
+    const vorbei = (html) => html.replace(/^<li( class="([^"]*)")?/, (m, _k, k) => `<li class="${k || ""} vorbei"`);
+    const karte = (tag, i) => {
+      const heute = i === 0;
+      const termine = this._termineAm(tag).filter((t) => tlKal == null || tlKal.includes(t.kalender));
+      const ganz = termine.filter((t) => t.ganztag);
+      const schs = this._schichtenAm(tag);
+      const tagAufg = tag === h ? heuteOffen.filter((a) => !a.top) : offen.filter((a) => a.datum === tag);
+      const mitZeit = [
+        ...termine.filter((t) => !t.ganztag).map((t) => {
+          const s0 = t.start.slice(0, 10) < tag ? 0 : zeit(uhr(t.start));
+          const e0 = t.ende.slice(0, 10) > tag ? 1440 : zeit(uhr(t.ende));
+          return { s: s0, e: e0, html: this._terminZeile(t, tag) };
+        }),
+        ...sort(tagAufg.filter((a) => a.uhrzeit)).map((a) => {
+          const s0 = zeit(a.uhrzeit);
+          return { s: s0, e: s0 + (a.dauer || 0), html: this._zeile(a), aufgabe: true };
+        }),
+      ].sort((x, y) => x.s - y.s);
+      const ohneZeit = sort(tagAufg.filter((a) => !a.uhrzeit));
+      const items = [];
+      if (heute) {
+        for (const a of top) items.push(this._zeile(a));
+        for (const a of ueber) items.push(this._zeile(a));
+        let gesetzt = false;
+        for (const x of mitZeit) {
+          if (!gesetzt && x.s >= jetztMin) { items.push(`<li class="jetzt" aria-hidden="true"><span>Jetzt ${hhmm(jetztMin)}</span></li>`); gesetzt = true; }
+          items.push(x.e <= jetztMin ? vorbei(x.html) : x.html);
+        }
+        if (mitZeit.length && !gesetzt) items.push(`<li class="jetzt" aria-hidden="true"><span>Jetzt ${hhmm(jetztMin)}</span></li>`);
+        for (const a of ohneZeit) items.push(this._zeile(a));
+        for (const a of ohne) items.push(this._zeile(a));
+      } else {
+        for (const x of mitZeit) items.push(x.html);
+        for (const a of ohneZeit) items.push(this._zeile(a));
+      }
+      if (!heute && !items.length && !ganz.length && !schs.length) return "";
+      let frei = "";
+      if (heute) {
+        const von = Math.max((this._daten.einst?.tag_von ?? 7) * 60, jetztMin);
+        const bis = bisStd * 60;
+        const belegt = [...mitZeit].map((x) => [Math.max(x.s, von), Math.min(x.e, bis)]).filter(([p, q]) => q > p).sort((x, y) => x[0] - y[0]);
+        let f = Math.max(0, bis - von), ende = von;
+        for (const [p, q] of belegt) { const p2 = Math.max(p, ende); if (q > p2) { f -= q - p2; ende = q; } }
+        frei = `<p class="frei">${esc(f <= 0 ? `Heute ist bis ${bisStd} Uhr nichts mehr frei.` : `Frei bis ${bisStd} Uhr: ${Math.floor(f / 60) ? `${Math.floor(f / 60)} Std. ` : ""}${f % 60 ? `${f % 60} Min.` : ""}`.trim())}</p>`;
+      }
+      const name = i === 0 ? "Heute" : i === 1 ? "Morgen" : WOCHENTAGE[wt(ausIso(tag))];
+      const id = `g-${tag}`;
+      const chips = schs.length ? `<div class="schicht-chips">${schs.map(({ a: sc, wer }) => `<span class="schicht-chip" style="--k:${sc.farbe}"><b>${esc(sc.kurz || sc.name)}</b> ${esc(sc.name)}${sc.von && sc.bis ? ` <span class="sz">${esc(sc.von)}–${esc(sc.bis)}</span>` : ""}${wer ? ` <span class="sw">${esc(wer)}</span>` : ""}</span>`).join("")}</div>` : "";
+      return `<section class="gruppe tkarte ${heute ? "heute" : ""}" aria-labelledby="${id}">
+        <h2 id="${id}">${esc(name)}, ${esc((() => { const d = ausIso(tag); const m = MONATE[d.getMonth()]; return `${d.getDate()}. ${m.length > 4 ? m.slice(0, 3) + "." : m}`; })())}</h2>
+        ${chips}
+        ${ganz.length ? `<ul class="termine ganztag" aria-label="Ganztägig">${ganz.map((t) => this._terminZeile(t, tag)).join("")}</ul>` : ""}
+        ${items.length ? `<ul class="liste" aria-label="Einträge">${items.join("")}</ul>` : heute ? `<p class="leer">Für heute ist nichts offen.</p>` : ""}
+        ${frei}
+      </section>`;
+    };
+    let html = "";
+    for (let i = 0; i <= 14; i++) html += karte(iso(plusTage(ausIso(h), i)), i);
+    if (this._kalFehler) html = `<p class="fehler">${esc(this._kalFehler)}</p>` + html;
     const erledigtHeute = [...fertig, ...wiederHeute];
     if (erledigtHeute.length) {
       html += `<details class="zu"><summary>Heute erledigt (${erledigtHeute.length})</summary>
         <ul class="liste">${erledigtHeute.map((a) => this._zeile(a, a.status === "offen")).join("")}</ul></details>`;
     }
-    if (this._narrow) return html;
-    return `<div class="spalten"><div>${html}</div><aside>${kal}</aside></div>`;
+    return `<div class="tage">${html}</div>`;
   }
 
   // ---------- Einkauf (Bring! und andere To-do-Listen) ----------
@@ -2697,7 +2774,7 @@ class PlanerPanel extends HTMLElement {
           const ts = am(t), as = aufg(t);
           const sch = this._schichtenAm(t);
           const items = [
-            ...ts.map((x) => `<span class="me" style="--c:${this._farbe(x.kalender)}">${x.ganztag ? "" : `<span class="u">${uhr(x.start)}</span>`}<span class="tx">${esc(x.titel)}${x.ort ? `<span class="o">${esc(x.ort)}</span>` : ""}</span></span>`),
+            ...ts.map((x) => `<span class="me" style="--c:${this._farbe(x.kalender)}">${x.ganztag ? "" : `<span class="u">${uhr(x.start)}</span>`}<span class="tx">${esc(x.titel)}</span></span>`),
             ...as.map((a) => `<span class="me auf" style="--c:${bereichFarbe(a.bereich, this._daten.farben) || "var(--muted)"}">${a.uhrzeit ? `<span class="u">${a.uhrzeit}</span>` : ""}<span class="tx">${this._kalAv(a)}${esc(a.titel)}</span></span>`),
           ];
           const schHtml = sch.length ? `<span class="msz">${sch.map(({ a: sc, wer }) => `<span class="msk" style="--sc:${sc.farbe}" title="${esc(`${wer ? wer + ": " : ""}${sc.name} ${this._schichtZeit(sc)}`.trim())}">${esc(wer ? `${wer[0]} ${sc.kurz}` : sc.kurz)}${sc.von && sc.bis ? `<span class="sz">${sc.von}–${sc.bis}</span>` : ""}</span>`).join("")}</span>` : "";
@@ -2765,15 +2842,34 @@ class PlanerPanel extends HTMLElement {
   _wochePassen() {
     const c = this._app.querySelector("#wcal");
     if (!c) return;
-    const von = +c.dataset.von, hpx = +c.dataset.hpx;
-    const voll = c.querySelector(".wsticky").offsetHeight + c.querySelector(".wkoerper").offsetHeight;
-    c.style.height = `${Math.min(voll, Math.max(this._narrow ? 0 : 400, this._freieHoehe(c)))}px`;
+    const von = +c.dataset.von, bis = +c.dataset.bis;
+    const stunden = Math.max(1, bis - von);
+    const kopfH = c.querySelector(".wsticky").offsetHeight;
+    let hpx = +c.dataset.hpx;
+    if (!this._narrow) {
+      // PC: Zeitraum füllt genau die freie Höhe (mindestens 28 px pro Stunde, sonst Scrollen)
+      hpx = Math.max(28, (this._freieHoehe(c) - kopfH) / stunden);
+      c.style.setProperty("--hpx", `${hpx}px`);
+      c.style.height = `${Math.ceil(kopfH + stunden * hpx)}px`;
+      if (window.ResizeObserver && this._wocheRO?.ziel !== c) {
+        this._wocheRO?.disconnect();
+        this._wocheRO = new ResizeObserver(() => { cancelAnimationFrame(this._wocheRaf); this._wocheRaf = requestAnimationFrame(() => this._wochePassen()); });
+        this._wocheRO.ziel = c;
+        this._wocheRO.observe(c.querySelector(".wsticky"));
+        this._wocheRO.observe(document.documentElement);
+        if (this._app.firstElementChild) this._wocheRO.observe(this._app.firstElementChild);
+      }
+    } else {
+      const voll = kopfH + c.querySelector(".wkoerper").offsetHeight;
+      c.style.height = `${Math.min(voll, this._freieHoehe(c))}px`;
+    }
     c.onscroll = () => { this._wScroll = c.scrollTop; };
-    if (this._wScroll === undefined) {
+    if (!this._narrow) { this._wScroll = c.scrollHeight > c.clientHeight + 1 ? this._wScroll : 0; }
+    else if (this._wScroll === undefined) {
       const h = new Date().getHours();
       this._wScroll = h >= von + 3 ? Math.max(0, (h - 1 - von) * hpx) : 0;
     }
-    c.scrollTop = this._wScroll;
+    c.scrollTop = this._wScroll || 0;
   }
 
   async _monatTermineLaden(von, key) {
@@ -2796,28 +2892,15 @@ class PlanerPanel extends HTMLElement {
     const tage = [...Array(7)].map((_, i) => iso(plusTage(start, i)));
     const termine = this._wTermine?.start === iso(start) ? this._wTermine.liste : null;
     if (!termine) this._wocheTermineLaden(start);
-    const ziele = [...((this._daten.wochen || {})[k]?.ziele || [])];
-    while (ziele.length < 3) ziele.push({ text: "", erledigt: false });
     const aufg = (tag) => this._sortiert(alle.filter((a) => a.datum === tag && (a.status === "offen" || (a.erledigt_am || "").slice(0, 10) === tag)));
     const d0 = ausIso(tage[0]), d7 = ausIso(tage[6]);
     const spanne = `${d0.getDate()}. ${d0.getMonth() !== d7.getMonth() ? MONATE[d0.getMonth()] + " " : ""}– ${d7.getDate()}. ${MONATE[d7.getMonth()]}`;
     const eingang = this._sortiert(alle.filter((a) => a.status === "offen" && !a.datum));
     return `<section class="gruppe" aria-labelledby="w-titel">
       ${this._narrow ? this._kalenderUmschalter() : ""}
-      <div class="wkopf"><h2 id="w-titel">${esc(spanne)}</h2>${this._narrow ? "" : this._kalenderUmschalter(true)}${this._kalNavi("woche", "Heute", iso(start) === iso(montag(new Date())), "Woche wechseln")}</div>
+      <div class="wkopf"><h2 id="w-titel">${esc(spanne)}<span class="zahl">KW ${+k.slice(6)}</span></h2>${this._narrow ? "" : this._kalenderUmschalter(true)}${this._kalNavi("woche", "Heute", iso(start) === iso(montag(new Date())), "Woche wechseln")}</div>
     </section>
     ${this._wocheRaster(tage, termine || [], aufg)}
-    <section class="gruppe" aria-labelledby="z-titel">
-      <h2 id="z-titel">Wochenziele <span class="zahl">KW ${+k.slice(6)}</span></h2>
-      <form class="ziele" id="zform" data-kw="${k}">
-        ${ziele.slice(0, 3).map((z, i) => `<div class="ziel">
-          <span class="nr" aria-hidden="true">${i + 1}</span>
-          <label class="sr" for="z-${i}">Wochenziel ${i + 1}</label>
-          <input type="text" id="z-${i}" data-fokus="z-${i}" value="${esc(z.text)}" placeholder="${["Was soll diese Woche klappen?", "Zweites Ziel (optional)", "Drittes Ziel (optional)"][i]}">
-          <input type="checkbox" id="zc-${i}" ${z.erledigt ? "checked" : ""} aria-label="Wochenziel ${i + 1} erreicht">
-        </div>`).join("")}
-      </form>
-    </section>
     ${termine === null ? `<p class="hinweis" role="status">Termine werden geladen …</p>` : ""}
     ${eingang.length ? `<section class="gruppe" aria-labelledby="ab-titel">
       <h2 id="ab-titel">Aus dem Eingang einplanen</h2>
@@ -2882,28 +2965,29 @@ class PlanerPanel extends HTMLElement {
         gruppe.push(x); gEnde = Math.max(gEnde, x.e);
       }
       if (gruppe.length) fertig();
-      const px = (m) => (Math.max(m, von * 60) - von * 60) / 60 * hpx;
+      const px = (m) => (Math.max(m, von * 60) - von * 60) / 60;
+      const cp = (h, extra = "") => `calc(var(--hpx) * ${h.toFixed(4)}${extra})`;
       const bandHtml = baender.map((x, n) => {
         const top = px(x.s), h = px(Math.min(x.e, bis * 60)) - top;
-        return `<div class="wband ${x.fort ? "fort" : ""} ${baender.length > 1 ? "geteilt" : ""}" style="top:${top}px;height:${h}px;left:${n * 100 / baender.length}%;width:${100 / baender.length}%;--k:${x.sc.farbe}" title="${esc(`${x.wer ? x.wer + ": " : ""}${x.sc.name} ${this._schichtZeit(x.sc)}`.trim())}"><span>${x.wer ? `<b>${esc(x.wer[0])}</b> ` : ""}${esc(x.sc.name)}</span></div>`;
+        return `<div class="wband ${x.fort ? "fort" : ""} ${baender.length > 1 ? "geteilt" : ""}" style="top:${cp(top)};height:${cp(h)};left:${n * 100 / baender.length}%;width:${100 / baender.length}%;--k:${x.sc.farbe}" title="${esc(`${x.wer ? x.wer + ": " : ""}${x.sc.name} ${this._schichtZeit(x.sc)}`.trim())}"><span>${x.wer ? `<b>${esc(x.wer[0])}</b> ` : ""}${esc(x.sc.name)}</span></div>`;
       }).join("");
       const blockHtml = bloecke.map((x) => {
-        const top = px(x.s), hoehe = Math.max(18, px(Math.min(x.e, bis * 60)) - top - 1);
-        return x.html(`top:${top}px;height:${hoehe}px;left:calc(${x.sp * 100 / x.n}% + 1px);width:calc(${100 / x.n}% - 2px)`, hoehe >= 34 && !this._narrow);
+        const top = px(x.s), hoeheH = px(Math.min(x.e, bis * 60)) - top;
+        return x.html(`top:${cp(top)};height:max(18px, ${cp(hoeheH, " - 1px")});left:calc(${x.sp * 100 / x.n}% + 1px);width:calc(${100 / x.n}% - 2px)`, hoeheH * hpx - 1 >= 34 && !this._narrow);
       }).join("");
       const heuteTag = tag === this._tag;
-      const jetztHtml = heuteTag && jetztMin > von * 60 && jetztMin < bis * 60 ? `<div class="wjetzt" style="top:${px(jetztMin)}px" aria-hidden="true"></div>` : "";
+      const jetztHtml = heuteTag && jetztMin > von * 60 && jetztMin < bis * 60 ? `<div class="wjetzt" style="top:${cp(px(jetztMin))}" aria-hidden="true"></div>` : "";
       const d = ausIso(tag);
       return { kopf: `<button type="button" class="wkh ${heuteTag ? "heute" : ""}" data-tagauf="${tag}" aria-label="${esc(datumText(tag) + ", Tag öffnen")}"><span class="wn">${WT_KURZ[i]}</span><b>${d.getDate()}</b></button>`,
         ganz: `<div class="wkg ${heuteTag ? "heute" : ""}" data-tag="${tag}" data-wleer="${tag}">${sichtbar}</div>`,
-        spalte: `<div class="wspalte ${heuteTag ? "heute" : ""}" data-tag="${tag}" data-wleer="${tag}" style="height:${stunden * hpx}px">${bandHtml}${blockHtml}${jetztHtml}</div>` };
+        spalte: `<div class="wspalte ${heuteTag ? "heute" : ""}" data-tag="${tag}" data-wleer="${tag}" style="height:${cp(stunden)}">${bandHtml}${blockHtml}${jetztHtml}</div>` };
     });
-    return `<div class="wcal" id="wcal" style="--hpx:${hpx}px" role="group" aria-label="Wochenkalender" data-von="${von}" data-hpx="${hpx}">
+    return `<div class="wcal" id="wcal" style="--hpx:${hpx}px" role="group" aria-label="Wochenkalender" data-von="${von}" data-bis="${bis}" data-hpx="${hpx}">
       <div class="wsticky">
         <div class="wzeile"><div class="wl"></div>${spalten.map((x) => x.kopf).join("")}</div>
         <div class="wzeile wganzz"><div class="wl">Ganztag</div>${spalten.map((x) => x.ganz).join("")}</div>
       </div>
-      <div class="wzeile wkoerper"><div class="wl wstunden" style="height:${stunden * hpx}px" aria-hidden="true">${[...Array(stunden)].map((_, i) => `<span style="top:${i * hpx}px">${String(von + i).padStart(2, "0")}<small>:00</small></span>`).join("")}</div>${spalten.map((x) => x.spalte).join("")}</div>
+      <div class="wzeile wkoerper"><div class="wl wstunden" style="height:calc(var(--hpx) * ${stunden})" aria-hidden="true">${[...Array(stunden)].map((_, i) => `<span style="top:calc(var(--hpx) * ${i})">${String(von + i).padStart(2, "0")}<small>:00</small></span>`).join("")}</div>${spalten.map((x) => x.spalte).join("")}</div>
     </div>`;
   }
 
@@ -3183,86 +3267,9 @@ class PlanerPanel extends HTMLElement {
     </button></li>`;
   }
 
-  // Heute als Zeitleiste: Termine und Aufgaben mit Uhrzeit, Linie „Jetzt“, freie Zeit bis Tagesende
-  // Zeitleiste: heute mit Jetzt-Markierung, dazu die nächsten Tage; scrollt in sich
-  _zeitleiste(offen) {
-    const h = this._tag;
-    const zeit = (x) => +x.slice(0, 2) * 60 + +x.slice(3, 5);
-    const jetzt = new Date();
-    const jetztMin = jetzt.getHours() * 60 + jetzt.getMinutes();
-    const bisStd = this._daten.einst?.tag_bis ?? 22;
-    const tlKal = this._daten.einst?.kalender_zeitleiste;
-    const tagDaten = (tag) => {
-      const termine = this._termineAm(tag).filter((t) => tlKal == null || tlKal.includes(t.kalender));
-      const eintraege = [
-        ...termine.filter((t) => !t.ganztag).map((t) => {
-          const s0 = t.start.slice(0, 10) < tag ? 0 : zeit(uhr(t.start));
-          const e0 = t.ende.slice(0, 10) > tag ? 1440 : zeit(uhr(t.ende));
-          return { s: s0, e: e0, html: this._terminZeile(t, tag) };
-        }),
-        ...offen.filter((a) => a.datum === tag && a.uhrzeit).map((a) => {
-          const s0 = zeit(a.uhrzeit);
-          const e0 = s0 + (a.dauer || 0);
-          const bis = a.dauer ? ` – ${hhmm(e0)}` : "";
-          return { s: s0, e: Math.max(e0, s0 + 1), html: `<li class="tl-aufgabe ${a.top ? "top" : ""}" data-id="${a.id}">
-            <button type="button" class="haken" role="checkbox" aria-checked="false" data-aktion="haken" data-id="${a.id}" aria-label="${esc(a.titel)} erledigt"></button>
-            <button type="button" class="inhalt" data-aktion="oeffnen" data-id="${a.id}">
-              <span class="zeit">${a.uhrzeit}${bis}</span><span class="titel">${esc(a.titel)}</span>
-              <span class="unter">Aufgabe${a.top ? ` · Top ${a.top}` : ""}${a.bereich ? ` · ${esc(a.bereich)}` : ""}</span></button></li>` };
-        }),
-      ];
-      const schs = this._schichtenAm(tag);
-      for (const { a: sch, wer } of schs) {
-        if (!sch.von || !sch.bis) continue;
-        const s0 = zeit(sch.von); let e0 = zeit(sch.bis); if (e0 <= s0) e0 = 1440;
-        eintraege.push({ s: s0, e: e0, html: `<li><div class="termin schicht" style="--k:${sch.farbe}"><span class="zeit">${sch.von}–${sch.bis}</span><span class="was">${esc(sch.name)}</span><span class="wo">Schicht${wer ? ` · ${esc(wer)}` : ""}</span></div></li>` });
-      }
-      eintraege.sort((x, y) => x.s - y.s);
-      return { ganz: termine.filter((t) => t.ganztag), eintraege, schicht: schs.length ? schs : null };
-    };
-    // Heute
-    const heuteD = tagDaten(h);
-    let html = "", jetztGesetzt = false;
-    for (const x of heuteD.eintraege) {
-      if (!jetztGesetzt && x.s >= jetztMin) { html += `<li class="jetzt"><span>Jetzt ${hhmm(jetztMin)}</span></li>`; jetztGesetzt = true; }
-      html += x.e <= jetztMin ? x.html.replace(/^<li( class="([^"]*)")?/, (m, _k, k) => `<li class="${k || ""} vorbei"`) : x.html;
-    }
-    if (heuteD.eintraege.length && !jetztGesetzt) html += `<li class="jetzt"><span>Jetzt ${hhmm(jetztMin)}</span></li>`;
-    // freie Zeit von jetzt (frühestens Tagesbeginn) bis Tagesende
-    const von = Math.max((this._daten.einst?.tag_von ?? 7) * 60, jetztMin);
-    const bis = bisStd * 60;
-    const belegt = heuteD.eintraege.map((x) => [Math.max(x.s, von), Math.min(x.e, bis)]).filter(([a, b]) => b > a).sort((x, y) => x[0] - y[0]);
-    let frei = Math.max(0, bis - von), ende = von;
-    for (const [a, b] of belegt) { const a2 = Math.max(a, ende); if (b > a2) { frei -= b - a2; ende = b; } }
-    const freiText = frei <= 0 ? `Heute ist bis ${bisStd} Uhr nichts mehr frei.` : `Frei bis ${bisStd} Uhr: ${Math.floor(frei / 60) ? `${Math.floor(frei / 60)} Std. ` : ""}${frei % 60 ? `${frei % 60} Min.` : ""}`.trim();
-    const keineKal = !(this._daten.kalender || []).length;
-    const tagBlock = (tag, titel, inhalt, ganz) => `<div class="tl-tag" aria-label="${esc(titel)}">
-        <h3 class="tl-kopf">${esc(titel)}</h3>
-        ${(() => { const l = this._schichtenAm(tag).filter(({ a }) => !(a.von && a.bis)); return l.length ? `<div class="ganztags">${l.map(({ a: sc, wer }) => `<span class="wpunkt s" style="--k:${sc.farbe}"><b>${esc(sc.kurz)}</b> ${wer ? `${esc(wer)}: ` : ""}${esc(sc.name)}</span>`).join("")}</div>` : ""; })()}
-        ${ganz.length ? `<ul class="termine ganztag" aria-label="Ganztägig">${ganz.map((t) => this._terminZeile(t, tag)).join("")}</ul>` : ""}
-        ${inhalt}
-      </div>`;
-    let tageHtml = tagBlock(h, `Heute, ${datumKurz(h)}`, heuteD.eintraege.length ? `<ul class="zeitleiste">${html}</ul>`
-      : `<p class="leer">${keineKal ? "Noch kein Kalender sichtbar. In HA eingebundene Kalender erscheinen hier automatisch." : "Heute nichts mit Uhrzeit."}</p>`, heuteD.ganz)
-      + `<p class="frei">${esc(freiText)}</p>`;
-    for (let i = 1; i <= 14; i++) {
-      const tag = iso(plusTage(ausIso(h), i));
-      const d = tagDaten(tag);
-      if (!d.ganz.length && !d.eintraege.length && !d.schicht) continue;
-      const name = i === 1 ? "Morgen" : WOCHENTAGE[wt(ausIso(tag))];
-      tageHtml += tagBlock(tag, `${name}, ${datumKurz(tag)}`, d.eintraege.length ? `<ul class="zeitleiste">${d.eintraege.map((x) => x.html).join("")}</ul>` : "", d.ganz);
-    }
-    return `<section class="kal gruppe" aria-labelledby="g-kal">
-      <h2 id="g-kal">Zeitleiste <span class="zahl">14 Tage</span></h2>
-      ${this._kalFehler ? `<p class="fehler">${esc(this._kalFehler)}</p>` : ""}
-      <div class="tl-scroll" tabindex="0" aria-label="Zeitleiste, scrollbar">${tageHtml}</div>
-    </section>`;
-  }
-
   _gruppe(titel, liste, leer = "", art = "", zusatz = "") {
     const id = `g-${titel.replace(/\W+/g, "-").toLowerCase()}`;
-    const knopf = art === "rot" && liste.length
-      ? `<button type="button" class="knopf klein rot-knopf" data-aktion="alle-heute" data-fokus="alle-heute">Alle auf heute</button>` : "";
+    const knopf = "";
     return `<section class="gruppe ${art === "rot" ? "ueberfaellig" : ""}" aria-labelledby="${id}">
       <div class="gkopf"><h2 id="${id}">${esc(titel)} ${titel === "Top 3" ? "" : `<span class="zahl">${liste.length || ""}</span>`}${zusatz ? ` <span class="chip">${esc(zusatz)}</span>` : ""}</h2>${knopf}</div>
       ${liste.length ? `<ul class="liste">${liste.map((a) => this._zeile(a)).join("")}</ul>` : leer ? `<p class="leer">${esc(leer)}</p>` : ""}
@@ -3272,26 +3279,20 @@ class PlanerPanel extends HTMLElement {
   _zeile(a, wiederErledigt = false) {
     const fertig = a.status === "erledigt" || wiederErledigt;
     const meta = [];
-    if (a.datum && (this._ansicht !== "heute" || a.datum < this._tag)) meta.push(`<span class="chip ${a.datum < this._tag ? "warn" : ""}">${esc(datumText(a.datum))}</span>`);
+    const ueberf = !fertig && this._ansicht === "heute" && a.datum && a.datum < this._tag;
+    if (ueberf) {
+      const n = Math.round((ausIso(this._tag) - ausIso(a.datum)) / 864e5);
+      meta.push(`<span class="chip rot">${n <= 1 ? "seit gestern" : `seit ${n} Tagen`}</span>`);
+    } else if (a.datum && this._ansicht !== "heute") meta.push(`<span class="chip ${a.datum < this._tag ? "warn" : ""}">${esc(datumText(a.datum))}</span>`);
     if (wiederErledigt) meta.push(`<span class="chip mint">nächstes Mal ${esc(datumText(a.datum))}</span>`);
-    if (a.uhrzeit) meta.push(`<span class="chip">${esc(a.uhrzeit)} Uhr</span>`);
+    if (a.uhrzeit) meta.push(`<span class="chip zeit">${esc(a.uhrzeit)}${this._narrow ? "" : " Uhr"}</span>`);
     const farbe = bereichFarbe(a.bereich, this._daten.farben);
-    if (!fertig && this._ansicht === "heute" && this._naechste === a.id) meta.unshift(`<span class="chip naechstes">Als Nächstes</span>`);
+    // Kompakt: nur Datum/Uhrzeit und Bereich; alles Weitere im Detail beim Antippen
     if (a.bereich) meta.push(`<span class="chip" style="--b:${farbe}"><span class="punkt" aria-hidden="true"></span> ${esc(a.bereich)}</span>`);
-    for (const t of a.tags || []) meta.push(`<span class="chip">#${esc(t)}</span>`);
-    const teile = a.teilaufgaben || [];
-    if (teile.length) {
-      const fertigT = teile.filter((t) => t.erledigt).length;
-      meta.push(`<span class="chip ${fertigT === teile.length ? "mint" : ""}">${ICON.teile}${fertigT}/${teile.length}<span class="sr"> Teilaufgaben erledigt</span></span>`);
-      const naechster = teile.find((t) => !t.erledigt);
-      if (naechster && !fertig) meta.push(`<span class="chip">Nächster Schritt: ${esc(naechster.text)}</span>`);
-    }
-    if (a.wiederholung) meta.push(`<span class="chip mint">${ICON.wdh}${esc(regelText(a.wiederholung))}</span>`);
-    if (a.verschoben > 0) meta.push(`<span class="chip warn">${a.verschoben}× verschoben</span>`);
     const morgen = fertig || this._narrow ? "" : `<button type="button" class="knopf klein" data-aktion="morgen" data-id="${a.id}" data-fokus="m-${a.id}" aria-label="${esc(a.titel)} auf morgen verschieben">Morgen</button>`;
     const mehr = `<button type="button" class="mehr-knopf" data-zmenue="${a.id}" data-fokus="zm-${a.id}" aria-haspopup="menu" aria-expanded="false" aria-label="Aktionen für ${esc(a.titel)}" title="Aktionen (Rechtsklick, lange drücken)">${ICON.mehr}</button>`;
     const wer = this._werZeigen(a.person);
-    return `<li class="aufgabe ${a.top && !fertig ? "top" : ""} ${fertig ? "erledigt" : ""} ${a.bereich ? "farbig" : ""}" data-id="${a.id}" ${a.bereich ? `style="--b:${farbe}"` : ""}>
+    return `<li class="aufgabe ${ueberf ? "ueberf" : ""} ${a.top && !fertig ? "top" : ""} ${fertig ? "erledigt" : ""} ${a.bereich ? "farbig" : ""}" data-id="${a.id}" ${a.bereich ? `style="--b:${farbe}"` : ""}>
       <div class="wisch rechts" aria-hidden="true">${ICON.haken}Erledigt</div><div class="wisch links" aria-hidden="true">Verschieben${ICON.pfeil}</div>
       <div class="zeile">
         <button type="button" class="haken" role="checkbox" aria-checked="${fertig}" data-aktion="haken" data-id="${a.id}" data-fokus="h-${a.id}" aria-label="${esc(a.titel)} erledigt">${fertig ? HAKEN : ""}</button>
@@ -3374,17 +3375,6 @@ class PlanerPanel extends HTMLElement {
       const st = montag(this._wStart || ausIso(heute()));
       this._sagen(`${datumText(iso(st))} bis ${datumText(iso(plusTage(st, 6)))}`);
     }));
-    const zf = root.getElementById("zform");
-    if (zf) {
-      const speichern = async () => {
-        const ziele = [0, 1, 2].map((i) => ({ text: zf.querySelector(`#z-${i}`).value.trim(), erledigt: zf.querySelector(`#zc-${i}`).checked }));
-        const e = await this._ws({ type: "planer/woche", kw: zf.dataset.kw, ziele, notiz: "" });
-        this._daten.wochen = { ...(this._daten.wochen || {}), [zf.dataset.kw]: e };
-      };
-      zf.querySelectorAll('input[type="text"]').forEach((i) => i.addEventListener("change", () => { speichern(); this._sagen("Wochenziel gespeichert"); }));
-      zf.querySelectorAll('input[type="checkbox"]').forEach((c) => c.addEventListener("change", () => { speichern(); this._sagen(c.checked ? "Wochenziel erreicht" : "Wochenziel wieder offen"); }));
-      zf.addEventListener("submit", (e) => e.preventDefault());
-    }
     // Ziehen auf einen Tag (Maus/Trackpad); am Handy und mit Tastatur über „Öffnen“ und Datum
     this._app.querySelectorAll("[data-ziehen]").forEach((el) => el.addEventListener("dragstart", (e) => {
       e.dataTransfer.setData("text/plain", el.dataset.ziehen);
@@ -3506,7 +3496,6 @@ class PlanerPanel extends HTMLElement {
       return;
     }
     if (art === "suche") return this._suche();
-    if (art === "alle-heute") return this._alleAufHeute();
     if (art === "tags-einblenden") return this._ansichtSpeichern({ ausgeblendete_tags: [] });
     if (!a) return;
     if (art === "oeffnen") return this._oeffnen(a);
@@ -3640,18 +3629,6 @@ class PlanerPanel extends HTMLElement {
       } catch (e) { this._sTermine = []; }
       zeigen();
     }
-  }
-
-  async _alleAufHeute() {
-    const h = this._tag;
-    const ueber = this._sichtbar().filter((a) => a.status === "offen" && a.datum && a.datum < h);
-    if (!ueber.length) return;
-    const vorher = ueber.map((a) => ({ id: a.id, datum: a.datum, top: a.top || null }));
-    for (const a of ueber) await this._ws({ type: "planer/speichern", aufgabe: { id: a.id, datum: h, top: null } });
-    const text = `${ueber.length} ${ueber.length === 1 ? "Aufgabe" : "Aufgaben"} auf heute geschoben`;
-    this._sagen(text);
-    this._hinweis(text, async () => { for (const v of vorher) await this._ws({ type: "planer/speichern", aufgabe: v }); });
-    await this._lesen();
   }
 
   // Dialog mit Ausblend-Animation schließen
@@ -3953,6 +3930,10 @@ class PlanerPanel extends HTMLElement {
         if (m.lastElementChild && !m.lastElementChild.classList.contains("menue-trenner")) {
           const t = document.createElement("div"); t.className = "menue-trenner"; t.setAttribute("role", "separator"); m.append(t);
         }
+        continue;
+      }
+      if (e.kopf) {
+        const k = document.createElement("div"); k.className = "menue-kopf"; k.setAttribute("role", "presentation"); k.textContent = e.kopf; m.append(k);
         continue;
       }
       if (e.eingabe) {
