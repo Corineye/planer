@@ -758,7 +758,13 @@ dialog.schliesst::backdrop{background:rgba(0,0,0,0)}
 main.einblenden{animation:einblenden .28s var(--bewegung)}
 @keyframes einblenden{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 li.aufgabe.abgehakt .zeile{animation:abhaken .35s var(--bewegung) forwards}
-li.aufgabe.abgehakt .haken::before{background:var(--accent-fill);border-color:var(--accent-fill);animation:haken-fuell .32s var(--bewegung)}
+.tag-aufgaben{list-style:none;margin:0;padding:var(--s1) var(--s3);border-radius:var(--r-karte);background:var(--card);display:grid}
+.tag-aufgaben li{display:flex;align-items:center;gap:var(--s1);min-height:44px;border-left:3px solid var(--k);padding-left:var(--s1)}
+.tag-aufgaben li+li{border-top:.5px solid var(--line2)}
+.tag-aufgaben .ta-titel{flex:1;min-width:0;text-align:left;border:0;background:none;font:inherit;color:var(--fg);padding:var(--s2) 0;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tag-aufgaben .ta-titel .u{color:var(--muted);margin-right:var(--s2);font-variant-numeric:tabular-nums}
+.tag-aufgaben li.fertig .ta-titel{color:var(--muted);text-decoration:line-through}
+.tag-aufgaben li.abgehakt .haken::before,li.aufgabe.abgehakt .haken::before{background:var(--accent-fill);border-color:var(--accent-fill);animation:haken-fuell .32s var(--bewegung)}
 li.aufgabe.abgehakt .haken::after{content:"";grid-area:1/1;width:24px;height:24px;border-radius:50%;box-shadow:0 0 0 0 var(--accent-fill);animation:haken-ring .5s ease-out forwards;pointer-events:none}
 li.aufgabe.abgehakt .haken svg{animation:haken-svg .3s .08s var(--bewegung) both}
 @keyframes haken-fuell{0%{transform:scale(.6)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
@@ -3239,12 +3245,19 @@ class PlanerPanel extends HTMLElement {
         <span class="r tag-r"><button type="button" class="rund" data-tagweiter="1" aria-label="Nächster Tag">${ICON.vor}</button><button type="submit" class="knopf text fett">Fertig</button></span></div>
       ${quelle ? "" : `<p class="hinweis" role="status">Termine werden geladen …</p>`}
       ${this._narrow ? "" : `<p class="hinweis">Im Raster ein Zeitfenster ziehen, um etwas einzutragen.</p>`}
+      ${as.length ? `<ul class="tag-aufgaben" aria-label="Aufgaben an diesem Tag">${as.map((a) => { const fertig = a.status === "erledigt"; return `<li class="${fertig ? "fertig" : ""}" style="--k:${bereichFarbe(a.bereich, this._daten.farben) || "var(--accent)"}">
+        <button type="button" class="haken" role="checkbox" aria-checked="${fertig}" data-tag-haken="${a.id}" aria-label="${esc(a.titel)} erledigt">${fertig ? HAKEN : ""}</button>
+        <button type="button" class="ta-titel" data-aktion="oeffnen" data-id="${a.id}">${a.uhrzeit ? `<span class="u">${a.uhrzeit}</span>` : ""}${esc(a.titel)}</button></li>`; }).join("")}</ul>` : ""}
       <div class="tag-inhalt">${this._tagInhalt(tag, ts, as, 52, true)}</div>
       ${kannTermin ? `<button type="button" class="knopf" data-tagtermin="1">${ICON.termin}Ganztägig oder mit allen Optionen</button>` : ""}
     </form>`;
     dlg.querySelectorAll("[data-tagweiter]").forEach((b) => b.addEventListener("click", () => this._tagZeigen(iso(plusTage(ausIso(tag), +b.dataset.tagweiter)))));
     dlg.querySelectorAll("[data-aktion=oeffnen]").forEach((b) => b.addEventListener("click", () => { const a = this._finde(b.dataset.id); if (a) this._oeffnen(a); }));
     dlg.querySelector("[data-tagtermin]")?.addEventListener("click", () => this._terminNeu(tag));
+    dlg.querySelectorAll("[data-tag-haken]").forEach((b) => b.addEventListener("click", async () => {
+      b.closest("li")?.classList.add("abgehakt");
+      try { await this._aktion("haken", b.dataset.tagHaken); } finally { if (dlg.open) this._tagZeigen(tag); }
+    }));
     this._terminKlicks(dlg);
     const raster = dlg.querySelector(".raster.waehlbar");
     if (raster) this._rasterWahl(raster, tag);
@@ -3925,6 +3938,7 @@ class PlanerPanel extends HTMLElement {
       <p class="hinweis">Ohne Uhrzeit wird um 9:00 Uhr am Fälligkeitstag gerechnet. Erinnert wird nur, wenn für die Person ein Handy eingestellt ist.</p>
       <div class="feld"><label for="b-notiz">Notiz</label><textarea id="b-notiz">${esc(a.notiz || "")}</textarea></div>
       <p class="fehler" id="b-fehler" role="alert"></p>
+      ${a.id ? `<div class="fuss"><button type="button" class="knopf ${a.status === "erledigt" ? "" : "primaer"}" id="b-erledigt" style="width:100%">${a.status === "erledigt" ? "Wieder offen" : "Erledigt"}</button></div>` : ""}
       ${a.id ? `<div class="fuss"><button type="button" class="knopf gefahr" id="b-loeschen" style="width:100%">Aufgabe löschen</button></div>` : ""}
     </form>`;
 
@@ -4044,6 +4058,12 @@ class PlanerPanel extends HTMLElement {
       await autoSpeichern();
       if (geaendert) { geaendert = false; await this._lesen(); }
     };
+    $("b-erledigt")?.addEventListener("click", async () => {
+      try { await dlg._vorZu?.(); } catch (e) { /* Speichern meldet selbst */ }
+      this._zu(dlg);
+      await this._aktion("haken", a.id);
+      if (this._tagOffen) this._tagZeigen(this._tagOffen);
+    });
     $("b-loeschen")?.addEventListener("click", async () => {
       if (!sicher) { sicher = true; $("b-loeschen").textContent = "Wirklich löschen?"; $("b-loeschen").focus(); return; }
       weg = true; clearTimeout(uhr);
