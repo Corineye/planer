@@ -541,9 +541,10 @@ aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);positio
 .schmal .mnr{width:20px;height:20px;font-size:12px}
 .schmal .mtag:has(.msz) .mnr{margin-bottom:0}
 @container (min-width:600px){
-.monat{--kompakt:0;gap:var(--s1)}
+.monat{--kompakt:1;gap:var(--s1);grid-template-rows:auto repeat(var(--zeilen),minmax(0,1fr))}
 .mkopf{text-align:left;padding-left:6px}
-.mtag{height:auto;min-height:112px;padding:6px 6px 8px;overflow:visible;gap:3px}
+.mtag{height:auto;min-height:0;padding:5px 6px 4px;overflow:hidden;gap:3px}
+.mmehr{font-size:11px;line-height:16px;padding-left:6px}
 .mnr{width:26px;height:26px;font-size:var(--t-sub);margin-bottom:2px}
 .msz{flex-wrap:wrap;gap:3px}
 .msk{font-size:10.5px;height:18px;line-height:18px;padding:0 6px;overflow:visible}
@@ -1403,7 +1404,7 @@ class PlanerPanel extends HTMLElement {
   }
   // Termine, die an diesem Tag stattfinden (ganztägige: Ende exklusiv)
   _termineAm(tag) {
-    return (this._termine || []).filter((t) => {
+    return this._ohneSchichtTermine(this._termine || []).filter((t) => {
       const s = t.start.slice(0, 10), e = t.ende.slice(0, 10);
       return t.ganztag ? s <= tag && tag < e : s <= tag && tag <= e;
     });
@@ -2212,7 +2213,28 @@ class PlanerPanel extends HTMLElement {
   }
   _schichtPersonen() {
     const p = this._schichtPerson();
-    return p ? [p] : (this._daten.personen || []).map((x) => x.id).filter((id) => (this._daten.schichten || {})[id]);
+    if (!p) return (this._daten.personen || []).map((x) => x.id).filter((id) => (this._daten.schichten || {})[id]);
+    // Wer den Arbeitskalender einer anderen Person eingeblendet hat, sieht auch deren Schichten
+    if (this._ansicht === "woche" && this._kalAnsicht === "schichten") return [p];
+    const extra = (this._daten.personen || []).map((x) => x.id).filter((id) => id !== p && this._plan(id).arten.length && this._schichtKalAn(id));
+    return [p, ...extra];
+  }
+  // Kalender, in den die Schichten einer Person laufen (eingestellt oder „<Vorname> Arbeit“)
+  _schichtKal(person) {
+    const se = (this._daten.schicht_einst || {})[person] || {};
+    if (se.kalender) return se.kalender;
+    const vn = `${(this._name(person) || "").split(" ")[0].toLowerCase()} arbeit`;
+    return (this._daten.kalender || []).find((k) => (k.name || "").trim().toLowerCase() === vn)?.id || null;
+  }
+  _schichtKalAn(person) {
+    const id = this._schichtKal(person);
+    return !!id && (this._daten.kalender || []).some((k) => k.id === id && k.angezeigt !== false);
+  }
+  // Vom Planer eingetragene Schicht-Termine ausblenden, wenn die Schicht schon als Schicht gezeigt wird
+  _ohneSchichtTermine(liste) {
+    const kals = new Set(this._schichtPersonen().map((p) => this._schichtKal(p)).filter(Boolean));
+    if (!kals.size) return liste;
+    return liste.filter((t) => !(kals.has(t.kalender) && (t.beschreibung || "").includes("planer-schicht")));
   }
   // Schichten an einem Tag für alle gerade gezeigten Personen; bei mehreren mit Namenskürzel
   _schichtenAm(tag) {
@@ -2769,7 +2791,7 @@ class PlanerPanel extends HTMLElement {
     const key = tage[0];
     const termine = this._mTermine?.start === key ? this._mTermine.liste : null;
     if (!termine) this._monatTermineLaden(von, key);
-    const am = (tag) => (termine || []).filter((t) => {
+    const am = (tag) => this._ohneSchichtTermine(termine || []).filter((t) => {
       const s0 = t.start.slice(0, 10), e0 = t.ende.slice(0, 10);
       return t.ganztag ? s0 <= tag && tag < e0 : s0 <= tag && tag <= e0;
     });
@@ -2822,7 +2844,7 @@ class PlanerPanel extends HTMLElement {
     const m = this._app.querySelector(".monat");
     if (!m) return;
     const kompakt = getComputedStyle(m).getPropertyValue("--kompakt").trim() === "1";
-    if (this._narrow) m.style.height = `${this._freieHoehe(m)}px`; else m.style.height = "";
+    m.style.height = this._narrow ? `${this._freieHoehe(m)}px` : `${Math.max(520, this._freieHoehe(m))}px`;
     // Ändert sich die Größe später (Schrift geladen, Kopf umgebrochen), neu verteilen
     if (window.ResizeObserver && this._monatRO?.ziel !== m) {
       this._monatRO?.disconnect();
@@ -2833,22 +2855,24 @@ class PlanerPanel extends HTMLElement {
     m.querySelectorAll(".mmehr").forEach((x) => x.remove());
     m.querySelectorAll(".me[hidden]").forEach((x) => { x.hidden = false; });
     if (!kompakt) return;
+    const wort = this._narrow ? "" : " weitere";
     m.querySelectorAll(".mtag").forEach((z) => {
       const es = [...z.querySelectorAll(".me")];
       if (!es.length) return;
       const unten = z.getBoundingClientRect().bottom - 3;
       let weg = 0;
-      for (let i = es.length - 1; i >= 0; i--) if (es[i].getBoundingClientRect().bottom > unten) { es[i].hidden = true; weg++; }
+      // Höchstens 3 Einträge pro Tag, der Rest als „+n weitere“
+      for (let i = es.length - 1; i >= 0; i--) if (i >= 3 || es[i].getBoundingClientRect().bottom > unten) { es[i].hidden = true; weg++; }
       if (!weg) return;
       const mm = document.createElement("span");
       mm.className = "mmehr";
-      mm.textContent = `+${weg}`;
+      mm.textContent = `+${weg}${wort}`;
       z.appendChild(mm);
       while (mm.getBoundingClientRect().bottom > unten) {
         const sicht = es.filter((e) => !e.hidden);
         if (!sicht.length) break;
         sicht[sicht.length - 1].hidden = true; weg++;
-        mm.textContent = `+${weg}`;
+        mm.textContent = `+${weg}${wort}`;
       }
     });
   }
@@ -3005,7 +3029,7 @@ class PlanerPanel extends HTMLElement {
   }
 
   _termineIn(liste, tag) {
-    return liste.filter((t) => {
+    return this._ohneSchichtTermine(liste).filter((t) => {
       const s0 = t.start.slice(0, 10), e0 = t.ende.slice(0, 10);
       return t.ganztag ? s0 <= tag && tag < e0 : s0 <= tag && tag <= e0;
     });
