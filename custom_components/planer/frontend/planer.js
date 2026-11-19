@@ -339,7 +339,7 @@ svg{flex:none}
 @media (prefers-reduced-transparency:reduce){.glas,.seg,nav.tabs,.knopf:not(.primaer):not(.text),.rund,.fab{background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none}}
 
 /* ---------- Grundgerüst ---------- */
-.wrap{max-width:1040px;margin:0 auto;padding:var(--s4) var(--s5) var(--s6);display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s4)}
+.wrap{max-width:1320px;margin:0 auto;padding:var(--s4) var(--s5) var(--s6);display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s4)}
 .wrap>*{min-width:0}
 .schmal .wrap{padding:var(--s2) var(--s4) calc(112px + env(safe-area-inset-bottom,0px));gap:var(--s4)}
 header{display:flex;gap:var(--s3);align-items:center;min-width:0}
@@ -353,11 +353,16 @@ header .titel-block{flex:1 1 200px}
 header .rechts{order:2}
 header nav.tabs button{padding:0 var(--s3)}
 #rahmen:not(.schmal) .wrap{container-type:inline-size}
-@container (min-width:840px){header{flex-wrap:nowrap}header nav.tabs{flex:0 1 auto;min-width:0}header nav.tabs{order:2;margin:0 var(--s2)}header .titel-block{flex:0 1 170px;min-width:110px}header .rechts{order:3;margin-left:auto}header nav.tabs .zahl{display:none}}
+@container (min-width:840px){header{flex-wrap:nowrap}header nav.tabs{flex:0 1 auto;min-width:0}header nav.tabs{order:2;margin:0 var(--s2)}header .titel-block{flex:none;min-width:0}header .rechts{order:3;margin-left:auto}header nav.tabs .zahl{display:none}}
 @container (min-width:990px){header nav.tabs .zahl:not(.null){display:inline}}
 @container (max-width:700px){header nav.tabs{max-width:100%}header nav.tabs button{padding:0 var(--s2);gap:4px;flex:1 1 auto;justify-content:center;min-width:0}header nav.tabs .zahl{display:none}}
 .schmal header{padding-top:var(--s1)}
-.tage{display:grid;gap:var(--s4);max-width:760px;width:100%;margin:0 auto;min-width:0}
+.tagraster{display:grid;gap:var(--s4);width:100%;min-width:0;grid-template-columns:minmax(0,1fr);align-items:stretch}
+@container (min-width:720px){.tagraster{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@container (min-width:1120px){.tagraster{grid-template-columns:repeat(6,minmax(0,1fr))}.tagraster>.tkarte{grid-column:span 2}.tagraster>.tkarte:nth-child(-n+2 of .tkarte){grid-column:span 3}}
+.tagraster>.zu,.tagraster>.fehler{grid-column:1/-1}
+.tkarte{align-content:start}
+.tkarte h2{margin:0;padding:0 var(--s1);min-height:28px;display:flex;align-items:center}
 .tkarte{padding:var(--s3);border-radius:20px;background:var(--fill);display:grid;gap:var(--s3);min-width:0}
 .tkarte h2{font-size:var(--t-kopf);color:var(--muted)}
 .tkarte.heute h2{color:var(--accent)}
@@ -800,6 +805,14 @@ dialog .schnellwahl .knopf:not(.primaer):not(.text)[aria-pressed="true"]{backgro
 .schmal .wstunden span{font-size:9px;right:3px}
 .schmal .wstunden small{display:none}
 .wspalte{position:relative;min-width:0;border-left:1px solid var(--line);background-image:repeating-linear-gradient(to bottom,var(--line) 0 1px,transparent 1px var(--hpx));cursor:pointer}
+/* Vergangene Tage: leicht grau, ohne Farbe – so sieht man sofort, wo man ist */
+.wspalte.vorbei,.wkg.vorbei{background-color:color-mix(in srgb,var(--fg) 5%,transparent)}
+.wkh.vorbei{color:var(--muted)}
+.wspalte.vorbei>.wband{opacity:.3}
+.wspalte.vorbei>*,.wkg.vorbei>*{filter:grayscale(1);opacity:.6}
+.mtag.vorbei,.mtag.vorbei.mschichttag,.mtag.fremd.vorbei.mschichttag{background:color-mix(in srgb,var(--fg) 6%,var(--card))}
+.mtag.vorbei>*{filter:grayscale(1);opacity:.55}
+.mtag.vorbei .mnr{color:var(--muted)}
 .wspalte.ziel-drop,.wkg.ziel-drop{outline:2px dashed var(--accent);outline-offset:-2px}
 .wband{position:absolute;z-index:1;box-sizing:border-box;pointer-events:none;overflow:hidden;background:color-mix(in srgb,var(--k) 26%,transparent);border-left:3px solid var(--k);padding:2px 3px;font-size:10px;font-weight:600;line-height:1.15;color:var(--fg)}
 .wband span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -2122,7 +2135,7 @@ class PlanerPanel extends HTMLElement {
       html += `<details class="zu"><summary>Heute erledigt (${erledigtHeute.length})</summary>
         <ul class="liste">${erledigtHeute.map((a) => this._zeile(a, a.status === "offen")).join("")}</ul></details>`;
     }
-    return `<div class="tage">${html}</div>`;
+    return `<div class="tagraster">${html}</div>`;
   }
 
   // ---------- Einkauf (Bring! und andere To-do-Listen) ----------
@@ -2779,7 +2792,7 @@ class PlanerPanel extends HTMLElement {
           ];
           const schHtml = sch.length ? `<span class="msz">${sch.map(({ a: sc, wer }) => `<span class="msk" style="--sc:${sc.farbe}" title="${esc(`${wer ? wer + ": " : ""}${sc.name} ${this._schichtZeit(sc)}`.trim())}">${esc(wer ? `${wer[0]} ${sc.kurz}` : sc.kurz)}${sc.von && sc.bis ? `<span class="sz">${sc.von}–${sc.bis}</span>` : ""}</span>`).join("")}</span>` : "";
           const streifen = sch.length ? `<span class="mstreifen" aria-hidden="true">${sch.map(({ a: sc }) => `<i style="--sc:${sc.farbe}"></i>`).join("")}</span>` : "";
-          return `<button type="button" role="gridcell" class="mtag ${d.getMonth() !== dieserMonat ? "fremd" : ""} ${t === heuteIso ? "heute" : ""} ${sch.length ? "mschichttag" : ""}" data-mtag="${t}" ${sch.length ? `style="--sc1:${sch[0].a.farbe}"` : ""}
+          return `<button type="button" role="gridcell" class="mtag ${d.getMonth() !== dieserMonat ? "fremd" : ""} ${t === heuteIso ? "heute" : ""} ${t < heuteIso ? "vorbei" : ""} ${sch.length ? "mschichttag" : ""}" data-mtag="${t}" ${sch.length ? `style="--sc1:${sch[0].a.farbe}"` : ""}
             aria-label="${esc(`${d.getDate()}. ${MONATE[d.getMonth()]}: ${sch.map(({ a: sc, wer }) => `${wer ? wer + " " : ""}${sc.name}`).join(", ")}${sch.length ? ", " : ""}${ts.length} Termine, ${as.length} Aufgaben. Tag öffnen`)}">
             ${streifen}<span class="mnr">${d.getDate()}</span>${schHtml}${items.join("")}</button>`;
         }).join("")}
@@ -2978,9 +2991,9 @@ class PlanerPanel extends HTMLElement {
       const heuteTag = tag === this._tag;
       const jetztHtml = heuteTag && jetztMin > von * 60 && jetztMin < bis * 60 ? `<div class="wjetzt" style="top:${cp(px(jetztMin))}" aria-hidden="true"></div>` : "";
       const d = ausIso(tag);
-      return { kopf: `<button type="button" class="wkh ${heuteTag ? "heute" : ""}" data-tagauf="${tag}" aria-label="${esc(datumText(tag) + ", Tag öffnen")}"><span class="wn">${WT_KURZ[i]}</span><b>${d.getDate()}</b></button>`,
-        ganz: `<div class="wkg ${heuteTag ? "heute" : ""}" data-tag="${tag}" data-wleer="${tag}">${sichtbar}</div>`,
-        spalte: `<div class="wspalte ${heuteTag ? "heute" : ""}" data-tag="${tag}" data-wleer="${tag}" style="height:${cp(stunden)}">${bandHtml}${blockHtml}${jetztHtml}</div>` };
+      return { kopf: `<button type="button" class="wkh ${heuteTag ? "heute" : ""} ${tag < this._tag ? "vorbei" : ""}" data-tagauf="${tag}" aria-label="${esc(datumText(tag) + ", Tag öffnen")}"><span class="wn">${WT_KURZ[i]}</span><b>${d.getDate()}</b></button>`,
+        ganz: `<div class="wkg ${heuteTag ? "heute" : ""} ${tag < this._tag ? "vorbei" : ""}" data-tag="${tag}" data-wleer="${tag}">${sichtbar}</div>`,
+        spalte: `<div class="wspalte ${heuteTag ? "heute" : ""} ${tag < this._tag ? "vorbei" : ""}" data-tag="${tag}" data-wleer="${tag}" style="height:${cp(stunden)}">${bandHtml}${blockHtml}${jetztHtml}</div>` };
     });
     return `<div class="wcal" id="wcal" style="--hpx:${hpx}px" role="group" aria-label="Wochenkalender" data-von="${von}" data-bis="${bis}" data-hpx="${hpx}">
       <div class="wsticky">
