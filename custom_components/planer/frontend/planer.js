@@ -5376,6 +5376,11 @@ class PlanerPanel extends HTMLElement {
             <div class="feld"><label for="tb-${i}">bis</label><select id="tb-${i}" data-feld="tag_bis">${[...Array(24)].map((_, h) => h + 1).map((h) => `<option value="${h}" ${(e.tag_bis ?? 22) === h ? "selected" : ""}>${String(h).padStart(2, "0")}:00</option>`).join("")}</select></div>
           </div>
           ${erinnHtml(`se${i}`, e.erinnerungen || [30, 180, 1440])}
+          <div class="reihe">
+            <div class="feld"><label for="ab-${i}">Abfahrtserinnerung (Waze)</label><select id="ab-${i}" data-feld="abfahrt"><option value="">Aus</option><option value="1" ${e.abfahrt ? "selected" : ""}>An: Push, wenn es Zeit zum Losfahren ist</option></select></div>
+            <div class="feld"><label for="ap-${i}">Puffer in Minuten</label><input id="ap-${i}" data-feld="abfahrt_puffer" type="number" min="0" max="180" step="5" inputmode="numeric" value="${e.abfahrt_puffer ?? 10}"></div>
+          </div>
+          <p class="hinweis">Für Termine mit Ort: Fahrzeit mit dem Auto ab deinem aktuellen Standort (sonst Zuhause) plus Puffer. Braucht die Integration „Waze Travel Time“ und ein Handy für Erinnerungen.</p>
           <div class="fuss"><button type="button" class="knopf" data-speichern="${i}">Für ${esc(p.name.split(" ")[0])} speichern</button></div>
         </section>`;
       }).join("")}
@@ -5419,6 +5424,8 @@ class PlanerPanel extends HTMLElement {
         erinnerungen: erinnLesen(dlg, `se${i}`),
         tag_von: +sec.querySelector('[data-feld="tag_von"]').value,
         tag_bis: +sec.querySelector('[data-feld="tag_bis"]').value,
+        abfahrt: !!sec.querySelector('[data-feld="abfahrt"]').value,
+        abfahrt_puffer: String(Math.max(0, Math.min(180, parseInt(sec.querySelector('[data-feld="abfahrt_puffer"]').value, 10) || 0))),
       };
       if (kal.length) {
         werte.kalender_sehen = liste("sehen").length === alle("sehen") ? null : liste("sehen");

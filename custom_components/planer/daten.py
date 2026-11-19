@@ -127,6 +127,9 @@ class Planer:
             # "" = keine Erinnerung, "vorabend" = am Vortag zur Uhrzeit schicht_push_uhr, Zahl = Minuten vor Beginn
             "schicht_push": e.get("schicht_push", ""),
             "schicht_push_uhr": e.get("schicht_push_uhr", "20:00"),
+            # Abfahrtserinnerung: Fahrzeit per Waze zu Terminen mit Ort, Puffer in Minuten
+            "abfahrt": e.get("abfahrt", False),
+            "abfahrt_puffer": e.get("abfahrt_puffer", 10),
         }
 
     def sichtbar(self, aufgabe: dict[str, Any], benutzer_id: str | None) -> bool:
@@ -506,6 +509,10 @@ class Planer:
             e["schicht_push"] = v if v == "vorabend" or (v.isdigit() and int(v) <= 1440) else ""
         if "schicht_push_uhr" in werte and UHRZEIT.match(str(werte["schicht_push_uhr"])):
             e["schicht_push_uhr"] = str(werte["schicht_push_uhr"])
+        if "abfahrt" in werte:
+            e["abfahrt"] = bool(werte["abfahrt"])
+        if "abfahrt_puffer" in werte and str(werte["abfahrt_puffer"]).isdigit():
+            e["abfahrt_puffer"] = min(180, int(werte["abfahrt_puffer"]))
         if "erinnerungen" in werte:
             e["erinnerungen"] = sorted({int(m) for m in werte["erinnerungen"] or [] if str(m).isdigit() and int(m) <= 43200})
         await self._sichern()
