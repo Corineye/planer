@@ -45,6 +45,7 @@ def async_registrieren(hass: HomeAssistant) -> None:
         ws_lesen, ws_abonnieren, ws_speichern, ws_erledigen, ws_loeschen, ws_einstellung,
         ws_termine, ws_kalender_anzeige, ws_schicht_arten, ws_schicht_tage, ws_schicht_einstellung, ws_termin_anlegen, ws_termin_loeschen, ws_woche, ws_allgemein,
         ws_einkauf, ws_einkauf_aktion, ws_notiz_speichern, ws_notiz_loeschen,
+        ws_ansicht, ws_sicherungen, ws_sichern, ws_wiederherstellen,
     ):
         websocket_api.async_register_command(hass, befehl)
     daten["ws"] = True
@@ -373,3 +374,53 @@ async def ws_notiz_loeschen(hass: HomeAssistant, connection: websocket_api.Activ
         _fehler(connection, msg["id"], err)
         return
     connection.send_result(msg["id"], {"ok": True})
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): f"{DOMAIN}/ansicht",
+        vol.Optional("aufgaben_sortierung"): str,
+        vol.Optional("ausgeblendete_tags"): [str],
+    }
+)
+@websocket_api.async_response
+async def ws_ansicht(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    """Sortierung und ausgeblendete Hashtags der Aufgabenlisten, gilt nur für die angemeldete Person."""
+    werte = {k: msg[k] for k in ("aufgaben_sortierung", "ausgeblendete_tags") if k in msg}
+    await _planer(hass).einstellung(connection.user.id, werte)
+    connection.send_result(msg["id"], {"ok": True})
+
+
+def _sicherung(hass: HomeAssistant):
+    return hass.data[DOMAIN]["sicherung"]
+
+
+@websocket_api.websocket_command({vol.Required("type"): f"{DOMAIN}/sicherungen"})
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_sicherungen(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    connection.send_result(msg["id"], await _sicherung(hass).liste())
+
+
+@websocket_api.websocket_command({vol.Required("type"): f"{DOMAIN}/sichern"})
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_sichern(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    try:
+        name = await _sicherung(hass).sichern()
+    except OSError as err:
+        _fehler(connection, msg["id"], err)
+        return
+    connection.send_result(msg["id"], {"name": name, "liste": await _sicherung(hass).liste()})
+
+
+@websocket_api.websocket_command({vol.Required("type"): f"{DOMAIN}/wiederherstellen", vol.Required("name"): str})
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_wiederherstellen(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    try:
+        await _sicherung(hass).wiederherstellen(msg["name"])
+    except (ValueError, OSError) as err:
+        _fehler(connection, msg["id"], err)
+        return
+    connection.send_result(msg["id"], {"ok": True, "liste": await _sicherung(hass).liste()})

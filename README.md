@@ -10,7 +10,7 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
 3. Einstellungen › Geräte & Dienste › Integration hinzufügen › **Planer**.
 4. In der Seitenleiste erscheint „Planer“.
 
-## Was es gibt (v0.9.1)
+## Was es gibt (v0.10.0)
 
 - **Heute** mit Top 3 (je Rang 1–3, nie mehr als drei), weiteren Aufgaben, Überfälligem und „Heute erledigt“.
 - **Demnächst** (nach Tagen gruppiert) und **Eingang** (alles ohne Datum).
@@ -37,6 +37,12 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
   zurückblättern. Aufgaben am PC auf einen Tag ziehen, auch aus dem Eingang; am Handy und mit Tastatur über „Öffnen“ und Datum.
 - **Gemeinsame Termine** (v0.3): In den Einstellungen einen Kalender für gemeinsame Termine wählen (z. B. „Linda und Corin“).
   Beim Termin „Gemeinsam“ wählen oder `@gemeinsam` tippen, dann landet er dort.
+
+- **Woche wie Google Kalender** (v0.10): sieben Spalten Mo–So mit Ganztags-Zeile und Stundenraster. Termine und Aufgaben mit
+  Uhrzeit als Blöcke nach Dauer, Schichten als farbiges Band hinter den Terminen, rote Jetzt-Linie. Am Handy passen alle sieben Tage ohne Seitwärts-Scrollen.
+- **Monat neu** (v0.10): Am Handy der ganze Monat ohne Scrollen (einzeilig, „+n“ für den Rest), am PC alle Einträge mit Uhrzeit und Ort.
+  Schichten als Kürzel-Chips in der Schichtfarbe unter dem Datum, Aufgaben mit leerem Kreis.
+- **Schichtfarben** (v0.10): überall die Farbe aus dem Schichtplaner, Schrift automatisch hell oder dunkel.
 
 - **Teilaufgaben** (v0.4): Checkliste in jeder Aufgabe, Fortschritt (z. B. 1/3) und „Nächster Schritt“ in der Liste.
   Bei wiederkehrenden Aufgaben werden die Teilaufgaben beim nächsten Termin wieder geöffnet.
@@ -95,8 +101,16 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
   beim Schließen und wenn die App in den Hintergrund geht.
 - **Schichten anlegen** (v0.9.1): ein übersichtliches Formular pro Schicht (Name, Kürzel, Farbe, Uhrzeit, Pause, Kalender).
   „Schichten bearbeiten“ zeigt die Liste, Tippen öffnet die Schicht. Der heutige Tag ist im Kalender und bei den Schichten rot umrandet.
+- **Eigene Schichtfarbe** (v0.9.2): neben den Standardfarben gibt es einen Farbwähler mit beliebiger Farbe.
+- **Desktop-Kopfzeile** (v0.9.2): bei breitem Fenster sitzen die Reiter in der Kopfzeile, und Monat/Woche/Schichten stehen neben Heute und den Pfeilen.
+- **Gemeinsames überall** (v0.9.2): Aufgaben mit „Gemeinsam“ erscheinen auch dann, wenn oben eine bestimmte Person (z. B. Linda) gewählt ist, nicht nur bei „Ich“.
 - **Handy** (v0.9): größere Tippflächen, Verschieben-Knopf in jeder Zeile, Plus-Knopf weicht beim Scrollen aus,
   deckende Tab-Leiste, kompakter Tages-Dialog, Einstellungen speichern beim Schließen automatisch.
+- **Sicherung** (v0.10): jede Nacht um 03:30 (und beim Start, falls die heutige fehlt) eine Kopie der Planer-Daten in `planer_sicherungen/` (die letzten 14). Einstellungen › Sicherung: „Jetzt sichern“ und „Wiederherstellen“ mit Bestätigung.
+- **Schichten ohne Flackern** (v0.10): mehrere Schichten schnell nacheinander stempeln lässt nichts mehr verschwinden.
+- **Aufgabenlisten sortieren und ausblenden** (v0.10): im „⋯“-Menü von Heute und Demnächst nach Fällig, Priorität, Bereich, Neueste zuerst oder A–Z sortieren und #Hashtags ausblenden („n ausgeblendet“ zeigt sie wieder). Gilt pro Person.
+- **Gemeinsamer Kalender mit Einzel-To-dos** (v0.10): bei „Gemeinsam“ und „Alle“ zeigt der Kalender-Reiter auch die Aufgaben von Corin und Linda, mit Avatar.
+- **Schicht-Statistik** (v0.10): Kalender › Schichten › „⋯“ › „Statistik …“: Arbeitsstunden, Schichtarten, Wochenenden, Nachtstunden, freie Tage und Vergleich zum Vormonat.
 
 ## Daten
 
