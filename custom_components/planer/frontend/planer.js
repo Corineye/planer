@@ -497,7 +497,7 @@ aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);positio
 .mtag.fremd.mschichttag{background:color-mix(in srgb,var(--sc1) 8%,transparent)}
 .mnr{flex:none;font-weight:600;font-size:12px;font-variant-numeric:tabular-nums;width:22px;height:22px;display:grid;place-items:center;border-radius:50%;margin-bottom:1px}
 .mtag.heute .mnr,.schichtmonat .stag.heute .mnr{background:var(--rot);color:#fff;font-weight:700}
-.mtag.heute,.schichtmonat .stag.heute,.wtag.heute{box-shadow:inset 0 0 0 2.5px var(--rot),var(--karte-schatten)}
+.schichtmonat .stag.heute,.wtag.heute{box-shadow:inset 0 0 0 2.5px var(--rot),var(--karte-schatten)}
 .mstreifen{position:absolute;left:0;right:0;top:0;height:3px;display:flex}
 .mstreifen i{flex:1;background:var(--sc)}
 .msz{display:flex;gap:2px;flex:none;flex-wrap:nowrap;min-width:0}
@@ -505,7 +505,7 @@ aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);positio
 .msk .sz{display:none;font-weight:500;margin-left:4px}
 .me{flex:none;display:block;min-width:0;height:14px;line-height:14px;font-size:9.5px;font-weight:600;padding:0 2px 0 3px;border-radius:3px;background:color-mix(in srgb,var(--c) 20%,transparent);border-left:2px solid var(--c);color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .me[hidden]{display:none!important}
-.me .u,.me .o{display:none}
+.me .u{display:none}
 .me.auf{background:none;border-left:0;padding-left:1px}
 .me.auf::before{content:"";display:inline-block;box-sizing:border-box;width:8px;height:8px;border-radius:50%;border:1.5px solid var(--c);margin-right:3px;vertical-align:-1px}
 .mmehr{flex:none;font-size:9px;color:var(--muted);font-weight:700;padding-left:3px;line-height:12px}
@@ -531,7 +531,7 @@ aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);positio
 .me.auf .tx{flex:1;min-width:0}
 .me.auf::before{width:10px;height:10px;margin-right:4px;vertical-align:-1px}
 }
-@container (min-width:820px){.me{white-space:normal;overflow:visible}.me .tx{overflow:visible;overflow-wrap:anywhere}.me .o{display:block;color:var(--muted);font-size:10.5px;font-weight:400}}
+@container (min-width:820px){.me{white-space:normal;overflow:visible}.me .tx{overflow:visible;overflow-wrap:anywhere}}
 .woche-wrap{overflow-x:auto;padding-bottom:var(--s1)}
 .schmal .woche-wrap{overflow:visible}
 .woche{display:grid;grid-template-columns:repeat(7,minmax(118px,1fr));gap:var(--s2);min-width:860px}
@@ -555,11 +555,6 @@ aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);positio
 .wleer{font-size:var(--t-fuss);color:var(--muted)}
 .ablage{display:flex;gap:var(--s2);flex-wrap:wrap}
 .ablage .wpunkt{width:auto}
-.ziele{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);min-width:0}
-.ziel{display:flex;gap:var(--s3);align-items:center;background:var(--card);border-radius:var(--r-karte);padding:var(--s1) var(--s3);box-shadow:var(--karte-schatten);min-height:52px}
-.ziel input[type=text]{flex:1;min-width:0;min-height:44px;border:0;background:none;padding:0}
-.ziel input[type=checkbox]{width:24px;height:24px;accent-color:var(--accent-fill);flex:none}
-.ziel .nr{font-weight:700;font-size:var(--t-klein);width:22px;height:22px;border-radius:6px;display:grid;place-items:center;background:var(--mint-dim);color:var(--accent);flex:none}
 
 /* ---------- Einkauf: gruppierte Liste wie in Erinnerungen ---------- */
 ul.liste.gruppiert{gap:0;background:var(--card);border-radius:var(--r-karte);box-shadow:var(--karte-schatten);overflow:hidden}
@@ -763,9 +758,8 @@ dialog .schnellwahl .knopf:not(.primaer):not(.text)[aria-pressed="true"]{backgro
 .wkh b{font-size:17px;color:var(--fg);width:30px;height:30px;line-height:30px;border-radius:50%;text-transform:none;letter-spacing:0;font-weight:600;font-variant-numeric:tabular-nums}
 .schmal .wkh b{font-size:14px;width:24px;height:24px;line-height:24px}
 .wkh.heute b{background:var(--rot);color:#fff}
-.wkh.heute{box-shadow:inset 2px 0 0 var(--rot),inset -2px 0 0 var(--rot),inset 0 2px 0 var(--rot)}
+.wkh.heute .wn{color:var(--rot)}
 .wkg{display:flex;flex-direction:column;gap:2px;min-width:0;min-height:24px;padding:2px 1px;border-left:1px solid var(--line);border-top:1px solid var(--line);cursor:pointer}
-.wkg.heute{box-shadow:inset 2px 0 0 var(--rot),inset -2px 0 0 var(--rot)}
 .wc{display:block;box-sizing:border-box;width:100%;min-width:0;height:18px;line-height:18px;text-align:left;border:0;font:inherit;font-size:11px;padding:0 4px;border-radius:4px;background:color-mix(in srgb,var(--c,var(--accent)) 24%,var(--card));color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;flex:none}
 .wc.t{box-shadow:inset 3px 0 0 var(--c)}
 .wc.a{background:color-mix(in srgb,var(--c) 10%,var(--card))}
@@ -784,7 +778,6 @@ dialog .schnellwahl .knopf:not(.primaer):not(.text)[aria-pressed="true"]{backgro
 .schmal .wstunden span{font-size:9px;right:3px}
 .schmal .wstunden small{display:none}
 .wspalte{position:relative;min-width:0;border-left:1px solid var(--line);background-image:repeating-linear-gradient(to bottom,var(--line) 0 1px,transparent 1px var(--hpx));cursor:pointer}
-.wspalte.heute{box-shadow:inset 2px 0 0 var(--rot),inset -2px 0 0 var(--rot),inset 0 -2px 0 var(--rot)}
 .wspalte.ziel-drop,.wkg.ziel-drop{outline:2px dashed var(--accent);outline-offset:-2px}
 .wband{position:absolute;z-index:1;box-sizing:border-box;pointer-events:none;overflow:hidden;background:color-mix(in srgb,var(--k) 26%,transparent);border-left:3px solid var(--k);padding:2px 3px;font-size:10px;font-weight:600;line-height:1.15;color:var(--fg)}
 .wband span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1105,6 +1098,12 @@ dialog.nz-farbig .blatt-kopf{box-shadow:inset 0 -3px 0 var(--nf)}
 .pille .pfeil-runter{width:14px;height:14px;opacity:.65;margin-left:-2px}
 .pille>svg:not(.pfeil-runter){width:16px;height:16px}
 .pille .punkt{width:10px;height:10px}
+.pille.chip{min-height:30px;padding:0 10px}
+.pille.chip .chip-x{font-size:11px;opacity:.7;margin-left:2px}
+.rund.wer-knopf .wer-av{width:30px;height:30px;font-size:14px}
+.rund.wer-knopf .wer-av.alle svg{width:18px;height:18px}
+.rund .filter-punkt{position:absolute;top:7px;right:7px;width:10px;height:10px;border-radius:50%;background:var(--accent-fill);box-shadow:0 0 0 2px var(--card)}
+.menue-kopf{padding:8px 12px 2px;font-size:var(--t-klein);font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
 .wer-av{flex:none;display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--pf);color:#fff;font-size:11px;font-weight:700;line-height:1;letter-spacing:0;font-style:normal}
 .wer-av.klein{width:14px;height:14px;font-size:9px;margin-right:4px;vertical-align:-2px}
 .wer-av.alle{background:var(--fill2);color:var(--fg)}
@@ -1295,7 +1294,7 @@ class PlanerPanel extends HTMLElement {
   disconnectedCallback() {
     document.removeEventListener("keydown", this._tasten);
     if (this._kalGroesse) { window.removeEventListener("resize", this._kalGroesse); this._kalGroesse = null; }
-    this._monatRO?.disconnect(); this._monatRO = null;
+    this._monatRO?.disconnect(); this._monatRO = null; this._wocheRO?.disconnect(); this._wocheRO = null;
     window.removeEventListener("scroll", this._rollen, { capture: true });
     this.shadowRoot?.removeEventListener("scroll", this._rollen, { capture: true });
     if (this._abo) this._abo.then((ab) => ab()).catch(() => {});
@@ -1469,8 +1468,9 @@ class PlanerPanel extends HTMLElement {
         </div>
         ${schmal ? "" : tabsHtml}
         <div class="rechts">
+          ${this._werKnopf()}
           <button type="button" class="rund" data-aktion="suche" data-fokus="suche" aria-label="Suchen" title="Suchen (Taste /)">${ICON.suche}</button>
-          ${this._kopfEintraege().length ? `<button type="button" class="rund" data-aktion="kopf-menue" data-fokus="kopf-menue" aria-haspopup="menu" aria-expanded="false" aria-label="Weitere Aktionen" title="Weitere Aktionen">${ICON.mehr}</button>` : ""}
+          ${this._kopfEintraege().length ? `<button type="button" class="rund" data-aktion="kopf-menue" data-fokus="kopf-menue" aria-haspopup="menu" aria-expanded="false" aria-label="Weitere Aktionen${this._bereich && this._bereichFilterAn() ? `, Bereichsfilter aktiv: ${esc(this._bereich)}` : ""}" title="Weitere Aktionen">${ICON.mehr}${this._bereich && this._bereichFilterAn() ? '<span class="filter-punkt" aria-hidden="true"></span>' : ""}</button>` : ""}
         </div>
       </header>
       ${pillen}
@@ -1617,21 +1617,25 @@ class PlanerPanel extends HTMLElement {
   _pille(art, inhalt, label, aktiv) {
     return `<button type="button" class="pille${aktiv ? " aktiv" : ""}" data-menue="${art}" data-fokus="p-${art}" aria-haspopup="menu" aria-expanded="false" aria-label="${esc(label)}">${inhalt}${ICON.runter}</button>`;
   }
-  // Eine Zeile Filter direkt unter dem Titel, überall gleich
+  // Personenwahl: runder Knopf in der Kopfzeile (Avatar), öffnet das Auswahl-Menü
+  _werKnopf() {
+    if (this._ansicht === "einkauf") return "";
+    const d = this._daten, f = this._filter || "ich";
+    const werId = f === "ich" ? d.ich : f === "alle" ? "" : f;
+    const inhalt = werId ? this._avatar(werId) : `<span class="wer-av alle" aria-hidden="true">${ICON.personen}</span>`;
+    return `<button type="button" class="rund wer-knopf" data-menue="wer" data-fokus="p-wer" aria-haspopup="menu" aria-expanded="false" aria-label="Wessen Einträge: ${esc(this._werText())}. Ändern" title="Wessen Einträge: ${esc(this._werText())}">${inhalt}</button>`;
+  }
+  // Der Bereichsfilter wirkt in Heute, Demnächst und Kalender
+  _bereichFilterAn() { return ["heute", "demnaechst", "woche"].includes(this._ansicht); }
+  // Eine Zeile unter dem Titel nur, wenn es etwas anzuzeigen gibt (Bereichsfilter aktiv, Notizen-Filter)
   _pillenHtml() {
     const d = this._daten, v = this._ansicht;
     if (v === "einkauf") return "";
-    const f = this._filter || "ich";
     const teile = [];
-    const werId = f === "ich" ? d.ich : f === "alle" ? "" : f;
-    teile.push(this._pille("wer", `${werId ? this._avatar(werId) : `<span class="wer-av alle" aria-hidden="true">${ICON.personen}</span>`}<span class="pille-text">${esc(this._werText())}</span>`,
-      `Wessen Einträge: ${this._werText()}. Ändern`, false));
-    if (v === "heute" || v === "demnaechst") {
-      const b = this._bereich;
-      if (b || this._bereichListe().length) {
-        const name = b ? b[0].toUpperCase() + b.slice(1) : "Alle Bereiche";
-        teile.push(this._pille("bereich", `${b ? `<span class="punkt" style="--b:${bereichFarbe(b, d.farben)}" aria-hidden="true"></span>` : ""}<span class="pille-text">${esc(name)}</span>`, `Bereich: ${name}. Ändern`, !!b));
-      }
+    const b = this._bereich;
+    if (b && v !== "notizen" && this._bereichFilterAn()) {
+      const name = b[0].toUpperCase() + b.slice(1);
+      teile.push(`<button type="button" class="pille aktiv chip" data-aktion="bereich-weg" data-fokus="p-bereich" aria-label="Bereichsfilter ${esc(name)} entfernen"><span class="punkt" style="--b:${bereichFarbe(b, d.farben)}" aria-hidden="true"></span><span class="pille-text">Bereich: ${esc(name)}</span><span class="chip-x" aria-hidden="true">✕</span></button>`);
     }
     if (v === "notizen") {
       const { ordner, tags } = this._notizFilterListen();
@@ -1640,7 +1644,13 @@ class PlanerPanel extends HTMLElement {
         teile.push(this._pille("notizen", `${this._nOrdner ? ICON.ordner : ""}<span class="pille-text">${esc(t)}</span>`, `Notizen filtern: ${t}. Ändern`, !!(this._nOrdner || this._nTag)));
       }
     }
-    return `<div class="pillen" role="group" aria-label="Filter">${teile.join("")}</div>`;
+    return teile.length ? `<div class="pillen" role="group" aria-label="Filter">${teile.join("")}</div>` : "";
+  }
+  _bereichSetzen(b) {
+    this._bereich = b;
+    try { localStorage.setItem("planer.bereich", b); } catch (e) { /* egal */ }
+    this._zeichnen();
+    this._sagen(b ? `Nur Bereich ${b}` : "Alle Bereiche");
   }
 
   _filterSetzen(f) {
@@ -1662,12 +1672,7 @@ class PlanerPanel extends HTMLElement {
   }
   _bereichMenue(anker, info) {
     const d = this._daten;
-    const setzen = (b) => {
-      this._bereich = b;
-      try { localStorage.setItem("planer.bereich", b); } catch (e) { /* egal */ }
-      this._zeichnen();
-      this._sagen(b ? `Nur Bereich ${b}` : "Alle Bereiche");
-    };
+    const setzen = (b) => this._bereichSetzen(b);
     this._menue(anker, [
       { text: "Alle Bereiche", radio: true, aktiv: !this._bereich, aktion: () => setzen("") },
       "-",
@@ -1704,6 +1709,16 @@ class PlanerPanel extends HTMLElement {
     const d = this._daten, v = this._ansicht;
     const termin = (d.kalender || []).some((k) => k.schreiben) ? { text: "Neuer Termin", icon: ICON.termin, aktion: () => this._terminNeu() } : null;
     let e = [];
+    // Bereichsfilter (Heute, Demnächst, Kalender; im Kalender nicht bei Schichten)
+    const bFilter = this._bereichFilterAn() && !(v === "woche" && this._kalAnsicht === "schichten") && (this._bereich || this._bereichListe().length) ? [
+      { kopf: "Filter" },
+      { text: this._bereich ? `Bereich: ${this._bereich[0].toUpperCase() + this._bereich.slice(1)}` : "Bereich: Alle", icon: this._bereich ? `<span class="nz-punkt" style="--nf:${bereichFarbe(this._bereich, d.farben)}"></span>` : ICON.filter, untermenue: true,
+        aktion: (i) => this._menue(anker, [
+          { text: "Zurück", icon: "‹", aktion: zurueck }, "-",
+          { text: "Alle Bereiche", radio: true, aktiv: !this._bereich, aktion: () => this._bereichSetzen("") },
+          ...this._bereichListe().map((x) => ({ text: x[0].toUpperCase() + x.slice(1), icon: `<span class="nz-punkt" style="--nf:${bereichFarbe(x, d.farben)}"></span>`, radio: true, aktiv: this._bereich === x, aktion: () => this._bereichSetzen(x) })),
+        ], { titel: "Bereich", tastatur: i?.tastatur }) },
+    ] : [];
     // Am PC stehen „Erweitert“ und „Termin“ schon neben der Eingabezeile, deshalb nur am Handy hier.
     if ((v === "heute" || v === "demnaechst") && this._narrow) e = [{ text: "Neue Aufgabe mit allen Optionen", icon: ICON.regler, aktion: () => this._erweitert() }, termin];
     else if (v === "woche" && this._kalAnsicht === "schichten") {
@@ -1733,7 +1748,9 @@ class PlanerPanel extends HTMLElement {
         ], { titel: "Liste", tastatur: i?.tastatur }) }];
       }
     }
-    if (v === "heute" || v === "demnaechst") e.push("-", ...this._listenEintraege(anker, zurueck));
+    // Abschnitt „Filter“: Bereich, Sortierung, Ausblenden
+    if (v === "heute" || v === "demnaechst") e.push("-", ...bFilter, ...this._listenEintraege(anker, zurueck));
+    else if (bFilter.length) e.push("-", ...bFilter);
     e = e.filter(Boolean);
     if (d.admin) e.push("-", { text: "Einstellungen", icon: ICON.einstellungen, aktion: () => this._einstellungen() });
     if (e[0] === "-") e.shift();
@@ -1925,6 +1942,7 @@ class PlanerPanel extends HTMLElement {
       else if (art === "bereich") this._bereichMenue(b, info);
       else if (art === "notizen") this._notizFilterMenue(b, info);
     }));
+    app.querySelectorAll('[data-aktion="bereich-weg"]').forEach((b) => b.addEventListener("click", () => this._bereichSetzen("")));
     app.querySelectorAll('[data-aktion="kopf-menue"]').forEach((b) => b.addEventListener("click", (e) => this._kopfMenue(b, { tastatur: e.detail === 0 })));
     app.querySelectorAll("[data-zmenue]").forEach((b) => b.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -2697,7 +2715,7 @@ class PlanerPanel extends HTMLElement {
           const ts = am(t), as = aufg(t);
           const sch = this._schichtenAm(t);
           const items = [
-            ...ts.map((x) => `<span class="me" style="--c:${this._farbe(x.kalender)}">${x.ganztag ? "" : `<span class="u">${uhr(x.start)}</span>`}<span class="tx">${esc(x.titel)}${x.ort ? `<span class="o">${esc(x.ort)}</span>` : ""}</span></span>`),
+            ...ts.map((x) => `<span class="me" style="--c:${this._farbe(x.kalender)}">${x.ganztag ? "" : `<span class="u">${uhr(x.start)}</span>`}<span class="tx">${esc(x.titel)}</span></span>`),
             ...as.map((a) => `<span class="me auf" style="--c:${bereichFarbe(a.bereich, this._daten.farben) || "var(--muted)"}">${a.uhrzeit ? `<span class="u">${a.uhrzeit}</span>` : ""}<span class="tx">${this._kalAv(a)}${esc(a.titel)}</span></span>`),
           ];
           const schHtml = sch.length ? `<span class="msz">${sch.map(({ a: sc, wer }) => `<span class="msk" style="--sc:${sc.farbe}" title="${esc(`${wer ? wer + ": " : ""}${sc.name} ${this._schichtZeit(sc)}`.trim())}">${esc(wer ? `${wer[0]} ${sc.kurz}` : sc.kurz)}${sc.von && sc.bis ? `<span class="sz">${sc.von}–${sc.bis}</span>` : ""}</span>`).join("")}</span>` : "";
@@ -2765,15 +2783,34 @@ class PlanerPanel extends HTMLElement {
   _wochePassen() {
     const c = this._app.querySelector("#wcal");
     if (!c) return;
-    const von = +c.dataset.von, hpx = +c.dataset.hpx;
-    const voll = c.querySelector(".wsticky").offsetHeight + c.querySelector(".wkoerper").offsetHeight;
-    c.style.height = `${Math.min(voll, Math.max(this._narrow ? 0 : 400, this._freieHoehe(c)))}px`;
+    const von = +c.dataset.von, bis = +c.dataset.bis;
+    const stunden = Math.max(1, bis - von);
+    const kopfH = c.querySelector(".wsticky").offsetHeight;
+    let hpx = +c.dataset.hpx;
+    if (!this._narrow) {
+      // PC: Zeitraum füllt genau die freie Höhe (mindestens 28 px pro Stunde, sonst Scrollen)
+      hpx = Math.max(28, (this._freieHoehe(c) - kopfH) / stunden);
+      c.style.setProperty("--hpx", `${hpx}px`);
+      c.style.height = `${Math.ceil(kopfH + stunden * hpx)}px`;
+      if (window.ResizeObserver && this._wocheRO?.ziel !== c) {
+        this._wocheRO?.disconnect();
+        this._wocheRO = new ResizeObserver(() => { cancelAnimationFrame(this._wocheRaf); this._wocheRaf = requestAnimationFrame(() => this._wochePassen()); });
+        this._wocheRO.ziel = c;
+        this._wocheRO.observe(c.querySelector(".wsticky"));
+        this._wocheRO.observe(document.documentElement);
+        if (this._app.firstElementChild) this._wocheRO.observe(this._app.firstElementChild);
+      }
+    } else {
+      const voll = kopfH + c.querySelector(".wkoerper").offsetHeight;
+      c.style.height = `${Math.min(voll, this._freieHoehe(c))}px`;
+    }
     c.onscroll = () => { this._wScroll = c.scrollTop; };
-    if (this._wScroll === undefined) {
+    if (!this._narrow) { this._wScroll = c.scrollHeight > c.clientHeight + 1 ? this._wScroll : 0; }
+    else if (this._wScroll === undefined) {
       const h = new Date().getHours();
       this._wScroll = h >= von + 3 ? Math.max(0, (h - 1 - von) * hpx) : 0;
     }
-    c.scrollTop = this._wScroll;
+    c.scrollTop = this._wScroll || 0;
   }
 
   async _monatTermineLaden(von, key) {
@@ -2796,28 +2833,15 @@ class PlanerPanel extends HTMLElement {
     const tage = [...Array(7)].map((_, i) => iso(plusTage(start, i)));
     const termine = this._wTermine?.start === iso(start) ? this._wTermine.liste : null;
     if (!termine) this._wocheTermineLaden(start);
-    const ziele = [...((this._daten.wochen || {})[k]?.ziele || [])];
-    while (ziele.length < 3) ziele.push({ text: "", erledigt: false });
     const aufg = (tag) => this._sortiert(alle.filter((a) => a.datum === tag && (a.status === "offen" || (a.erledigt_am || "").slice(0, 10) === tag)));
     const d0 = ausIso(tage[0]), d7 = ausIso(tage[6]);
     const spanne = `${d0.getDate()}. ${d0.getMonth() !== d7.getMonth() ? MONATE[d0.getMonth()] + " " : ""}– ${d7.getDate()}. ${MONATE[d7.getMonth()]}`;
     const eingang = this._sortiert(alle.filter((a) => a.status === "offen" && !a.datum));
     return `<section class="gruppe" aria-labelledby="w-titel">
       ${this._narrow ? this._kalenderUmschalter() : ""}
-      <div class="wkopf"><h2 id="w-titel">${esc(spanne)}</h2>${this._narrow ? "" : this._kalenderUmschalter(true)}${this._kalNavi("woche", "Heute", iso(start) === iso(montag(new Date())), "Woche wechseln")}</div>
+      <div class="wkopf"><h2 id="w-titel">${esc(spanne)}<span class="zahl">KW ${+k.slice(6)}</span></h2>${this._narrow ? "" : this._kalenderUmschalter(true)}${this._kalNavi("woche", "Heute", iso(start) === iso(montag(new Date())), "Woche wechseln")}</div>
     </section>
     ${this._wocheRaster(tage, termine || [], aufg)}
-    <section class="gruppe" aria-labelledby="z-titel">
-      <h2 id="z-titel">Wochenziele <span class="zahl">KW ${+k.slice(6)}</span></h2>
-      <form class="ziele" id="zform" data-kw="${k}">
-        ${ziele.slice(0, 3).map((z, i) => `<div class="ziel">
-          <span class="nr" aria-hidden="true">${i + 1}</span>
-          <label class="sr" for="z-${i}">Wochenziel ${i + 1}</label>
-          <input type="text" id="z-${i}" data-fokus="z-${i}" value="${esc(z.text)}" placeholder="${["Was soll diese Woche klappen?", "Zweites Ziel (optional)", "Drittes Ziel (optional)"][i]}">
-          <input type="checkbox" id="zc-${i}" ${z.erledigt ? "checked" : ""} aria-label="Wochenziel ${i + 1} erreicht">
-        </div>`).join("")}
-      </form>
-    </section>
     ${termine === null ? `<p class="hinweis" role="status">Termine werden geladen …</p>` : ""}
     ${eingang.length ? `<section class="gruppe" aria-labelledby="ab-titel">
       <h2 id="ab-titel">Aus dem Eingang einplanen</h2>
@@ -2882,28 +2906,29 @@ class PlanerPanel extends HTMLElement {
         gruppe.push(x); gEnde = Math.max(gEnde, x.e);
       }
       if (gruppe.length) fertig();
-      const px = (m) => (Math.max(m, von * 60) - von * 60) / 60 * hpx;
+      const px = (m) => (Math.max(m, von * 60) - von * 60) / 60;
+      const cp = (h, extra = "") => `calc(var(--hpx) * ${h.toFixed(4)}${extra})`;
       const bandHtml = baender.map((x, n) => {
         const top = px(x.s), h = px(Math.min(x.e, bis * 60)) - top;
-        return `<div class="wband ${x.fort ? "fort" : ""} ${baender.length > 1 ? "geteilt" : ""}" style="top:${top}px;height:${h}px;left:${n * 100 / baender.length}%;width:${100 / baender.length}%;--k:${x.sc.farbe}" title="${esc(`${x.wer ? x.wer + ": " : ""}${x.sc.name} ${this._schichtZeit(x.sc)}`.trim())}"><span>${x.wer ? `<b>${esc(x.wer[0])}</b> ` : ""}${esc(x.sc.name)}</span></div>`;
+        return `<div class="wband ${x.fort ? "fort" : ""} ${baender.length > 1 ? "geteilt" : ""}" style="top:${cp(top)};height:${cp(h)};left:${n * 100 / baender.length}%;width:${100 / baender.length}%;--k:${x.sc.farbe}" title="${esc(`${x.wer ? x.wer + ": " : ""}${x.sc.name} ${this._schichtZeit(x.sc)}`.trim())}"><span>${x.wer ? `<b>${esc(x.wer[0])}</b> ` : ""}${esc(x.sc.name)}</span></div>`;
       }).join("");
       const blockHtml = bloecke.map((x) => {
-        const top = px(x.s), hoehe = Math.max(18, px(Math.min(x.e, bis * 60)) - top - 1);
-        return x.html(`top:${top}px;height:${hoehe}px;left:calc(${x.sp * 100 / x.n}% + 1px);width:calc(${100 / x.n}% - 2px)`, hoehe >= 34 && !this._narrow);
+        const top = px(x.s), hoeheH = px(Math.min(x.e, bis * 60)) - top;
+        return x.html(`top:${cp(top)};height:max(18px, ${cp(hoeheH, " - 1px")});left:calc(${x.sp * 100 / x.n}% + 1px);width:calc(${100 / x.n}% - 2px)`, hoeheH * hpx - 1 >= 34 && !this._narrow);
       }).join("");
       const heuteTag = tag === this._tag;
-      const jetztHtml = heuteTag && jetztMin > von * 60 && jetztMin < bis * 60 ? `<div class="wjetzt" style="top:${px(jetztMin)}px" aria-hidden="true"></div>` : "";
+      const jetztHtml = heuteTag && jetztMin > von * 60 && jetztMin < bis * 60 ? `<div class="wjetzt" style="top:${cp(px(jetztMin))}" aria-hidden="true"></div>` : "";
       const d = ausIso(tag);
       return { kopf: `<button type="button" class="wkh ${heuteTag ? "heute" : ""}" data-tagauf="${tag}" aria-label="${esc(datumText(tag) + ", Tag öffnen")}"><span class="wn">${WT_KURZ[i]}</span><b>${d.getDate()}</b></button>`,
         ganz: `<div class="wkg ${heuteTag ? "heute" : ""}" data-tag="${tag}" data-wleer="${tag}">${sichtbar}</div>`,
-        spalte: `<div class="wspalte ${heuteTag ? "heute" : ""}" data-tag="${tag}" data-wleer="${tag}" style="height:${stunden * hpx}px">${bandHtml}${blockHtml}${jetztHtml}</div>` };
+        spalte: `<div class="wspalte ${heuteTag ? "heute" : ""}" data-tag="${tag}" data-wleer="${tag}" style="height:${cp(stunden)}">${bandHtml}${blockHtml}${jetztHtml}</div>` };
     });
-    return `<div class="wcal" id="wcal" style="--hpx:${hpx}px" role="group" aria-label="Wochenkalender" data-von="${von}" data-hpx="${hpx}">
+    return `<div class="wcal" id="wcal" style="--hpx:${hpx}px" role="group" aria-label="Wochenkalender" data-von="${von}" data-bis="${bis}" data-hpx="${hpx}">
       <div class="wsticky">
         <div class="wzeile"><div class="wl"></div>${spalten.map((x) => x.kopf).join("")}</div>
         <div class="wzeile wganzz"><div class="wl">Ganztag</div>${spalten.map((x) => x.ganz).join("")}</div>
       </div>
-      <div class="wzeile wkoerper"><div class="wl wstunden" style="height:${stunden * hpx}px" aria-hidden="true">${[...Array(stunden)].map((_, i) => `<span style="top:${i * hpx}px">${String(von + i).padStart(2, "0")}<small>:00</small></span>`).join("")}</div>${spalten.map((x) => x.spalte).join("")}</div>
+      <div class="wzeile wkoerper"><div class="wl wstunden" style="height:calc(var(--hpx) * ${stunden})" aria-hidden="true">${[...Array(stunden)].map((_, i) => `<span style="top:calc(var(--hpx) * ${i})">${String(von + i).padStart(2, "0")}<small>:00</small></span>`).join("")}</div>${spalten.map((x) => x.spalte).join("")}</div>
     </div>`;
   }
 
@@ -3374,17 +3399,6 @@ class PlanerPanel extends HTMLElement {
       const st = montag(this._wStart || ausIso(heute()));
       this._sagen(`${datumText(iso(st))} bis ${datumText(iso(plusTage(st, 6)))}`);
     }));
-    const zf = root.getElementById("zform");
-    if (zf) {
-      const speichern = async () => {
-        const ziele = [0, 1, 2].map((i) => ({ text: zf.querySelector(`#z-${i}`).value.trim(), erledigt: zf.querySelector(`#zc-${i}`).checked }));
-        const e = await this._ws({ type: "planer/woche", kw: zf.dataset.kw, ziele, notiz: "" });
-        this._daten.wochen = { ...(this._daten.wochen || {}), [zf.dataset.kw]: e };
-      };
-      zf.querySelectorAll('input[type="text"]').forEach((i) => i.addEventListener("change", () => { speichern(); this._sagen("Wochenziel gespeichert"); }));
-      zf.querySelectorAll('input[type="checkbox"]').forEach((c) => c.addEventListener("change", () => { speichern(); this._sagen(c.checked ? "Wochenziel erreicht" : "Wochenziel wieder offen"); }));
-      zf.addEventListener("submit", (e) => e.preventDefault());
-    }
     // Ziehen auf einen Tag (Maus/Trackpad); am Handy und mit Tastatur über „Öffnen“ und Datum
     this._app.querySelectorAll("[data-ziehen]").forEach((el) => el.addEventListener("dragstart", (e) => {
       e.dataTransfer.setData("text/plain", el.dataset.ziehen);
@@ -3953,6 +3967,10 @@ class PlanerPanel extends HTMLElement {
         if (m.lastElementChild && !m.lastElementChild.classList.contains("menue-trenner")) {
           const t = document.createElement("div"); t.className = "menue-trenner"; t.setAttribute("role", "separator"); m.append(t);
         }
+        continue;
+      }
+      if (e.kopf) {
+        const k = document.createElement("div"); k.className = "menue-kopf"; k.setAttribute("role", "presentation"); k.textContent = e.kopf; m.append(k);
         continue;
       }
       if (e.eingabe) {
