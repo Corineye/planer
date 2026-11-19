@@ -1098,8 +1098,8 @@ dialog.nz-farbig .blatt-kopf{box-shadow:inset 0 -3px 0 var(--nf)}
 .pille .pfeil-runter{width:14px;height:14px;opacity:.65;margin-left:-2px}
 .pille>svg:not(.pfeil-runter){width:16px;height:16px}
 .pille .punkt{width:10px;height:10px}
-.pille.chip{min-height:30px;padding:0 10px}
-.pille.chip .chip-x{font-size:11px;opacity:.7;margin-left:2px}
+.pille.filterchip{min-height:30px;padding:0 10px}
+.pille.filterchip .chip-x{font-size:11px;opacity:.7;margin-left:2px}
 .rund.wer-knopf .wer-av{width:30px;height:30px;font-size:14px}
 .rund.wer-knopf .wer-av.alle svg{width:18px;height:18px}
 .rund .filter-punkt{position:absolute;top:7px;right:7px;width:10px;height:10px;border-radius:50%;background:var(--accent-fill);box-shadow:0 0 0 2px var(--card)}
@@ -1635,7 +1635,7 @@ class PlanerPanel extends HTMLElement {
     const b = this._bereich;
     if (b && v !== "notizen" && this._bereichFilterAn()) {
       const name = b[0].toUpperCase() + b.slice(1);
-      teile.push(`<button type="button" class="pille aktiv chip" data-aktion="bereich-weg" data-fokus="p-bereich" aria-label="Bereichsfilter ${esc(name)} entfernen"><span class="punkt" style="--b:${bereichFarbe(b, d.farben)}" aria-hidden="true"></span><span class="pille-text">Bereich: ${esc(name)}</span><span class="chip-x" aria-hidden="true">✕</span></button>`);
+      teile.push(`<button type="button" class="pille aktiv filterchip" data-aktion="bereich-weg" data-fokus="p-bereich" aria-label="Bereichsfilter ${esc(name)} entfernen"><span class="punkt" style="--b:${bereichFarbe(b, d.farben)}" aria-hidden="true"></span><span class="pille-text">Bereich: ${esc(name)}</span><span class="chip-x" aria-hidden="true">✕</span></button>`);
     }
     if (v === "notizen") {
       const { ordner, tags } = this._notizFilterListen();
