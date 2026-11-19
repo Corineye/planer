@@ -511,6 +511,9 @@ aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);positio
 .wkopf .kalumschalter{margin:0;justify-self:auto}
 .wkopf .navi .knopf{padding:0 var(--s3)}
 .wkopf .navi{display:flex;gap:var(--s2);align-items:center}
+.schmal .wkopf:has(#w-titel){flex-wrap:nowrap}
+.schmal #w-titel{flex-wrap:nowrap;white-space:nowrap;min-width:0}
+.schmal #w-titel .zahl{font-size:var(--t-titel);font-weight:700;color:var(--muted)}
 .kalleiste{display:flex;gap:var(--s3);align-items:center;flex-wrap:wrap;justify-content:space-between}
 .kalleiste .seg{flex:none}
 .monat{--kompakt:1;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;align-content:start}
@@ -2935,7 +2938,7 @@ class PlanerPanel extends HTMLElement {
     const eingang = this._sortiert(alle.filter((a) => a.status === "offen" && !a.datum));
     return `<section class="gruppe" aria-labelledby="w-titel">
       ${this._narrow ? this._kalenderUmschalter() : ""}
-      <div class="wkopf"><h2 id="w-titel">${esc(spanne)}<span class="zahl">KW ${+k.slice(6)}</span></h2>${this._narrow ? "" : this._kalenderUmschalter(true)}${this._kalNavi("woche", "Heute", iso(start) === iso(montag(new Date())), "Woche wechseln")}</div>
+      <div class="wkopf"><h2 id="w-titel">${this._narrow ? `<span class="wmon">${esc(d0.getMonth() !== d7.getMonth() ? `${MONATE[d0.getMonth()].slice(0, 3)}/${MONATE[d7.getMonth()].slice(0, 3)}` : MONATE[d7.getMonth()].slice(0, 3))}</span><span class="zahl">KW ${+k.slice(6)}</span><span class="sr">${esc(spanne)}</span>` : `${esc(spanne)}<span class="zahl">KW ${+k.slice(6)}</span>`}</h2>${this._narrow ? "" : this._kalenderUmschalter(true)}${this._kalNavi("woche", "Heute", iso(start) === iso(montag(new Date())), "Woche wechseln")}</div>
     </section>
     ${this._wocheRaster(tage, termine || [], aufg)}
     ${termine === null ? `<p class="hinweis" role="status">Termine werden geladen …</p>` : ""}
