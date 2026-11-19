@@ -353,7 +353,7 @@ header .titel-block{flex:1 1 200px}
 header .rechts{order:2}
 header nav.tabs button{padding:0 var(--s3)}
 #rahmen:not(.schmal) .wrap{container-type:inline-size}
-@container (min-width:840px){header nav.tabs{order:2;margin:0 var(--s2)}header .titel-block{flex:0 1 170px;min-width:110px}header .rechts{order:3;margin-left:auto}header nav.tabs .zahl{display:none}}
+@container (min-width:840px){header{flex-wrap:nowrap}header nav.tabs{flex:0 1 auto;min-width:0}header nav.tabs{order:2;margin:0 var(--s2)}header .titel-block{flex:0 1 170px;min-width:110px}header .rechts{order:3;margin-left:auto}header nav.tabs .zahl{display:none}}
 @container (min-width:990px){header nav.tabs .zahl:not(.null){display:inline}}
 @container (max-width:700px){header nav.tabs{max-width:100%}header nav.tabs button{padding:0 var(--s2);gap:4px;flex:1 1 auto;justify-content:center;min-width:0}header nav.tabs .zahl{display:none}}
 .schmal header{padding-top:var(--s1)}
