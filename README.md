@@ -10,7 +10,7 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
 3. Einstellungen › Geräte & Dienste › Integration hinzufügen › **Planer**.
 4. In der Seitenleiste erscheint „Planer“.
 
-## Was es gibt (v0.9.2)
+## Was es gibt (v0.10.0)
 
 - **Heute** mit Top 3 (je Rang 1–3, nie mehr als drei), weiteren Aufgaben, Überfälligem und „Heute erledigt“.
 - **Demnächst** (nach Tagen gruppiert) und **Eingang** (alles ohne Datum).
@@ -37,6 +37,12 @@ Installation über HACS (Typ **Integration**). In die `configuration.yaml` muss 
   zurückblättern. Aufgaben am PC auf einen Tag ziehen, auch aus dem Eingang; am Handy und mit Tastatur über „Öffnen“ und Datum.
 - **Gemeinsame Termine** (v0.3): In den Einstellungen einen Kalender für gemeinsame Termine wählen (z. B. „Linda und Corin“).
   Beim Termin „Gemeinsam“ wählen oder `@gemeinsam` tippen, dann landet er dort.
+
+- **Woche wie Google Kalender** (v0.10): sieben Spalten Mo–So mit Ganztags-Zeile und Stundenraster. Termine und Aufgaben mit
+  Uhrzeit als Blöcke nach Dauer, Schichten als farbiges Band hinter den Terminen, rote Jetzt-Linie. Am Handy passen alle sieben Tage ohne Seitwärts-Scrollen.
+- **Monat neu** (v0.10): Am Handy der ganze Monat ohne Scrollen (einzeilig, „+n“ für den Rest), am PC alle Einträge mit Uhrzeit und Ort.
+  Schichten als Kürzel-Chips in der Schichtfarbe unter dem Datum, Aufgaben mit leerem Kreis.
+- **Schichtfarben** (v0.10): überall die Farbe aus dem Schichtplaner, Schrift automatisch hell oder dunkel.
 
 - **Teilaufgaben** (v0.4): Checkliste in jeder Aufgabe, Fortschritt (z. B. 1/3) und „Nächster Schritt“ in der Liste.
   Bei wiederkehrenden Aufgaben werden die Teilaufgaben beim nächsten Termin wieder geöffnet.
