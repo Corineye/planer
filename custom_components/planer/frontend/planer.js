@@ -675,7 +675,8 @@ ul.zeitleiste>li.jetzt span{position:absolute;right:0;top:-10px;font-size:var(--
 .block b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .block span{color:var(--muted);font-size:var(--t-klein);white-space:nowrap}
 .block .wer-av{color:#fff;font-size:9px}
-.schmal .mpunkt .wer-av{display:none}
+.schmal .me .wer-av{display:none}
+.me .wer-av{margin-right:3px;vertical-align:-1px}
 .block.a{background:color-mix(in srgb,var(--k,var(--accent)) 13%,var(--card));box-shadow:inset 0 0 0 1.5px var(--k,var(--accent))}
 .block.fertig{opacity:.5;text-decoration:line-through}
 .block:focus-visible{z-index:3}
@@ -1294,6 +1295,7 @@ class PlanerPanel extends HTMLElement {
   disconnectedCallback() {
     document.removeEventListener("keydown", this._tasten);
     if (this._kalGroesse) { window.removeEventListener("resize", this._kalGroesse); this._kalGroesse = null; }
+    this._monatRO?.disconnect(); this._monatRO = null;
     window.removeEventListener("scroll", this._rollen, { capture: true });
     this.shadowRoot?.removeEventListener("scroll", this._rollen, { capture: true });
     if (this._abo) this._abo.then((ab) => ab()).catch(() => {});
@@ -2731,6 +2733,13 @@ class PlanerPanel extends HTMLElement {
     if (!m) return;
     const kompakt = getComputedStyle(m).getPropertyValue("--kompakt").trim() === "1";
     if (this._narrow) m.style.height = `${this._freieHoehe(m)}px`; else m.style.height = "";
+    // Ändert sich die Größe später (Schrift geladen, Kopf umgebrochen), neu verteilen
+    if (window.ResizeObserver && this._monatRO?.ziel !== m) {
+      this._monatRO?.disconnect();
+      this._monatRO = new ResizeObserver(() => { cancelAnimationFrame(this._monatRaf); this._monatRaf = requestAnimationFrame(() => this._monatPassen()); });
+      this._monatRO.ziel = m;
+      this._monatRO.observe(m.querySelector(".mtag") || m);
+    }
     m.querySelectorAll(".mmehr").forEach((x) => x.remove());
     m.querySelectorAll(".me[hidden]").forEach((x) => { x.hidden = false; });
     if (!kompakt) return;
