@@ -549,7 +549,8 @@ aside.kal{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);positio
 .mtag{height:auto;min-height:0;padding:5px 6px 4px;overflow:hidden;gap:3px}
 .mmehr{font-size:11px;line-height:16px;padding-left:6px}
 .mnr{width:26px;height:26px;font-size:var(--t-sub);margin-bottom:2px}
-.msz{flex-wrap:wrap;gap:3px}
+.msz{flex-wrap:nowrap;gap:3px;overflow:hidden}
+.msz:has(.msk + .msk) .sz{display:none}
 .msk{font-size:10.5px;height:18px;line-height:18px;padding:0 6px;overflow:visible}
 .msk .sz{display:inline}
 .mstreifen{height:4px}
@@ -830,7 +831,7 @@ dialog .schnellwahl .knopf:not(.primaer):not(.text)[aria-pressed="true"]{backgro
 .wcal.drei .block{margin-left:calc(var(--nb,0) * 7px);max-width:calc(100% - var(--nb,0) * 7px - 2px);border-radius:8px;padding:3px 7px}
 .wcal.drei .block b{font-size:13px}
 .wcal.drei .block.a b{white-space:nowrap;display:block}
-.wcal.drei .block.t:has(span) b{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.wcal.drei .block.t b{white-space:normal;display:-webkit-box;-webkit-line-clamp:var(--zl,1);-webkit-box-orient:vertical}
 .wcal.drei .block span{font-size:11px}
 .wcal.drei .wkh b{font-size:17px}
 .wcal.drei .wc.s .nm{display:inline}
@@ -2873,7 +2874,7 @@ class PlanerPanel extends HTMLElement {
     const m = this._app.querySelector(".monat");
     if (!m) return;
     const kompakt = getComputedStyle(m).getPropertyValue("--kompakt").trim() === "1";
-    m.style.height = this._narrow ? `${this._freieHoehe(m)}px` : `${Math.max(520, this._freieHoehe(m))}px`;
+    m.style.height = this._narrow ? `${this._freieHoehe(m) - (this._app.querySelector(".fab") ? 60 : 0)}px` : `${Math.max(520, this._freieHoehe(m))}px`;
     // Ändert sich die Größe später (Schrift geladen, Kopf umgebrochen), neu verteilen
     if (window.ResizeObserver && this._monatRO?.ziel !== m) {
       this._monatRO?.disconnect();
@@ -3061,7 +3062,11 @@ class PlanerPanel extends HTMLElement {
       }).join("");
       const blockHtml = bloecke.map((x) => {
         const top = px(x.s), hoeheH = px(Math.min(x.e, bis * 60)) - top;
-        return x.html(`top:${cp(top)};height:max(18px, ${cp(hoeheH, " - 1px")});left:calc(${x.sp * 100 / x.n}% + 1px);width:calc(${100 / x.n}% - 2px)`, hoeheH * hpx - 1 >= 34 && !this._narrow);
+        // 3-Tage-Ansicht: Überschneidungen leicht versetzt übereinander (wie Apple), sonst nebeneinander
+        const lage = tage.length === 3
+          ? `left:calc(${x.sp * 16}px + 1px);width:calc(100% - ${x.sp * 16}px - 2px);z-index:${2 + x.sp}`
+          : `left:calc(${x.sp * 100 / x.n}% + 1px);width:calc(${100 / x.n}% - 2px)`;
+        return x.html(`top:${cp(top)};height:max(${tage.length === 3 ? 24 : 20}px, ${cp(hoeheH, " - 1px")});${lage};--zl:${hoeheH * hpx >= 38 ? 2 : 1}`, hoeheH * hpx - 1 >= (tage.length === 3 ? 58 : 34) && (!this._narrow || tage.length === 3));
       }).join("");
       const heuteTag = tag === this._tag;
       const jetztHtml = heuteTag && jetztMin > von * 60 && jetztMin < bis * 60 ? `<div class="wjetzt" style="top:${cp(px(jetztMin))}" aria-hidden="true"></div>` : "";
@@ -3479,7 +3484,7 @@ class PlanerPanel extends HTMLElement {
       b.addEventListener("click", () => this._tagZeigen(b.dataset.tagauf));
       b.addEventListener("keydown", (ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); this._tagZeigen(b.dataset.tagauf); } });
     });
-    this._app.querySelectorAll("[data-wleer]").forEach((el) => el.addEventListener("click", (ev) => { if (ev.target === el) this._tagZeigen(el.dataset.wleer); }));
+    this._app.querySelectorAll("[data-wleer]").forEach((el) => el.addEventListener("click", (ev) => { if (el._lang) { el._lang = false; return; } if (ev.target === el) this._tagZeigen(el.dataset.wleer); }));
     this._kalPassen();
     this._wRichtung = 0;
     this._app.querySelectorAll("[data-woche]").forEach((b) => b.addEventListener("click", () => {
@@ -3492,6 +3497,29 @@ class PlanerPanel extends HTMLElement {
       this._wRichtung = ziel > alt ? 1 : ziel < alt ? -1 : 0;
       this._zeichnen();
     }));
+    // 3-Tage-Woche: lange auf eine freie Stelle drücken legt dort einen Eintrag an (volle halbe Stunde, 1 Std.)
+    const wc3 = this._app.querySelector("#wcal.drei");
+    if (wc3) wc3.querySelectorAll(".wspalte").forEach((sp) => {
+      let t = null, y0 = 0, x0b = 0;
+      const ab = () => { clearTimeout(t); t = null; };
+      sp.addEventListener("touchstart", (e) => {
+        if (e.target !== sp && !e.target.classList.contains("wband")) return;
+        const r = sp.getBoundingClientRect();
+        y0 = e.touches[0].clientY; x0b = e.touches[0].clientX;
+        const y = y0 - r.top;
+        t = setTimeout(() => {
+          t = null; sp._lang = true; setTimeout(() => { sp._lang = false; }, 800);
+          const hpx = parseFloat(getComputedStyle(wc3).getPropertyValue("--hpx")) || 44;
+          const m = Math.round((+wc3.dataset.von * 60 + (y / hpx) * 60) / 30) * 30;
+          const s0 = Math.min(Math.max(0, m), 23 * 60);
+          navigator.vibrate?.(10);
+          this._schnellEintrag(sp.dataset.tag, hhmm(s0), hhmm(Math.min(s0 + 60, 23 * 60 + 59)), () => {});
+        }, 500);
+      }, { passive: true });
+      sp.addEventListener("touchmove", (e) => { if (t && Math.hypot(e.touches[0].clientX - x0b, e.touches[0].clientY - y0) > 10) ab(); }, { passive: true });
+      sp.addEventListener("touchend", ab, { passive: true });
+      sp.addEventListener("touchcancel", ab, { passive: true });
+    });
     // Handy: in der Woche nach links/rechts wischen blättert um 3 Tage
     const wc = this._app.querySelector("#wcal");
     if (wc && this._narrow) {
