@@ -780,7 +780,7 @@ dialog .schnellwahl .knopf:not(.primaer):not(.text)[aria-pressed="true"]{backgro
 /* Woche wie Google Kalender */
 .wcal{--rand:44px;position:relative;overflow-y:auto;overflow-x:hidden;background:var(--card);border-radius:var(--r-karte);box-shadow:var(--karte-schatten);overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .schmal .wcal{--rand:26px;border-radius:12px}
-.wzeile{display:grid;grid-template-columns:var(--rand) repeat(7,minmax(0,1fr))}
+.wzeile{display:grid;grid-template-columns:var(--rand) repeat(var(--wn,7),minmax(0,1fr))}
 .wsticky{position:sticky;top:0;z-index:6;background:var(--card);box-shadow:0 1px 0 var(--line)}
 .wl{font-size:var(--t-tab);color:var(--muted);align-self:center;text-align:right;padding-right:4px;min-width:0}
 .wganzz .wl{font-size:9px;line-height:1.1}
@@ -822,6 +822,30 @@ dialog .schnellwahl .knopf:not(.primaer):not(.text)[aria-pressed="true"]{backgro
 .wband span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wband b{font-weight:800}
 .schmal .wband{border-left-width:2px;padding:1px;font-size:8.5px}
+/* 3-Tage-Ansicht am Handy */
+.wcal.drei{--rand:38px}
+.wcal.drei .wband{left:calc(var(--bi) * 7px + 1px)!important;width:5px!important;padding:0;border:0;border-radius:3px;background:var(--k)}
+.wcal.drei .wband span{display:none}
+.wcal.drei .block{margin-left:calc(var(--nb,0) * 7px);max-width:calc(100% - var(--nb,0) * 7px - 2px);border-radius:8px;padding:3px 7px}
+.wcal.drei .block b{font-size:13px}
+.wcal.drei .block.t:has(span) b{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.wcal.drei .block span{font-size:11px}
+.wcal.drei .wkh b{font-size:17px}
+.wcal.drei .wc.s .nm{display:inline}
+.wcal.rein-r .wkoerper,.wcal.rein-r .wsticky{animation:w-rein-r .28s var(--bewegung)}
+.wcal.rein-l .wkoerper,.wcal.rein-l .wsticky{animation:w-rein-l .28s var(--bewegung)}
+@keyframes w-rein-r{from{transform:translateX(40px);opacity:.3}}
+@keyframes w-rein-l{from{transform:translateX(-40px);opacity:.3}}
+@media (prefers-reduced-motion:reduce){.wcal.rein-r .wkoerper,.wcal.rein-l .wkoerper,.wcal.rein-r .wsticky,.wcal.rein-l .wsticky{animation:none}}
+.wleiste{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:0 0 var(--s2)}
+.wleiste button{display:grid;justify-items:center;gap:2px;min-height:48px;padding:4px 0;border:0;border-radius:12px;background:transparent;color:var(--fg);font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.wleiste button small{font-size:10px;font-weight:600;color:var(--muted)}
+.wleiste button b{font-size:15px;font-weight:600;width:28px;height:28px;display:grid;place-items:center;border-radius:50%}
+.wleiste button.an{background:var(--fill)}
+.wleiste button.heute b{background:var(--rot);color:#fff}
+.wleiste button.vorbei{color:var(--muted)}
+.wleiste .pk{display:flex;gap:2px;height:5px}
+.wleiste .pk i{width:5px;height:5px;border-radius:50%;background:var(--sc)}
 .schmal .wband.geteilt span{font-size:0}
 .schmal .wband.geteilt b{font-size:9px}
 .wcal .block{z-index:2;font-size:11px;line-height:1.2;padding:2px 4px;border-radius:5px}
@@ -2927,19 +2951,22 @@ class PlanerPanel extends HTMLElement {
 
   // Woche wie im Google Kalender: 7 Tage als Spalten (Mo–So), Ganztags-Zeile, Stundenraster
   _wocheHtml(alle) {
-    const start = montag(this._wStart || ausIso(heute()));
+    // Handy: 3 Tage ab heute, Wischen und Pfeile blättern um 3 Tage
+    const drei = this._narrow;
+    const start = drei ? (this._w3Start || ausIso(heute())) : montag(this._wStart || ausIso(heute()));
     const k = kw(start);
-    const tage = [...Array(7)].map((_, i) => iso(plusTage(start, i)));
+    const tage = [...Array(drei ? 3 : 7)].map((_, i) => iso(plusTage(start, i)));
     const termine = this._wTermine?.start === iso(start) ? this._wTermine.liste : null;
     if (!termine) this._wocheTermineLaden(start);
     const aufg = (tag) => this._sortiert(alle.filter((a) => a.datum === tag && (a.status === "offen" || (a.erledigt_am || "").slice(0, 10) === tag)));
-    const d0 = ausIso(tage[0]), d7 = ausIso(tage[6]);
+    const d0 = ausIso(tage[0]), d7 = ausIso(tage[tage.length - 1]);
     const spanne = `${d0.getDate()}. ${d0.getMonth() !== d7.getMonth() ? MONATE[d0.getMonth()] + " " : ""}– ${d7.getDate()}. ${MONATE[d7.getMonth()]}`;
     const eingang = this._sortiert(alle.filter((a) => a.status === "offen" && !a.datum));
     return `<section class="gruppe" aria-labelledby="w-titel">
       ${this._narrow ? this._kalenderUmschalter() : ""}
-      <div class="wkopf"><h2 id="w-titel">${this._narrow ? `<span class="wmon">${esc(d0.getMonth() !== d7.getMonth() ? `${MONATE[d0.getMonth()].slice(0, 3)}/${MONATE[d7.getMonth()].slice(0, 3)}` : MONATE[d7.getMonth()].slice(0, 3))}</span><span class="zahl">KW ${+k.slice(6)}</span><span class="sr">${esc(spanne)}</span>` : `${esc(spanne)}<span class="zahl">KW ${+k.slice(6)}</span>`}</h2>${this._narrow ? "" : this._kalenderUmschalter(true)}${this._kalNavi("woche", "Heute", iso(start) === iso(montag(new Date())), "Woche wechseln")}</div>
+      <div class="wkopf"><h2 id="w-titel">${this._narrow ? `<span class="wmon">${esc(d0.getMonth() !== d7.getMonth() ? `${MONATE[d0.getMonth()].slice(0, 3)}/${MONATE[d7.getMonth()].slice(0, 3)}` : MONATE[d7.getMonth()].slice(0, 3))}</span><span class="zahl">KW ${+k.slice(6)}</span><span class="sr">${esc(spanne)}</span>` : `${esc(spanne)}<span class="zahl">KW ${+k.slice(6)}</span>`}</h2>${this._narrow ? "" : this._kalenderUmschalter(true)}${this._kalNavi("woche", "Heute", drei ? iso(start) === heute() : iso(start) === iso(montag(new Date())), drei ? "Tage wechseln" : "Woche wechseln")}</div>
     </section>
+    ${drei ? this._wocheLeiste(tage) : ""}
     ${this._wocheRaster(tage, termine || [], aufg)}
     ${termine === null ? `<p class="hinweis" role="status">Termine werden geladen …</p>` : ""}
     ${eingang.length ? `<section class="gruppe" aria-labelledby="ab-titel">
@@ -2991,6 +3018,8 @@ class PlanerPanel extends HTMLElement {
         const s0 = zeit(sc.von), e0 = zeit(sc.bis);
         if (e0 <= s0 && e0 > von * 60) baender.push({ s: 0, e: e0, sc, wer, fort: true });
       }
+      // 3-Tage-Ansicht: Schichten mit Uhrzeit zusätzlich als Chip oben, im Raster nur als Randstreifen
+      if (tage.length === 3) for (const b of baender) if (!b.fort) schicht.push({ sc: b.sc, wer: b.wer });
       const sChips = schicht.map(({ sc, wer }) => `<span class="wc s" style="--sc:${sc.farbe}" title="${esc(`${wer ? wer + ": " : ""}${sc.name} ${this._schichtZeit(sc)}`.trim())}"><b>${esc(wer ? `${wer[0]} ${sc.kurz}` : sc.kurz)}</b><i class="nm">${esc(sc.name)}</i></span>`);
       const alleGanz = [...sChips, ...ganz];
       const sichtbar = alleGanz.slice(0, 3).join("") + (alleGanz.length > 3 ? `<button type="button" class="wc mehr" data-tagauf="${tag}">+${alleGanz.length - 3}</button>` : "");
@@ -3009,7 +3038,7 @@ class PlanerPanel extends HTMLElement {
       const cp = (h, extra = "") => `calc(var(--hpx) * ${h.toFixed(4)}${extra})`;
       const bandHtml = baender.map((x, n) => {
         const top = px(x.s), h = px(Math.min(x.e, bis * 60)) - top;
-        return `<div class="wband ${x.fort ? "fort" : ""} ${baender.length > 1 ? "geteilt" : ""}" style="top:${cp(top)};height:${cp(h)};left:${n * 100 / baender.length}%;width:${100 / baender.length}%;--k:${x.sc.farbe}" title="${esc(`${x.wer ? x.wer + ": " : ""}${x.sc.name} ${this._schichtZeit(x.sc)}`.trim())}"><span>${x.wer ? `<b>${esc(x.wer[0])}</b> ` : ""}${esc(x.sc.name)}</span></div>`;
+        return `<div class="wband ${x.fort ? "fort" : ""} ${baender.length > 1 ? "geteilt" : ""}" style="--bi:${n};top:${cp(top)};height:${cp(h)};left:${n * 100 / baender.length}%;width:${100 / baender.length}%;--k:${x.sc.farbe}" title="${esc(`${x.wer ? x.wer + ": " : ""}${x.sc.name} ${this._schichtZeit(x.sc)}`.trim())}"><span>${x.wer ? `<b>${esc(x.wer[0])}</b> ` : ""}${esc(x.sc.name)}</span></div>`;
       }).join("");
       const blockHtml = bloecke.map((x) => {
         const top = px(x.s), hoeheH = px(Math.min(x.e, bis * 60)) - top;
@@ -3018,11 +3047,11 @@ class PlanerPanel extends HTMLElement {
       const heuteTag = tag === this._tag;
       const jetztHtml = heuteTag && jetztMin > von * 60 && jetztMin < bis * 60 ? `<div class="wjetzt" style="top:${cp(px(jetztMin))}" aria-hidden="true"></div>` : "";
       const d = ausIso(tag);
-      return { kopf: `<button type="button" class="wkh ${heuteTag ? "heute" : ""} ${tag < this._tag ? "vorbei" : ""}" data-tagauf="${tag}" aria-label="${esc(datumText(tag) + ", Tag öffnen")}"><span class="wn">${WT_KURZ[i]}</span><b>${d.getDate()}</b></button>`,
+      return { kopf: `<button type="button" class="wkh ${heuteTag ? "heute" : ""} ${tag < this._tag ? "vorbei" : ""}" data-tagauf="${tag}" aria-label="${esc(datumText(tag) + ", Tag öffnen")}"><span class="wn">${WT_KURZ[wt(d)]}</span><b>${d.getDate()}</b></button>`,
         ganz: `<div class="wkg ${heuteTag ? "heute" : ""} ${tag < this._tag ? "vorbei" : ""}" data-tag="${tag}" data-wleer="${tag}">${sichtbar}</div>`,
-        spalte: `<div class="wspalte ${heuteTag ? "heute" : ""} ${tag < this._tag ? "vorbei" : ""}" data-tag="${tag}" data-wleer="${tag}" style="height:${cp(stunden)}">${bandHtml}${blockHtml}${jetztHtml}</div>` };
+        spalte: `<div style="--nb:${tage.length === 3 ? new Set(baender.map((b) => b.wer + b.sc.id)).size : 0}" class="wspalte ${heuteTag ? "heute" : ""} ${tag < this._tag ? "vorbei" : ""}" data-tag="${tag}" data-wleer="${tag}" style="height:${cp(stunden)}">${bandHtml}${blockHtml}${jetztHtml}</div>` };
     });
-    return `<div class="wcal" id="wcal" style="--hpx:${hpx}px" role="group" aria-label="Wochenkalender" data-von="${von}" data-bis="${bis}" data-hpx="${hpx}">
+    return `<div class="wcal ${tage.length === 3 ? "drei" : ""} ${this._wRichtung ? (this._wRichtung > 0 ? "rein-r" : "rein-l") : ""}" id="wcal" style="--hpx:${hpx}px;--wn:${tage.length}" role="group" aria-label="Wochenkalender" data-von="${von}" data-bis="${bis}" data-hpx="${hpx}">
       <div class="wsticky">
         <div class="wzeile"><div class="wl"></div>${spalten.map((x) => x.kopf).join("")}</div>
         <div class="wzeile wganzz"><div class="wl">Ganztag</div>${spalten.map((x) => x.ganz).join("")}</div>
@@ -3277,6 +3306,31 @@ class PlanerPanel extends HTMLElement {
     if (tag && this._tagOffen === tag) this._tagZeigen(tag);
   }
 
+  // Handy: Mo–So als kleine Leiste, gezeigte Tage markiert, Schichten als Farbpunkte; Tipp springt hin
+  _wocheLeiste(tage) {
+    const mo = montag(ausIso(tage[1]));
+    return `<div class="wleiste" role="group" aria-label="Tag wählen">${[...Array(7)].map((_, i) => {
+      const t = iso(plusTage(mo, i)), d = ausIso(t);
+      const sch = this._schichtenAm(t);
+      return `<button type="button" data-wsprung="${t}" class="${tage.includes(t) ? "an" : ""} ${t === this._tag ? "heute" : ""} ${t < this._tag ? "vorbei" : ""}" aria-label="${esc(datumText(t))}"><small>${WT_KURZ[i]}</small><b>${d.getDate()}</b><span class="pk">${sch.map(({ a }) => `<i style="--sc:${a.farbe}"></i>`).join("")}</span></button>`;
+    }).join("")}</div>`;
+  }
+
+  _wocheBlaettern(n, gewischt) {
+    if (this._narrow) {
+      this._w3Start = n === 0 ? null : plusTage(this._w3Start || ausIso(heute()), 3 * n);
+      this._wRichtung = n;
+      this._zeichnen();
+      const st = this._w3Start || ausIso(heute());
+      this._sagen(`${datumText(iso(st))} bis ${datumText(iso(plusTage(st, 2)))}`);
+      return;
+    }
+    this._wStart = n === 0 ? null : plusTage(this._wStart || ausIso(heute()), 7 * n);
+    this._zeichnen();
+    const st = montag(this._wStart || ausIso(heute()));
+    this._sagen(`${datumText(iso(st))} bis ${datumText(iso(plusTage(st, 6)))}`);
+  }
+
   async _wocheTermineLaden(start) {
     const key = iso(start);
     if (this._wLaedt === key) return;
@@ -3408,13 +3462,29 @@ class PlanerPanel extends HTMLElement {
     });
     this._app.querySelectorAll("[data-wleer]").forEach((el) => el.addEventListener("click", (ev) => { if (ev.target === el) this._tagZeigen(el.dataset.wleer); }));
     this._kalPassen();
+    this._wRichtung = 0;
     this._app.querySelectorAll("[data-woche]").forEach((b) => b.addEventListener("click", () => {
       const n = +b.dataset.woche;
-      this._wStart = n === 0 ? null : plusTage(this._wStart || ausIso(heute()), 7 * n);
-      this._zeichnen();
-      const st = montag(this._wStart || ausIso(heute()));
-      this._sagen(`${datumText(iso(st))} bis ${datumText(iso(plusTage(st, 6)))}`);
+      this._wocheBlaettern(n);
     }));
+    this._app.querySelectorAll("[data-wsprung]").forEach((b) => b.addEventListener("click", () => {
+      const ziel = b.dataset.wsprung, alt = iso(this._w3Start || ausIso(heute()));
+      this._w3Start = ziel === heute() ? null : ausIso(ziel);
+      this._wRichtung = ziel > alt ? 1 : ziel < alt ? -1 : 0;
+      this._zeichnen();
+    }));
+    // Handy: in der Woche nach links/rechts wischen blättert um 3 Tage
+    const wc = this._app.querySelector("#wcal");
+    if (wc && this._narrow) {
+      let x0 = null, y0 = 0;
+      wc.addEventListener("touchstart", (e) => { if (e.touches.length === 1) { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; } }, { passive: true });
+      wc.addEventListener("touchend", (e) => {
+        if (x0 === null) return;
+        const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+        x0 = null;
+        if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) this._wocheBlaettern(dx < 0 ? 1 : -1, true);
+      }, { passive: true });
+    }
     // Ziehen auf einen Tag (Maus/Trackpad); am Handy und mit Tastatur über „Öffnen“ und Datum
     this._app.querySelectorAll("[data-ziehen]").forEach((el) => el.addEventListener("dragstart", (e) => {
       e.dataTransfer.setData("text/plain", el.dataset.ziehen);
