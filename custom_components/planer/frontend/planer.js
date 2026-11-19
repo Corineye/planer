@@ -799,8 +799,10 @@ li.angehoben{position:relative;z-index:5;transform:scale(1.03);box-shadow:0 12px
 #einst .regel-liste li{display:flex;align-items:center;gap:var(--s2);padding:var(--s2) 0}
 #einst .regel-liste li+li{border-top:.5px solid var(--line2)}
 #einst .regel-text{flex:1;min-width:0;display:grid;gap:2px}
-#einst .regel-neu{display:grid;gap:var(--s3)}
-#einst .regel-neu[open]{padding-top:var(--s2)}
+#einst .regel-form{display:grid;gap:var(--s4);padding-top:var(--s4)}
+#einst .regel-form .reihe{gap:var(--s3)}
+#einst .regel-form #r-speichern{width:100%;margin-top:var(--s1)}
+#einst .regel-form .fehler:empty,#einst .regel-form .hinweis:empty{display:none}
 #einst .regel-neu summary{list-style:none;width:max-content}
 #einst .regel-neu summary::-webkit-details-marker{display:none}
 #einst .regel-neu .feld input,#einst .regel-neu .feld select{background:var(--card2);border-color:transparent}
@@ -3470,7 +3472,7 @@ class PlanerPanel extends HTMLElement {
           <span class="regel-text"><b>${esc(x.titel)}</b><span class="hinweis">Wenn ${esc(name(x.entitaet))} → ${esc(zText(x.zu))}${x.erledigen_bei ? ` · erledigt bei ${esc(zText(x.erledigen_bei))}` : ""} · ${esc((personen.find(([id]) => id === x.person) || [, "Gemeinsam"])[1])}</span></span>
           <label class="schalter" title="Regel an/aus"><input type="checkbox" data-regel-an="${esc(x.id)}" ${x.aktiv !== false ? "checked" : ""} aria-label="Regel ${esc(x.titel)} aktiv"></label>
           <button type="button" class="knopf klein gefahr" data-regel-weg="${esc(x.id)}">Löschen</button></li>`).join("")}</ul>` : ""}
-        <details class="regel-neu"><summary class="knopf">Regel hinzufügen</summary>
+        <details class="regel-neu"><summary class="knopf">Regel hinzufügen</summary><div class="regel-form">
           <div class="feld"><label for="r-ent">Gerät oder Schalter</label><input id="r-ent" list="r-ent-liste" placeholder="z. B. Schalter Waschmaschine" autocomplete="off">
             <datalist id="r-ent-liste">${Object.keys(st).filter((k) => /^(switch|binary_sensor|input_boolean|sensor|light|cover|lock|button|input_button|person|device_tracker|media_player|climate|fan|vacuum)\./.test(k)).sort().map((k) => `<option value="${esc(k)}">${esc(name(k))}</option>`).join("")}</datalist></div>
           <div class="reihe"><div class="feld"><label for="r-zu">Wenn Zustand wird</label><input id="r-zu" list="r-zust" placeholder="on"></div>
@@ -3482,7 +3484,7 @@ class PlanerPanel extends HTMLElement {
             <div class="feld"><label for="r-ber">Bereich (optional)</label><input id="r-ber" placeholder="haushalt"></div></div>
           <button type="button" class="knopf primaer" id="r-speichern">Regel speichern</button>
           <p class="fehler" id="r-fehler" role="alert"></p>
-        </details>
+        </div></details>
       </fieldset>`;
   }
   _regelnBinden(dlg) {
