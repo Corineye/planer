@@ -3466,6 +3466,19 @@ class PlanerPanel extends HTMLElement {
           <select id="wetter-wahl"><option value="">Automatisch${this._wetterEntitaet() ? ` (${esc(name(this._wetterEntitaet()))})` : ""}</option><option value="-" ${d.wetter === "-" ? "selected" : ""}>Kein Wetter</option>
           ${wetter.map((w) => `<option value="${esc(w)}" ${d.wetter === w ? "selected" : ""}>${esc(name(w))}</option>`).join("")}</select></div>
       </fieldset>
+      <fieldset id="sensoren"><legend>Sensoren für Automationen</legend>
+        <p class="hinweis">Der Planer stellt diese Werte als Sensoren in Home Assistant bereit, zum Beispiel für eine Heizungs- oder Weckautomation. Der Name bestimmt die Entitäts-ID.</p>
+        ${(d.sensoren || []).length ? `<ul class="regel-liste">${d.sensoren.map((x) => { const ent = Object.keys(st).find((k) => k.startsWith("sensor.") && st[k].attributes?.friendly_name === x.name); return `<li>
+          <span class="regel-text"><b>${esc(x.name)}</b><span class="hinweis">${esc(SENSOR_ARTEN[x.art] || x.art)} · ${esc((personen.find(([id]) => id === x.person) || [, "Gemeinsam"])[1])}${ent ? ` · ${esc(ent)} = ${esc(st[ent].state)}` : " · erscheint nach dem Speichern"}</span></span>
+          <button type="button" class="knopf klein gefahr" data-sensor-weg="${esc(x.id)}">Löschen</button></li>`; }).join("")}</ul>` : ""}
+        <details class="regel-neu"><summary class="knopf">Sensor hinzufügen</summary><div class="regel-form">
+          <div class="feld"><label for="s-art">Was soll der Sensor zeigen?</label><select id="s-art">${Object.entries(SENSOR_ARTEN).map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join("")}</select></div>
+          <div class="feld"><label for="s-wer">Für</label><select id="s-wer">${personen.map(([id, n]) => `<option value="${esc(id)}" ${id === d.ich ? "selected" : ""}>${esc(n)}</option>`).join("")}</select></div>
+          <div class="feld"><label for="s-name">Name</label><input id="s-name" placeholder="z. B. Corin Schicht heute"></div>
+          <button type="button" class="knopf primaer" id="s-speichern">Sensor speichern</button>
+          <p class="fehler" id="s-fehler" role="alert"></p>
+        </div></details>
+      </fieldset>
       <fieldset id="regeln"><legend>Automatische Aufgaben</legend>
         <p class="hinweis">Wechselt ein Gerät oder Schalter in einen bestimmten Zustand, legt der Planer eine Aufgabe für heute an. Solange sie offen ist, kommt keine zweite dazu.</p>
         ${regeln.length ? `<ul class="regel-liste">${regeln.map((x) => `<li data-regel="${esc(x.id)}">
@@ -3498,6 +3511,28 @@ class PlanerPanel extends HTMLElement {
       this._einstellungen();
       if (offen) this.shadowRoot.getElementById("einst").querySelector("#regeln details")?.setAttribute("open", "");
     };
+    const sSpeichern = async (sensoren, text) => {
+      await this._ws({ type: "planer/allgemein", werte: { sensoren } });
+      d.sensoren = sensoren;
+      this._sagen(text);
+      this._einstellungen();
+      setTimeout(() => { if (this.shadowRoot.getElementById("einst").open) this._einstellungen(); }, 1500); // Entitäts-ID nachladen
+    };
+    const sNameVorschlag = () => {
+      const n = $("s-name"); if (!n || n.dataset.eigen) return;
+      const wer = $("s-wer").selectedOptions[0]?.textContent.split(" ")[0] || "";
+      n.value = `${wer} ${SENSOR_ARTEN[$("s-art").value]}`.trim();
+    };
+    $("s-art")?.addEventListener("change", sNameVorschlag);
+    $("s-wer")?.addEventListener("change", sNameVorschlag);
+    $("s-name")?.addEventListener("input", (e) => { e.target.dataset.eigen = "1"; });
+    sNameVorschlag();
+    $("s-speichern")?.addEventListener("click", async () => {
+      const name = $("s-name").value.trim();
+      if (!name) { $("s-fehler").textContent = "Bitte einen Namen eingeben."; return; }
+      await sSpeichern([...(d.sensoren || []), { name, art: $("s-art").value, person: $("s-wer").value }], `Sensor „${name}“ angelegt`);
+    });
+    dlg.querySelectorAll("[data-sensor-weg]").forEach((b) => b.addEventListener("click", () => sSpeichern((d.sensoren || []).filter((x) => x.id !== b.dataset.sensorWeg), "Sensor gelöscht")));
     $("wetter-wahl")?.addEventListener("change", async (e) => {
       await this._ws({ type: "planer/allgemein", werte: { wetter: e.target.value || null } });
       d.wetter = e.target.value === "-" ? "-" : e.target.value || null;
@@ -5538,6 +5573,8 @@ class PlanerPanel extends HTMLElement {
     dlg.showModal();
   }
 }
+
+const SENSOR_ARTEN = { schicht_heute: "Schicht heute", schicht_morgen: "Schicht morgen", naechste_schicht: "Nächster Schichtbeginn", offene_aufgaben: "Offene Aufgaben heute", ueberfaellig: "Überfällige Aufgaben" };
 
 function CSS_escape(s) { return String(s).replace(/["\\]/g, "\\$&"); }
 

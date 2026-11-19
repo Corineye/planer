@@ -447,6 +447,14 @@ class Planer:
         if "wetter" in werte:
             v = werte["wetter"]
             self.allgemein["wetter"] = str(v) if v and (str(v).startswith("weather.") or v == "-") else None
+        if "sensoren" in werte and isinstance(werte["sensoren"], list):
+            arten = {"schicht_heute", "schicht_morgen", "naechste_schicht", "offene_aufgaben", "ueberfaellig"}
+            self.allgemein["sensoren"] = [
+                {"id": _text(x.get("id"), 12) or uuid.uuid4().hex[:8], "name": _text(x.get("name"), 60),
+                 "art": x["art"], "person": _text(x.get("person"), 64) or GEMEINSAM}
+                for x in werte["sensoren"][:20]
+                if isinstance(x, dict) and x.get("art") in arten and _text(x.get("name"), 60)
+            ]
         if "regeln" in werte and isinstance(werte["regeln"], list):
             sauber = []
             for x in werte["regeln"][:30]:

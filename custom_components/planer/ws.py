@@ -93,6 +93,7 @@ async def ws_lesen(hass: HomeAssistant, connection: websocket_api.ActiveConnecti
             "gemeinsam_kalender": p.allgemein.get("gemeinsam_kalender"),
             "wetter": p.allgemein.get("wetter"),
             "regeln": p.allgemein.get("regeln", []) if user.is_admin else [],
+            "sensoren": p.allgemein.get("sensoren", []) if user.is_admin else [],
             "farben": p.allgemein.get("farben", {}),
             "einkauf_listen": einkauf.gewaehlte_listen(hass, p.allgemein.get("einkauf_listen")),
             "einkauf_eingestellt": p.allgemein.get("einkauf_listen"),
@@ -321,6 +322,8 @@ async def ws_allgemein(hass: HomeAssistant, connection: websocket_api.ActiveConn
     await _planer(hass).allgemein_setzen(msg["werte"])
     if "regeln" in msg["werte"] and (auto := hass.data[DOMAIN].get("automatik")):
         auto.neu_laden()
+    if "sensoren" in msg["werte"] and (abgleich := hass.data[DOMAIN].get("sensoren_abgleichen")):
+        abgleich()
     connection.send_result(msg["id"], {"ok": True})
 
 

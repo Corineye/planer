@@ -29,7 +29,7 @@ from .sicherung import Sicherung
 from .ws import async_registrieren
 
 ORDNER = Path(__file__).parent / "frontend"
-PLATTFORMEN = [Platform.TODO]
+PLATTFORMEN = [Platform.TODO, Platform.SENSOR]
 
 DIENST_HINZUFUEGEN = vol.Schema(
     {
