@@ -356,7 +356,28 @@ header nav.tabs button{padding:0 var(--s3)}
 @container (min-width:840px){header nav.tabs{order:2;margin:0 var(--s2)}header .titel-block{flex:0 1 170px;min-width:110px}header .rechts{order:3;margin-left:auto}header nav.tabs .zahl{display:none}}
 @container (min-width:990px){header nav.tabs .zahl:not(.null){display:inline}}
 @container (max-width:700px){header nav.tabs{max-width:100%}header nav.tabs button{padding:0 var(--s2);gap:4px;flex:1 1 auto;justify-content:center;min-width:0}header nav.tabs .zahl{display:none}}
-.schmal header{align-items:flex-start;padding-top:var(--s1)}
+.schmal header{padding-top:var(--s1)}
+.tage{display:grid;gap:var(--s4);max-width:760px;width:100%;margin:0 auto;min-width:0}
+.tkarte{padding:var(--s3);border-radius:20px;background:var(--fill);display:grid;gap:var(--s3);min-width:0}
+.tkarte h2{font-size:var(--t-kopf);color:var(--muted)}
+.tkarte.heute h2{color:var(--accent)}
+.tkarte.heute{box-shadow:inset 0 0 0 1.5px var(--accent-dim,var(--line2))}
+.schicht-chips{display:flex;flex-wrap:wrap;gap:6px}
+.schicht-chip{display:inline-flex;align-items:center;gap:5px;max-width:100%;padding:5px 11px;border-radius:var(--r-voll,999px);font-size:var(--t-fuss);font-weight:600;color:var(--fg);background:color-mix(in srgb,var(--k) 22%,transparent);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--k) 55%,transparent)}
+.schicht-chip b{display:inline-grid;place-items:center;min-width:20px;height:20px;border-radius:10px;background:var(--k);color:#fff;font-size:11px;padding:0 4px}
+.schicht-chip .sz{font-variant-numeric:tabular-nums;font-weight:500}
+.schicht-chip .sw{color:var(--muted);font-weight:500}
+ul.liste>li.vorbei{opacity:.5}
+ul.liste>li.jetzt{display:flex;align-items:center;gap:var(--s2);color:var(--rot);font-size:var(--t-klein);font-weight:700;margin:2px 0}
+ul.liste>li.jetzt::before,ul.liste>li.jetzt::after{content:"";height:2px;border-radius:1px;background:var(--rot);flex:1}
+ul.liste>li.jetzt::before{flex:0 0 12px}
+.chip.rot{color:var(--rot);background:color-mix(in srgb,var(--rot) 14%,transparent)}
+li.aufgabe.ueberf .zeile{box-shadow:inset 4px 0 0 var(--rot),var(--karte-schatten)}
+li.aufgabe.ueberf .haken::before{border-color:var(--rot)}
+.schmal header{flex-wrap:nowrap;align-items:center}
+.schmal header .titel-block{flex:1 1 0;min-width:0}
+.schmal header .rechts{order:0;gap:var(--s1)}
+.schmal header h1{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .schmal header .titel-block{padding-top:2px}
 
 /* ---------- Bedienelemente ---------- */
@@ -1255,6 +1276,7 @@ class PlanerPanel extends HTMLElement {
     this._tasten = (e) => this._taste(e);
     try {
       this._ansicht = localStorage.getItem("planer.ansicht") || "heute";
+      if (this._ansicht === "demnaechst") this._ansicht = "heute";
       this._kalAnsicht = localStorage.getItem("planer.kalansicht") || "monat";
       this._eListe = localStorage.getItem("planer.eliste") || "";
       this._filter = localStorage.getItem("planer.filter") || "ich";
@@ -1430,15 +1452,14 @@ class PlanerPanel extends HTMLElement {
     const offen = alle.filter((a) => a.status === "offen");
     const zaehler = {
       heute: offen.filter((a) => !a.datum || a.datum <= h).length,
-      demnaechst: offen.filter((a) => a.datum && a.datum > h).length,
       eingang: offen.length,
       woche: offen.filter((a) => a.datum && a.datum >= iso(montag(new Date())) && a.datum <= iso(plusTage(montag(new Date()), 6))).length,
       notizen: this._notizenSichtbar().length,
       einkauf: (this._eArtikel && this._eArtikel.liste === this._eListeId() ? this._eArtikel.items.filter((x) => !x.erledigt).length : 0),
     };
-    const tabs = [["heute", "Heute"], ["woche", "Kalender"], ["demnaechst", "Demnächst"]];
+    const tabs = [["heute", "Heute"], ["woche", "Kalender"]];
     tabs.push(["notizen", "Notizen"]);
-    if (this._ansicht === "eingang") this._ansicht = "heute";
+    if (this._ansicht === "eingang" || this._ansicht === "demnaechst") this._ansicht = "heute";
     if ((d.einkauf_listen || []).length) tabs.push(["einkauf", "Einkauf"]);
     if (this._ansicht === "einkauf" && !(d.einkauf_listen || []).length) this._ansicht = "heute";
     const heuteD = new Date();
@@ -1626,7 +1647,7 @@ class PlanerPanel extends HTMLElement {
     return `<button type="button" class="rund wer-knopf" data-menue="wer" data-fokus="p-wer" aria-haspopup="menu" aria-expanded="false" aria-label="Wessen Einträge: ${esc(this._werText())}. Ändern" title="Wessen Einträge: ${esc(this._werText())}">${inhalt}</button>`;
   }
   // Der Bereichsfilter wirkt in Heute, Demnächst und Kalender
-  _bereichFilterAn() { return ["heute", "demnaechst", "woche"].includes(this._ansicht); }
+  _bereichFilterAn() { return ["heute", "woche"].includes(this._ansicht); }
   // Eine Zeile unter dem Titel nur, wenn es etwas anzuzeigen gibt (Bereichsfilter aktiv, Notizen-Filter)
   _pillenHtml() {
     const d = this._daten, v = this._ansicht;
@@ -1720,7 +1741,7 @@ class PlanerPanel extends HTMLElement {
         ], { titel: "Bereich", tastatur: i?.tastatur }) },
     ] : [];
     // Am PC stehen „Erweitert“ und „Termin“ schon neben der Eingabezeile, deshalb nur am Handy hier.
-    if ((v === "heute" || v === "demnaechst") && this._narrow) e = [{ text: "Neue Aufgabe mit allen Optionen", icon: ICON.regler, aktion: () => this._erweitert() }, termin];
+    if (v === "heute" && this._narrow) e = [{ text: "Neue Aufgabe mit allen Optionen", icon: ICON.regler, aktion: () => this._erweitert() }, termin];
     else if (v === "woche" && this._kalAnsicht === "schichten") {
       const aus = !this._schichtPerson();
       e = [
@@ -1749,7 +1770,7 @@ class PlanerPanel extends HTMLElement {
       }
     }
     // Abschnitt „Filter“: Bereich, Sortierung, Ausblenden
-    if (v === "heute" || v === "demnaechst") e.push("-", ...bFilter, ...this._listenEintraege(anker, zurueck));
+    if (v === "heute") e.push("-", ...bFilter, ...this._listenEintraege(anker, zurueck));
     else if (bFilter.length) e.push("-", ...bFilter);
     e = e.filter(Boolean);
     if (d.admin) e.push("-", { text: "Einstellungen", icon: ICON.einstellungen, aktion: () => this._einstellungen() });
@@ -1967,7 +1988,7 @@ class PlanerPanel extends HTMLElement {
 
   // Heute/Demnächst: ausgeblendete #Hashtags/Bereiche herausnehmen und darauf hinweisen
   _ansichtHtml(alle, offen) {
-    if (this._ansicht !== "heute" && this._ansicht !== "demnaechst") return this._ansichtInnen(alle, offen);
+    if (this._ansicht !== "heute") return this._ansichtInnen(alle, offen);
     const set = new Set(this._ausgeblendet());
     if (!set.size) return this._ansichtInnen(alle, offen);
     const weg = (a) => set.has(a.bereich || "") || (a.tags || []).some((t) => set.has(t));
@@ -2016,54 +2037,91 @@ class PlanerPanel extends HTMLElement {
     if (this._ansicht === "einkauf") return this._einkaufHtml();
     if (this._ansicht === "notizen") return this._notizenHtml();
     if (this._ansicht === "woche") return this._kalAnsicht === "monat" ? this._monatHtml(this._kalenderAufgaben()) : this._kalAnsicht === "schichten" ? this._schichtHtml() : this._wocheHtml(this._kalenderAufgaben());
-    if (this._ansicht === "demnaechst") {
-      const kommend = offen.filter((a) => a.datum && a.datum > h).sort((a, b) => a.datum.localeCompare(b.datum));
-      const tage = new Set(kommend.map((a) => a.datum));
-      for (let i = 1; i <= 14; i++) {
-        const t = iso(plusTage(new Date(), i));
-        if (this._termineAm(t).length) tage.add(t);
-      }
-      if (!tage.size) return `<p class="leer">Für die nächsten Tage ist nichts geplant.</p>`;
-      return [...tage].sort().map((t) => {
-        const termine = this._termineAm(t);
-        const aufg = this._listeSort(kommend.filter((a) => a.datum === t));
-        const id = `g-${t}`;
-        return `<section class="gruppe" aria-labelledby="${id}">
-          <h2 id="${id}">${esc(datumText(t))}</h2>
-          ${termine.length ? `<ul class="termine" aria-label="Termine">${termine.map((x) => this._terminZeile(x, t)).join("")}</ul>` : ""}
-          ${aufg.length ? `<ul class="liste" aria-label="Aufgaben">${aufg.map((a) => this._zeile(a)).join("")}</ul>` : ""}
-        </section>`;
-      }).join("");
-    }
-    // Heute
+    return this._heuteHtml(alle, offen);
+  }
+
+  // Heute: Tageskarten für heute und die nächsten 14 Tage
+  _heuteHtml(alle, offen) {
+    const h = this._tag;
+    const zeit = (x) => +x.slice(0, 2) * 60 + +x.slice(3, 5);
+    const jetztMin = new Date().getHours() * 60 + new Date().getMinutes();
+    const bisStd = this._daten.einst?.tag_bis ?? 22;
+    const tlKal = this._daten.einst?.kalender_zeitleiste;
+    const faellig = (this._daten.einst?.aufgaben_sortierung || "faellig") === "faellig";
+    const sort = (l) => (faellig ? this._sortiert(l) : this._listeSort(l));
     const ueber = this._listeSort(offen.filter((a) => a.datum && a.datum < h));
     const heuteOffen = offen.filter((a) => a.datum === h);
     const top = heuteOffen.filter((a) => a.top).sort((a, b) => a.top - b.top);
-    // Heute: alles von heute (auch mit Uhrzeit) plus Aufgaben ohne Datum
-    const restFaellig = [...this._sortiert(heuteOffen.filter((a) => !a.top)), ...this._sortiert(offen.filter((a) => !a.datum))];
-    const rest = (this._daten.einst?.aufgaben_sortierung || "faellig") === "faellig" ? restFaellig : this._listeSort(restFaellig);
-    const spaeterAlle = offen.filter((a) => a.datum && a.datum > h).sort((a, b) => a.datum.localeCompare(b.datum) || (a.uhrzeit || "99").localeCompare(b.uhrzeit || "99"));
-    const spaeter = (this._daten.einst?.aufgaben_sortierung || "faellig") === "faellig" ? spaeterAlle : this._listeSort(spaeterAlle);
+    const ohne = sort(offen.filter((a) => !a.datum));
     const fertig = alle.filter((a) => a.status === "erledigt" && (a.erledigt_am || "").slice(0, 10) === h);
     const wiederHeute = alle.filter((a) => a.wiederholung && (a.verlauf || []).includes(h) && a.status === "offen");
-    let html = "";
-    const jetztUhr = new Date().toTimeString().slice(0, 5);
-    const naechste = ueber[0] || this._sortiert(heuteOffen.filter((a) => a.uhrzeit && a.uhrzeit >= jetztUhr))[0] || top[0] || rest[0];
+    const naechste = ueber[0] || this._sortiert(heuteOffen.filter((a) => a.uhrzeit && a.uhrzeit >= hhmm(jetztMin)))[0] || top[0] || this._sortiert(heuteOffen)[0] || ohne[0];
     this._naechste = naechste ? naechste.id : null;
-    const kal = this._zeitleiste(offen);
-    if (ueber.length) html += this._gruppe("Überfällig", ueber, "", "rot");
-    const freie = 3 - top.length;
-    if (top.length) html += this._gruppe("Top 3", top, "", "", freie > 0 ? `${freie} ${freie === 1 ? "Platz" : "Plätze"} frei` : "");
-    if (this._narrow) html += kal;
-    html += this._gruppe(top.length ? "Weitere Aufgaben heute" : "Aufgaben heute", rest, "Für heute ist nichts offen.");
-    if (spaeter.length) html += this._gruppe("Demnächst", spaeter);
+    const vorbei = (html) => html.replace(/^<li( class="([^"]*)")?/, (m, _k, k) => `<li class="${k || ""} vorbei"`);
+    const karte = (tag, i) => {
+      const heute = i === 0;
+      const termine = this._termineAm(tag).filter((t) => tlKal == null || tlKal.includes(t.kalender));
+      const ganz = termine.filter((t) => t.ganztag);
+      const schs = this._schichtenAm(tag);
+      const tagAufg = tag === h ? heuteOffen.filter((a) => !a.top) : offen.filter((a) => a.datum === tag);
+      const mitZeit = [
+        ...termine.filter((t) => !t.ganztag).map((t) => {
+          const s0 = t.start.slice(0, 10) < tag ? 0 : zeit(uhr(t.start));
+          const e0 = t.ende.slice(0, 10) > tag ? 1440 : zeit(uhr(t.ende));
+          return { s: s0, e: e0, html: this._terminZeile(t, tag) };
+        }),
+        ...sort(tagAufg.filter((a) => a.uhrzeit)).map((a) => {
+          const s0 = zeit(a.uhrzeit);
+          return { s: s0, e: s0 + (a.dauer || 0), html: this._zeile(a), aufgabe: true };
+        }),
+      ].sort((x, y) => x.s - y.s);
+      const ohneZeit = sort(tagAufg.filter((a) => !a.uhrzeit));
+      const items = [];
+      if (heute) {
+        for (const a of top) items.push(this._zeile(a));
+        for (const a of ueber) items.push(this._zeile(a));
+        let gesetzt = false;
+        for (const x of mitZeit) {
+          if (!gesetzt && x.s >= jetztMin) { items.push(`<li class="jetzt" aria-hidden="true"><span>Jetzt ${hhmm(jetztMin)}</span></li>`); gesetzt = true; }
+          items.push(x.e <= jetztMin ? vorbei(x.html) : x.html);
+        }
+        if (mitZeit.length && !gesetzt) items.push(`<li class="jetzt" aria-hidden="true"><span>Jetzt ${hhmm(jetztMin)}</span></li>`);
+        for (const a of ohneZeit) items.push(this._zeile(a));
+        for (const a of ohne) items.push(this._zeile(a));
+      } else {
+        for (const x of mitZeit) items.push(x.html);
+        for (const a of ohneZeit) items.push(this._zeile(a));
+      }
+      if (!heute && !items.length && !ganz.length && !schs.length) return "";
+      let frei = "";
+      if (heute) {
+        const von = Math.max((this._daten.einst?.tag_von ?? 7) * 60, jetztMin);
+        const bis = bisStd * 60;
+        const belegt = [...mitZeit].map((x) => [Math.max(x.s, von), Math.min(x.e, bis)]).filter(([p, q]) => q > p).sort((x, y) => x[0] - y[0]);
+        let f = Math.max(0, bis - von), ende = von;
+        for (const [p, q] of belegt) { const p2 = Math.max(p, ende); if (q > p2) { f -= q - p2; ende = q; } }
+        frei = `<p class="frei">${esc(f <= 0 ? `Heute ist bis ${bisStd} Uhr nichts mehr frei.` : `Frei bis ${bisStd} Uhr: ${Math.floor(f / 60) ? `${Math.floor(f / 60)} Std. ` : ""}${f % 60 ? `${f % 60} Min.` : ""}`.trim())}</p>`;
+      }
+      const name = i === 0 ? "Heute" : i === 1 ? "Morgen" : WOCHENTAGE[wt(ausIso(tag))];
+      const id = `g-${tag}`;
+      const chips = schs.length ? `<div class="schicht-chips">${schs.map(({ a: sc, wer }) => `<span class="schicht-chip" style="--k:${sc.farbe}"><b>${esc(sc.kurz || sc.name)}</b> ${esc(sc.name)}${sc.von && sc.bis ? ` <span class="sz">${esc(sc.von)}–${esc(sc.bis)}</span>` : ""}${wer ? ` <span class="sw">${esc(wer)}</span>` : ""}</span>`).join("")}</div>` : "";
+      return `<section class="gruppe tkarte ${heute ? "heute" : ""}" aria-labelledby="${id}">
+        <h2 id="${id}">${esc(name)}, ${esc((() => { const d = ausIso(tag); const m = MONATE[d.getMonth()]; return `${d.getDate()}. ${m.length > 4 ? m.slice(0, 3) + "." : m}`; })())}</h2>
+        ${chips}
+        ${ganz.length ? `<ul class="termine ganztag" aria-label="Ganztägig">${ganz.map((t) => this._terminZeile(t, tag)).join("")}</ul>` : ""}
+        ${items.length ? `<ul class="liste" aria-label="Einträge">${items.join("")}</ul>` : heute ? `<p class="leer">Für heute ist nichts offen.</p>` : ""}
+        ${frei}
+      </section>`;
+    };
+    let html = "";
+    for (let i = 0; i <= 14; i++) html += karte(iso(plusTage(ausIso(h), i)), i);
+    if (this._kalFehler) html = `<p class="fehler">${esc(this._kalFehler)}</p>` + html;
     const erledigtHeute = [...fertig, ...wiederHeute];
     if (erledigtHeute.length) {
       html += `<details class="zu"><summary>Heute erledigt (${erledigtHeute.length})</summary>
         <ul class="liste">${erledigtHeute.map((a) => this._zeile(a, a.status === "offen")).join("")}</ul></details>`;
     }
-    if (this._narrow) return html;
-    return `<div class="spalten"><div>${html}</div><aside>${kal}</aside></div>`;
+    return `<div class="tage">${html}</div>`;
   }
 
   // ---------- Einkauf (Bring! und andere To-do-Listen) ----------
@@ -3208,86 +3266,9 @@ class PlanerPanel extends HTMLElement {
     </button></li>`;
   }
 
-  // Heute als Zeitleiste: Termine und Aufgaben mit Uhrzeit, Linie „Jetzt“, freie Zeit bis Tagesende
-  // Zeitleiste: heute mit Jetzt-Markierung, dazu die nächsten Tage; scrollt in sich
-  _zeitleiste(offen) {
-    const h = this._tag;
-    const zeit = (x) => +x.slice(0, 2) * 60 + +x.slice(3, 5);
-    const jetzt = new Date();
-    const jetztMin = jetzt.getHours() * 60 + jetzt.getMinutes();
-    const bisStd = this._daten.einst?.tag_bis ?? 22;
-    const tlKal = this._daten.einst?.kalender_zeitleiste;
-    const tagDaten = (tag) => {
-      const termine = this._termineAm(tag).filter((t) => tlKal == null || tlKal.includes(t.kalender));
-      const eintraege = [
-        ...termine.filter((t) => !t.ganztag).map((t) => {
-          const s0 = t.start.slice(0, 10) < tag ? 0 : zeit(uhr(t.start));
-          const e0 = t.ende.slice(0, 10) > tag ? 1440 : zeit(uhr(t.ende));
-          return { s: s0, e: e0, html: this._terminZeile(t, tag) };
-        }),
-        ...offen.filter((a) => a.datum === tag && a.uhrzeit).map((a) => {
-          const s0 = zeit(a.uhrzeit);
-          const e0 = s0 + (a.dauer || 0);
-          const bis = a.dauer ? ` – ${hhmm(e0)}` : "";
-          return { s: s0, e: Math.max(e0, s0 + 1), html: `<li class="tl-aufgabe ${a.top ? "top" : ""}" data-id="${a.id}">
-            <button type="button" class="haken" role="checkbox" aria-checked="false" data-aktion="haken" data-id="${a.id}" aria-label="${esc(a.titel)} erledigt"></button>
-            <button type="button" class="inhalt" data-aktion="oeffnen" data-id="${a.id}">
-              <span class="zeit">${a.uhrzeit}${bis}</span><span class="titel">${esc(a.titel)}</span>
-              <span class="unter">Aufgabe${a.top ? ` · Top ${a.top}` : ""}${a.bereich ? ` · ${esc(a.bereich)}` : ""}</span></button></li>` };
-        }),
-      ];
-      const schs = this._schichtenAm(tag);
-      for (const { a: sch, wer } of schs) {
-        if (!sch.von || !sch.bis) continue;
-        const s0 = zeit(sch.von); let e0 = zeit(sch.bis); if (e0 <= s0) e0 = 1440;
-        eintraege.push({ s: s0, e: e0, html: `<li><div class="termin schicht" style="--k:${sch.farbe}"><span class="zeit">${sch.von}–${sch.bis}</span><span class="was">${esc(sch.name)}</span><span class="wo">Schicht${wer ? ` · ${esc(wer)}` : ""}</span></div></li>` });
-      }
-      eintraege.sort((x, y) => x.s - y.s);
-      return { ganz: termine.filter((t) => t.ganztag), eintraege, schicht: schs.length ? schs : null };
-    };
-    // Heute
-    const heuteD = tagDaten(h);
-    let html = "", jetztGesetzt = false;
-    for (const x of heuteD.eintraege) {
-      if (!jetztGesetzt && x.s >= jetztMin) { html += `<li class="jetzt"><span>Jetzt ${hhmm(jetztMin)}</span></li>`; jetztGesetzt = true; }
-      html += x.e <= jetztMin ? x.html.replace(/^<li( class="([^"]*)")?/, (m, _k, k) => `<li class="${k || ""} vorbei"`) : x.html;
-    }
-    if (heuteD.eintraege.length && !jetztGesetzt) html += `<li class="jetzt"><span>Jetzt ${hhmm(jetztMin)}</span></li>`;
-    // freie Zeit von jetzt (frühestens Tagesbeginn) bis Tagesende
-    const von = Math.max((this._daten.einst?.tag_von ?? 7) * 60, jetztMin);
-    const bis = bisStd * 60;
-    const belegt = heuteD.eintraege.map((x) => [Math.max(x.s, von), Math.min(x.e, bis)]).filter(([a, b]) => b > a).sort((x, y) => x[0] - y[0]);
-    let frei = Math.max(0, bis - von), ende = von;
-    for (const [a, b] of belegt) { const a2 = Math.max(a, ende); if (b > a2) { frei -= b - a2; ende = b; } }
-    const freiText = frei <= 0 ? `Heute ist bis ${bisStd} Uhr nichts mehr frei.` : `Frei bis ${bisStd} Uhr: ${Math.floor(frei / 60) ? `${Math.floor(frei / 60)} Std. ` : ""}${frei % 60 ? `${frei % 60} Min.` : ""}`.trim();
-    const keineKal = !(this._daten.kalender || []).length;
-    const tagBlock = (tag, titel, inhalt, ganz) => `<div class="tl-tag" aria-label="${esc(titel)}">
-        <h3 class="tl-kopf">${esc(titel)}</h3>
-        ${(() => { const l = this._schichtenAm(tag).filter(({ a }) => !(a.von && a.bis)); return l.length ? `<div class="ganztags">${l.map(({ a: sc, wer }) => `<span class="wpunkt s" style="--k:${sc.farbe}"><b>${esc(sc.kurz)}</b> ${wer ? `${esc(wer)}: ` : ""}${esc(sc.name)}</span>`).join("")}</div>` : ""; })()}
-        ${ganz.length ? `<ul class="termine ganztag" aria-label="Ganztägig">${ganz.map((t) => this._terminZeile(t, tag)).join("")}</ul>` : ""}
-        ${inhalt}
-      </div>`;
-    let tageHtml = tagBlock(h, `Heute, ${datumKurz(h)}`, heuteD.eintraege.length ? `<ul class="zeitleiste">${html}</ul>`
-      : `<p class="leer">${keineKal ? "Noch kein Kalender sichtbar. In HA eingebundene Kalender erscheinen hier automatisch." : "Heute nichts mit Uhrzeit."}</p>`, heuteD.ganz)
-      + `<p class="frei">${esc(freiText)}</p>`;
-    for (let i = 1; i <= 14; i++) {
-      const tag = iso(plusTage(ausIso(h), i));
-      const d = tagDaten(tag);
-      if (!d.ganz.length && !d.eintraege.length && !d.schicht) continue;
-      const name = i === 1 ? "Morgen" : WOCHENTAGE[wt(ausIso(tag))];
-      tageHtml += tagBlock(tag, `${name}, ${datumKurz(tag)}`, d.eintraege.length ? `<ul class="zeitleiste">${d.eintraege.map((x) => x.html).join("")}</ul>` : "", d.ganz);
-    }
-    return `<section class="kal gruppe" aria-labelledby="g-kal">
-      <h2 id="g-kal">Zeitleiste <span class="zahl">14 Tage</span></h2>
-      ${this._kalFehler ? `<p class="fehler">${esc(this._kalFehler)}</p>` : ""}
-      <div class="tl-scroll" tabindex="0" aria-label="Zeitleiste, scrollbar">${tageHtml}</div>
-    </section>`;
-  }
-
   _gruppe(titel, liste, leer = "", art = "", zusatz = "") {
     const id = `g-${titel.replace(/\W+/g, "-").toLowerCase()}`;
-    const knopf = art === "rot" && liste.length
-      ? `<button type="button" class="knopf klein rot-knopf" data-aktion="alle-heute" data-fokus="alle-heute">Alle auf heute</button>` : "";
+    const knopf = "";
     return `<section class="gruppe ${art === "rot" ? "ueberfaellig" : ""}" aria-labelledby="${id}">
       <div class="gkopf"><h2 id="${id}">${esc(titel)} ${titel === "Top 3" ? "" : `<span class="zahl">${liste.length || ""}</span>`}${zusatz ? ` <span class="chip">${esc(zusatz)}</span>` : ""}</h2>${knopf}</div>
       ${liste.length ? `<ul class="liste">${liste.map((a) => this._zeile(a)).join("")}</ul>` : leer ? `<p class="leer">${esc(leer)}</p>` : ""}
@@ -3297,7 +3278,11 @@ class PlanerPanel extends HTMLElement {
   _zeile(a, wiederErledigt = false) {
     const fertig = a.status === "erledigt" || wiederErledigt;
     const meta = [];
-    if (a.datum && (this._ansicht !== "heute" || a.datum < this._tag)) meta.push(`<span class="chip ${a.datum < this._tag ? "warn" : ""}">${esc(datumText(a.datum))}</span>`);
+    const ueberf = !fertig && this._ansicht === "heute" && a.datum && a.datum < this._tag;
+    if (ueberf) {
+      const n = Math.round((ausIso(this._tag) - ausIso(a.datum)) / 864e5);
+      meta.push(`<span class="chip rot">${n <= 1 ? "seit gestern" : `seit ${n} Tagen`}</span>`);
+    } else if (a.datum && this._ansicht !== "heute") meta.push(`<span class="chip ${a.datum < this._tag ? "warn" : ""}">${esc(datumText(a.datum))}</span>`);
     if (wiederErledigt) meta.push(`<span class="chip mint">nächstes Mal ${esc(datumText(a.datum))}</span>`);
     if (a.uhrzeit) meta.push(`<span class="chip">${esc(a.uhrzeit)} Uhr</span>`);
     const farbe = bereichFarbe(a.bereich, this._daten.farben);
@@ -3316,7 +3301,7 @@ class PlanerPanel extends HTMLElement {
     const morgen = fertig || this._narrow ? "" : `<button type="button" class="knopf klein" data-aktion="morgen" data-id="${a.id}" data-fokus="m-${a.id}" aria-label="${esc(a.titel)} auf morgen verschieben">Morgen</button>`;
     const mehr = `<button type="button" class="mehr-knopf" data-zmenue="${a.id}" data-fokus="zm-${a.id}" aria-haspopup="menu" aria-expanded="false" aria-label="Aktionen für ${esc(a.titel)}" title="Aktionen (Rechtsklick, lange drücken)">${ICON.mehr}</button>`;
     const wer = this._werZeigen(a.person);
-    return `<li class="aufgabe ${a.top && !fertig ? "top" : ""} ${fertig ? "erledigt" : ""} ${a.bereich ? "farbig" : ""}" data-id="${a.id}" ${a.bereich ? `style="--b:${farbe}"` : ""}>
+    return `<li class="aufgabe ${ueberf ? "ueberf" : ""} ${a.top && !fertig ? "top" : ""} ${fertig ? "erledigt" : ""} ${a.bereich ? "farbig" : ""}" data-id="${a.id}" ${a.bereich ? `style="--b:${farbe}"` : ""}>
       <div class="wisch rechts" aria-hidden="true">${ICON.haken}Erledigt</div><div class="wisch links" aria-hidden="true">Verschieben${ICON.pfeil}</div>
       <div class="zeile">
         <button type="button" class="haken" role="checkbox" aria-checked="${fertig}" data-aktion="haken" data-id="${a.id}" data-fokus="h-${a.id}" aria-label="${esc(a.titel)} erledigt">${fertig ? HAKEN : ""}</button>
@@ -3520,7 +3505,6 @@ class PlanerPanel extends HTMLElement {
       return;
     }
     if (art === "suche") return this._suche();
-    if (art === "alle-heute") return this._alleAufHeute();
     if (art === "tags-einblenden") return this._ansichtSpeichern({ ausgeblendete_tags: [] });
     if (!a) return;
     if (art === "oeffnen") return this._oeffnen(a);
@@ -3654,18 +3638,6 @@ class PlanerPanel extends HTMLElement {
       } catch (e) { this._sTermine = []; }
       zeigen();
     }
-  }
-
-  async _alleAufHeute() {
-    const h = this._tag;
-    const ueber = this._sichtbar().filter((a) => a.status === "offen" && a.datum && a.datum < h);
-    if (!ueber.length) return;
-    const vorher = ueber.map((a) => ({ id: a.id, datum: a.datum, top: a.top || null }));
-    for (const a of ueber) await this._ws({ type: "planer/speichern", aufgabe: { id: a.id, datum: h, top: null } });
-    const text = `${ueber.length} ${ueber.length === 1 ? "Aufgabe" : "Aufgaben"} auf heute geschoben`;
-    this._sagen(text);
-    this._hinweis(text, async () => { for (const v of vorher) await this._ws({ type: "planer/speichern", aufgabe: v }); });
-    await this._lesen();
   }
 
   // Dialog mit Ausblend-Animation schließen
