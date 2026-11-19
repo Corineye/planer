@@ -3286,18 +3286,8 @@ class PlanerPanel extends HTMLElement {
     if (wiederErledigt) meta.push(`<span class="chip mint">nächstes Mal ${esc(datumText(a.datum))}</span>`);
     if (a.uhrzeit) meta.push(`<span class="chip">${esc(a.uhrzeit)} Uhr</span>`);
     const farbe = bereichFarbe(a.bereich, this._daten.farben);
-    if (!fertig && this._ansicht === "heute" && this._naechste === a.id) meta.unshift(`<span class="chip naechstes">Als Nächstes</span>`);
+    // Kompakt: nur Datum/Uhrzeit und Bereich; alles Weitere im Detail beim Antippen
     if (a.bereich) meta.push(`<span class="chip" style="--b:${farbe}"><span class="punkt" aria-hidden="true"></span> ${esc(a.bereich)}</span>`);
-    for (const t of a.tags || []) meta.push(`<span class="chip">#${esc(t)}</span>`);
-    const teile = a.teilaufgaben || [];
-    if (teile.length) {
-      const fertigT = teile.filter((t) => t.erledigt).length;
-      meta.push(`<span class="chip ${fertigT === teile.length ? "mint" : ""}">${ICON.teile}${fertigT}/${teile.length}<span class="sr"> Teilaufgaben erledigt</span></span>`);
-      const naechster = teile.find((t) => !t.erledigt);
-      if (naechster && !fertig) meta.push(`<span class="chip">Nächster Schritt: ${esc(naechster.text)}</span>`);
-    }
-    if (a.wiederholung) meta.push(`<span class="chip mint">${ICON.wdh}${esc(regelText(a.wiederholung))}</span>`);
-    if (a.verschoben > 0) meta.push(`<span class="chip warn">${a.verschoben}× verschoben</span>`);
     const morgen = fertig || this._narrow ? "" : `<button type="button" class="knopf klein" data-aktion="morgen" data-id="${a.id}" data-fokus="m-${a.id}" aria-label="${esc(a.titel)} auf morgen verschieben">Morgen</button>`;
     const mehr = `<button type="button" class="mehr-knopf" data-zmenue="${a.id}" data-fokus="zm-${a.id}" aria-haspopup="menu" aria-expanded="false" aria-label="Aktionen für ${esc(a.titel)}" title="Aktionen (Rechtsklick, lange drücken)">${ICON.mehr}</button>`;
     const wer = this._werZeigen(a.person);
