@@ -362,7 +362,10 @@ header nav.tabs button{padding:0 var(--s3)}
 @container (min-width:1120px){.tagraster{grid-template-columns:repeat(6,minmax(0,1fr))}.tagraster>.tkarte{grid-column:span 2}.tagraster>.tkarte:nth-child(-n+2 of .tkarte){grid-column:span 3}}
 .tagraster>.zu,.tagraster>.fehler{grid-column:1/-1}
 .tkarte{align-content:start}
-.tkarte h2{margin:0;padding:0 var(--s1);min-height:28px;display:flex;align-items:center}
+.tkarte h2{margin:0;padding:0 var(--s1);min-height:28px;display:flex;align-items:center;gap:var(--s2)}
+.tkarte h2 .wetter{margin-left:auto;display:inline-flex;align-items:baseline;gap:4px;font-size:var(--t-sub);font-weight:600;color:var(--fg);font-variant-numeric:tabular-nums}
+.tkarte h2 .wetter>span[aria-hidden]{font-size:1.2em;align-self:center}
+.tkarte h2 .wetter small{font-size:var(--t-fuss);font-weight:500;color:var(--muted)}
 .tkarte{padding:var(--s3);border-radius:20px;background:var(--fill);display:grid;gap:var(--s3);min-width:0}
 .tkarte h2{font-size:var(--t-kopf);color:var(--muted)}
 .tkarte.heute h2{color:var(--accent)}
@@ -755,8 +758,10 @@ dialog:not([open]){opacity:0;transform:translateY(12px) scale(.98)}
 .schmal dialog:not([open]){opacity:1;transform:translateY(100%)}
 dialog:not([open])::backdrop{background:rgba(0,0,0,0)}
 dialog.schliesst::backdrop{background:rgba(0,0,0,0)}
-main.einblenden{animation:einblenden .28s var(--bewegung)}
+main.einblenden{animation:einblenden .3s var(--bewegung)}
+@media (prefers-reduced-motion:reduce){main.einblenden{animation:none}}
 @keyframes einblenden{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+li.aufgabe.klappt{transition:height .28s var(--bewegung),opacity .22s ease,margin .28s var(--bewegung);opacity:0;margin-block:0!important}
 li.aufgabe.abgehakt .zeile{animation:abhaken .35s var(--bewegung) forwards}
 .tag-aufgaben{list-style:none;margin:0;padding:var(--s1) var(--s3);border-radius:var(--r-karte);background:var(--card);display:grid}
 .tag-aufgaben li{display:flex;align-items:center;gap:var(--s1);min-height:44px;border-left:3px solid var(--k);padding-left:var(--s1)}
@@ -875,11 +880,13 @@ dialog:not(.pop) form>.feld input:focus,dialog:not(.pop) form>.reihe .feld input
 .wcal.drei .block span{font-size:var(--t-tab)}
 .wcal.drei .wkh b{font-size:var(--t-kopf)}
 .wcal.drei .wc.s .nm{display:inline}
+.monat.rein-r{animation:w-rein-r .28s var(--bewegung)}
+.monat.rein-l{animation:w-rein-l .28s var(--bewegung)}
 .wcal.rein-r .wkoerper,.wcal.rein-r .wsticky{animation:w-rein-r .28s var(--bewegung)}
 .wcal.rein-l .wkoerper,.wcal.rein-l .wsticky{animation:w-rein-l .28s var(--bewegung)}
 @keyframes w-rein-r{from{transform:translateX(40px);opacity:.3}}
 @keyframes w-rein-l{from{transform:translateX(-40px);opacity:.3}}
-@media (prefers-reduced-motion:reduce){.wcal.rein-r .wkoerper,.wcal.rein-l .wkoerper,.wcal.rein-r .wsticky,.wcal.rein-l .wsticky{animation:none}}
+@media (prefers-reduced-motion:reduce){.monat.rein-r,.monat.rein-l,.wcal.rein-r .wkoerper,.wcal.rein-l .wkoerper,.wcal.rein-r .wsticky,.wcal.rein-l .wsticky{animation:none}}
 .wleiste{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:0 0 var(--s2)}
 .wleiste button{display:grid;justify-items:center;gap:2px;min-height:48px;padding:4px 0;border:0;border-radius:12px;background:transparent;color:var(--fg);font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .wleiste button small{font-size:10px;font-weight:600;color:var(--muted)}
@@ -1414,6 +1421,7 @@ class PlanerPanel extends HTMLElement {
     this._gestartet = true;
     await this._lesen();
     this._termineLaden();
+    this._wetterStart();
     try {
       this._abo = this._hass.connection.subscribeMessage(() => {
         clearTimeout(this._neuTimer);
@@ -1563,8 +1571,8 @@ class PlanerPanel extends HTMLElement {
         ${tabs.map(([k, t]) => `<button type="button" data-ansicht="${k}" data-fokus="t-${k}" ${this._ansicht === k ? 'aria-current="page"' : ""}>${(k === "eingang" ? ICON.aufgaben : ICON[k]) || ""}<span>${t}</span><span class="zahl ${!zaehler[k] ? "null" : ""}" aria-label="${zaehler[k]} ${k === "notizen" ? (zaehler[k] === 1 ? "Notiz" : "Notizen") : "offen"}">${zaehler[k]}</span></button>`).join("")}
       </nav>`;
     this._gerust(schmal);
-    const neueAnsicht = this._zuletzt !== this._ansicht;
-    this._zuletzt = this._ansicht;
+    const neueAnsicht = this._zuletzt !== this._ansicht || (this._ansicht === "woche" && this._zuletztKal !== this._kalAnsicht);
+    this._zuletzt = this._ansicht; this._zuletztKal = this._kalAnsicht;
     this._app.innerHTML = `
     <div class="kompakt-kopf" aria-hidden="true">${esc(tabName)}</div>
     <div class="wrap">
@@ -2195,7 +2203,7 @@ class PlanerPanel extends HTMLElement {
       const id = `g-${tag}`;
       const chips = schs.length ? `<div class="schicht-chips">${schs.map(({ a: sc, wer }) => `<span class="schicht-chip" style="--k:${sc.farbe}"><b>${esc(sc.kurz || sc.name)}</b> ${esc(sc.name)}${sc.von && sc.bis ? ` <span class="sz">${esc(sc.von)}–${esc(sc.bis)}</span>` : ""}${wer ? ` <span class="sw">${esc(wer)}</span>` : ""}</span>`).join("")}</div>` : "";
       return `<section class="gruppe tkarte ${heute ? "heute" : ""}" aria-labelledby="${id}">
-        <h2 id="${id}">${esc(name)}, ${esc((() => { const d = ausIso(tag); const m = MONATE[d.getMonth()]; return `${d.getDate()}. ${m.length > 4 ? m.slice(0, 3) + "." : m}`; })())}</h2>
+        <h2 id="${id}">${esc(name)}, ${esc((() => { const d = ausIso(tag); const m = MONATE[d.getMonth()]; return `${d.getDate()}. ${m.length > 4 ? m.slice(0, 3) + "." : m}`; })())}${this._wetterHtml(tag)}</h2>
         ${chips}
         ${ganz.length ? `<ul class="termine ganztag" aria-label="Ganztägig">${ganz.map((t) => this._terminZeile(t, tag)).join("")}</ul>` : ""}
         ${items.length ? `<ul class="liste" aria-label="Einträge">${items.join("")}</ul>` : heute ? `<p class="leer">Für heute ist nichts offen.</p>` : ""}
@@ -2876,7 +2884,7 @@ class PlanerPanel extends HTMLElement {
     return `<section class="gruppe" aria-labelledby="m-titel">
       ${this._narrow ? this._kalenderUmschalter() : ""}
       <div class="wkopf"><h2 id="m-titel">${MONATE[dieserMonat]} ${dieserJahr}</h2>${this._narrow ? "" : this._kalenderUmschalter(true)}${this._kalNavi("monat", "Heute", dieserMonat === new Date().getMonth() && dieserJahr === new Date().getFullYear(), "Monat wechseln")}</div>
-      <div class="woche-wrap"><div class="monat" role="grid" aria-labelledby="m-titel" style="--zeilen:${zeilen / 7}">
+      <div class="woche-wrap"><div class="monat ${this._mRichtung > 0 ? "rein-r" : this._mRichtung < 0 ? "rein-l" : ""}" role="grid" aria-labelledby="m-titel" style="--zeilen:${zeilen / 7}">
         ${["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((n) => `<div class="mkopf" role="columnheader">${n}</div>`).join("")}
         ${tage.slice(0, zeilen).map((t) => {
           const d = ausIso(t);
@@ -3406,6 +3414,42 @@ class PlanerPanel extends HTMLElement {
     this._sagen(`${datumText(iso(st))} bis ${datumText(iso(plusTage(st, 6)))}`);
   }
 
+  // ---------- Wetter (Tagesvorhersage aus der HA-Wetter-Entität) ----------
+  _wetterEntitaet() {
+    const st = this._hass?.states || {};
+    const wahl = this._konf?.wetter;
+    if (wahl && st[wahl]) return wahl;
+    if (st["weather.forecast_home"]) return "weather.forecast_home";
+    return Object.keys(st).find((k) => k.startsWith("weather.")) || null;
+  }
+  _wetterStart() {
+    const id = this._wetterEntitaet();
+    if (!id || this._wetterAbo?.id === id) return;
+    this._wetterAbo?.ab?.then?.((f) => f()).catch?.(() => {});
+    const abo = { id, ab: null };
+    this._wetterAbo = abo;
+    try {
+      abo.ab = this._hass.connection.subscribeMessage((m) => {
+        const neu = {};
+        for (const f of m?.forecast || []) {
+          const d = new Date(f.datetime);
+          neu[iso(d)] = { z: f.condition, hoch: f.temperature, tief: f.templow };
+        }
+        this._wetter = neu;
+        if (this._ansicht === "heute") this._zeichnen();
+      }, { type: "weather/subscribe_forecast", entity_id: id, forecast_type: "daily" });
+      abo.ab.catch?.(() => { this._wetterAbo = { id, ab: null }; });
+    } catch (e) { /* ohne Wetter weiter */ }
+  }
+  _wetterHtml(tag) {
+    const w = (this._wetter || {})[tag];
+    if (!w) return "";
+    const S = { "clear-night": "🌙", cloudy: "☁️", exceptional: "⚠️", fog: "🌫️", hail: "🌨️", lightning: "🌩️", "lightning-rainy": "⛈️", partlycloudy: "⛅", pouring: "🌧️", rainy: "🌦️", snowy: "❄️", "snowy-rainy": "🌨️", sunny: "☀️", windy: "💨", "windy-variant": "💨" };
+    const T = { "clear-night": "klar", cloudy: "bewölkt", fog: "Nebel", hail: "Hagel", lightning: "Gewitter", "lightning-rainy": "Gewitter mit Regen", partlycloudy: "teils bewölkt", pouring: "starker Regen", rainy: "Regen", snowy: "Schnee", "snowy-rainy": "Schneeregen", sunny: "sonnig", windy: "windig", "windy-variant": "windig" };
+    const r = (x) => (x == null ? "" : `${Math.round(x)}°`);
+    return `<span class="wetter" title="${esc(T[w.z] || w.z || "")}"><span aria-hidden="true">${S[w.z] || "🌡️"}</span><b>${r(w.hoch)}</b>${w.tief != null ? `<small>${r(w.tief)}</small>` : ""}<span class="sr">${esc(`${T[w.z] || ""}, bis ${r(w.hoch)}${w.tief != null ? `, nachts ${r(w.tief)}` : ""}`)}</span></span>`;
+  }
+
   async _wocheTermineLaden(start) {
     const key = iso(start);
     if (this._wLaedt === key) return;
@@ -3527,7 +3571,9 @@ class PlanerPanel extends HTMLElement {
       const jetzt = new Date();
       const e = this._mStart || new Date(jetzt.getFullYear(), jetzt.getMonth(), 1);
       this._mStart = n === 0 ? new Date(jetzt.getFullYear(), jetzt.getMonth(), 1) : new Date(e.getFullYear(), e.getMonth() + n, 1);
+      this._mRichtung = n === 0 ? (e > this._mStart ? -1 : e < this._mStart ? 1 : 0) : n;
       this._zeichnen();
+      this._mRichtung = 0;
       this._sagen(`${MONATE[this._mStart.getMonth()]} ${this._mStart.getFullYear()}`);
     }));
     this._app.querySelectorAll("[data-mtag]").forEach((b) => b.addEventListener("click", () => this._tagZeigen(b.dataset.mtag)));
@@ -3711,8 +3757,11 @@ class PlanerPanel extends HTMLElement {
       const jetztErledigt = !(a.status === "erledigt" || (a.wiederholung && (a.verlauf || []).includes(this._tag) && a.datum > this._tag));
       if (!jetztErledigt && a.wiederholung) { this._sagen("Wiederkehrende Aufgabe ist schon auf den nächsten Termin gesetzt."); return; }
       const vorher = { datum: a.datum || null, top: a.top || null };
-      this._abhakAnimation(a.id);
-      const neu = await this._ws({ type: "planer/erledigen", aufgabe_id: a.id, erledigt: jetztErledigt });
+      const li = this._abhakAnimation(a.id);
+      const [neu] = await Promise.all([
+        this._ws({ type: "planer/erledigen", aufgabe_id: a.id, erledigt: jetztErledigt }),
+        jetztErledigt ? new Promise((ok) => setTimeout(ok, 380)).then(() => this._zuklappen(li)) : null,
+      ]);
       const text = jetztErledigt
         ? (neu.status === "offen" && neu.wiederholung ? `Erledigt: ${a.titel}. Nächstes Mal ${datumText(neu.datum)}.` : `Erledigt: ${a.titel}`)
         : `Wieder offen: ${a.titel}`;
@@ -3851,6 +3900,19 @@ class PlanerPanel extends HTMLElement {
   _abhakAnimation(id) {
     const li = this._app?.querySelector(`li.aufgabe[data-id="${CSS_escape(id)}"]`);
     li?.classList.add("abgehakt");
+    return li;
+  }
+  // Zeile weich zuklappen (Höhe → 0), die anderen rücken nach; danach neu zeichnen
+  _zuklappen(li) {
+    if (!li || !li.isConnected || matchMedia("(prefers-reduced-motion: reduce)").matches) return Promise.resolve();
+    return new Promise((fertig) => {
+      li.style.height = `${li.offsetHeight}px`;
+      li.style.overflow = "hidden";
+      li.getBoundingClientRect();
+      li.classList.add("klappt");
+      li.style.height = "0px";
+      setTimeout(fertig, 300);
+    });
   }
 
   _wischen(li) {
